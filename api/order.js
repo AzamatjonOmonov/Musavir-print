@@ -24,14 +24,15 @@ module.exports = async (req, res) => {
     return res.status(400).json({ ok: false, error: "Rasm sonini kiriting" });
   }
   const address = String(b.address || '').trim().slice(0, 300);
-  if (address.length < 3) {
-    return res.status(400).json({ ok: false, error: "Manzilni kiriting" });
-  }
-
   const lat = Number(b.lat);
   const lon = Number(b.lon);
-  const hasLoc = Number.isFinite(lat) && Number.isFinite(lon) &&
+  const hasLoc = b.lat != null && b.lon != null &&
+    Number.isFinite(lat) && Number.isFinite(lon) &&
     Math.abs(lat) <= 90 && Math.abs(lon) <= 180 && !(lat === 0 && lon === 0);
+  // Manzil YOKI lokatsiya — bittasi yetarli
+  if (address.length < 3 && !hasLoc) {
+    return res.status(400).json({ ok: false, error: "Manzilni yozing yoki lokatsiya tugmasini bosing" });
+  }
 
   const price = unitPrice(qty);
   const total = qty * price;
@@ -46,8 +47,8 @@ module.exports = async (req, res) => {
     free
       ? '🚚 Yetkazish: <b>bepul</b>'
       : `🚚 Yetkazish: pullik (bepul bo'lishi uchun yana ${FREE_DELIVERY_FROM - qty} ta kerak edi)`,
-    `🏠 Manzil: ${esc(address)}`,
   ];
+  if (address.length >= 3) lines.push(`🏠 Manzil: ${esc(address)}`);
   if (hasLoc) {
     lines.push(`📍 <a href="https://maps.google.com/?q=${lat},${lon}">Xaritada ochish</a>`);
   }
