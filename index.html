@@ -116,9 +116,16 @@
                     <div class="text-2xl opacity-90 mt-1 font-bold">so'm</div>
                 </div>
 
-                <!-- Free Delivery Badge -->
-                <div id="delivery-badge-container" class="mt-auto h-[48px] flex items-end justify-center overflow-hidden">
-                    <div id="delivery-badge" class="w-full bg-nokia-dark text-nokia-green px-2 py-2 text-base md:text-lg text-center transform transition-all duration-300 translate-y-full opacity-0 rounded font-bold leading-tight">
+                <!-- Free Delivery: progress / badge -->
+                <div class="mt-auto relative h-[56px]">
+                    <div id="delivery-progress" class="absolute inset-0 flex flex-col justify-end transition-all duration-300 opacity-0 translate-y-2">
+                        <div class="flex justify-between items-end text-lg md:text-xl font-bold leading-none mb-1 uppercase tracking-wide">
+                            <span>Yana <span id="left-count">0</span> ta</span>
+                            <span>bepul 🚚</span>
+                        </div>
+                        <div id="progress-cells" class="grid grid-cols-12 gap-[3px] border-2 border-nokia-dark p-[3px] rounded-sm"></div>
+                    </div>
+                    <div id="delivery-badge" class="absolute inset-x-0 bottom-0 bg-nokia-dark text-nokia-green px-2 py-2 text-base md:text-lg text-center transition-all duration-300 translate-y-2 opacity-0 rounded font-bold leading-tight">
                         Tabriklaymiz! Yetkazib berish bepul 🚚
                     </div>
                 </div>
@@ -130,7 +137,7 @@
             
             <!-- Quantity Input -->
             <div>
-                <label class="block text-sm font-bold text-calc-dark mb-1 ml-2 uppercase tracking-wider">Nechta rasm? (10x15)</label>
+                <label class="block text-sm font-bold text-calc-dark mb-1 ml-2 uppercase tracking-wider">Nechta rasm?</label>
                 <input type="number" id="qty-input" min="0" max="10000" placeholder="0" 
                     class="tactile-input w-full rounded-xl py-3 px-4 text-2xl font-bold text-center text-musavvir-pink placeholder-gray-400" />
             </div>
@@ -140,25 +147,11 @@
                 Buyurtma berish
             </button>
 
-            <!-- Price list -->
-            <div class="pt-2">
-                <div class="text-sm font-bold uppercase tracking-wider ml-2 mb-2">10x15 narxlari (1 dona)</div>
-                <ul id="price-list" class="bg-white/60 rounded-xl border-2 border-calc-gray divide-y divide-calc-gray/40 text-base font-bold">
-                    <li data-min="1"   class="flex justify-between px-4 py-2"><span>1–49 ta</span><span>5 000 so'm</span></li>
-                    <li data-min="50"  class="flex justify-between px-4 py-2"><span>50–99 ta</span><span>2 000 so'm</span></li>
-                    <li data-min="100" class="flex justify-between px-4 py-2"><span>100–200 ta</span><span>1 800 so'm</span></li>
-                    <li data-min="201" class="flex justify-between px-4 py-2"><span>201–300 ta</span><span>1 700 so'm</span></li>
-                    <li data-min="301" class="flex justify-between px-4 py-2"><span>301–500 ta</span><span>1 600 so'm</span></li>
-                    <li data-min="501" class="flex justify-between px-4 py-2"><span>501 tadan ko'p</span><span>1 500 so'm</span></li>
-                </ul>
-                <p class="text-sm text-center mt-2 font-bold">🚚 300 tadan boshlab yetkazib berish bepul</p>
-            </div>
-
             <!-- Other formats -->
-            <div class="rounded-xl border-2 border-dashed border-musavvir-pink p-4 text-center">
-                <p class="text-sm font-bold leading-snug">Polaroid, A5, A4, A3 va boshqa formatlar buyurtma asosida tayyorlanadi.</p>
-                <a href="https://t.me/AzizaxonOmonova" target="_blank" rel="noopener" class="inline-block mt-2 text-musavvir-pink font-bold underline underline-offset-4">Adminga yozing →</a>
-            </div>
+            <p class="text-center text-sm font-bold text-calc-dark/70 leading-snug">
+                Polaroid, A5, A4, A3 — buyurtma asosida.
+                <a href="https://t.me/AzizaxonOmonova" target="_blank" rel="noopener" class="text-musavvir-pink underline underline-offset-4">Adminga yozing</a>
+            </p>
         </div>
     </div>
 
@@ -167,7 +160,6 @@
         const displayUnitPrice = document.getElementById('display-unit-price');
         const displayPrice = document.getElementById('display-price');
         const deliveryBadge = document.getElementById('delivery-badge');
-        const priceRows = document.querySelectorAll('#price-list li');
 
         const formatter = new Intl.NumberFormat('ru-RU');
         const FREE_DELIVERY_FROM = 300;
@@ -184,19 +176,22 @@
             return 1500;
         }
 
-        function showBadge(text, celebrate) {
-            deliveryBadge.textContent = text;
-            deliveryBadge.classList.remove('translate-y-full', 'opacity-0');
-            deliveryBadge.classList.add('translate-y-0', 'opacity-100');
-            deliveryBadge.classList.toggle('bg-nokia-dark', celebrate);
-            deliveryBadge.classList.toggle('text-nokia-green', celebrate);
-            deliveryBadge.classList.toggle('bg-transparent', !celebrate);
-            deliveryBadge.classList.toggle('text-nokia-dark', !celebrate);
+        const progress = document.getElementById('delivery-progress');
+        const leftCount = document.getElementById('left-count');
+        const cellsBox = document.getElementById('progress-cells');
+        const CELLS = 12;
+        for (let i = 0; i < CELLS; i++) {
+            const c = document.createElement('div');
+            c.className = 'h-[10px] rounded-[1px] transition-colors duration-200';
+            cellsBox.appendChild(c);
         }
+        const cells = cellsBox.children;
 
-        function hideBadge() {
-            deliveryBadge.classList.add('translate-y-full', 'opacity-0');
-            deliveryBadge.classList.remove('translate-y-0', 'opacity-100');
+        function show(el, on) {
+            el.classList.toggle('opacity-0', !on);
+            el.classList.toggle('translate-y-2', !on);
+            el.classList.toggle('opacity-100', on);
+            el.classList.toggle('translate-y-0', on);
         }
 
         function calculate() {
@@ -207,17 +202,9 @@
             displayUnitPrice.textContent = formatter.format(price);
             displayPrice.textContent = formatter.format(qty * price);
 
-            // Jadvalda joriy narx qatorini belgilash
-            let active = null;
-            priceRows.forEach(row => { if (qty >= +row.dataset.min) active = row; });
-            priceRows.forEach(row => {
-                const on = row === active;
-                row.classList.toggle('bg-musavvir-pink', on);
-                row.classList.toggle('text-white', on);
-            });
-
             if (qty >= FREE_DELIVERY_FROM) {
-                showBadge('Tabriklaymiz! Yetkazib berish bepul 🚚', true);
+                show(progress, false);
+                show(deliveryBadge, true);
                 if (!hasFiredConfetti) {
                     confetti({
                         particleCount: 150,
@@ -230,10 +217,13 @@
                 }
             } else {
                 hasFiredConfetti = false;
-                if (qty > 0) {
-                    showBadge('Yana ' + (FREE_DELIVERY_FROM - qty) + ' ta — yetkazish bepul!', false);
-                } else {
-                    hideBadge();
+                show(deliveryBadge, false);
+                show(progress, qty > 0);
+                leftCount.textContent = FREE_DELIVERY_FROM - qty;
+                const filled = Math.floor(qty / FREE_DELIVERY_FROM * CELLS);
+                for (let i = 0; i < CELLS; i++) {
+                    cells[i].classList.toggle('bg-nokia-dark', i < filled);
+                    cells[i].classList.toggle('bg-nokia-dark/15', i >= filled);
                 }
             }
         }
