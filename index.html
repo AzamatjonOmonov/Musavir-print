@@ -168,7 +168,9 @@
         // 10x15 narxlari (1 dona)
         function unitPrice(qty) {
             if (qty <= 0)   return 0;
-            if (qty < 50)   return 5000;
+            if (qty <= 20)  return 5000;
+            if (qty <= 40)  return 4000;
+            if (qty < 50)   return 3000;
             if (qty < 100)  return 2000;
             if (qty <= 200) return 1800;
             if (qty <= 300) return 1700;
