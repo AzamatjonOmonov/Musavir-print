@@ -54,11 +54,9 @@
             var raw = new URLSearchParams(location.search).get('from') || 'link';
             var from = /^[a-z0-9_-]{1,32}$/i.test(raw) ? raw.toLowerCase() : 'link';
             var web = 'https://t.me/' + BOT + '?start=' + from;
-            var app = 'tg://resolve?domain=' + BOT + '&start=' + from;
             document.getElementById('open').href = web;
-            // Avval ilovani to'g'ridan-to'g'ri ochishga urinamiz, bo'lmasa t.me sahifasiga
-            location.href = app;
-            setTimeout(function () { location.replace(web); }, 1200);
+            // t.me o'zi telefonda Telegram ilovasini ochadi
+            setTimeout(function () { location.replace(web); }, 700);
         })();
     </script>
 </body>
