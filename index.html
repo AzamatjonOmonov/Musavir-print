@@ -149,14 +149,18 @@
             <div id="address-block" class="hidden">
                 <label for="address-input" class="block text-sm font-bold text-calc-dark mb-1 ml-2 uppercase tracking-wider">Manzil</label>
                 <div class="flex gap-3">
-                    <textarea id="address-input" rows="2" maxlength="300" placeholder="Viloyat, tuman, ko'cha, uy"
+                    <textarea id="address-input" rows="2" maxlength="300" placeholder="Viloyat, tuman (masalan: Farg'ona, Marg'ilon)"
                         class="tactile-input flex-1 min-w-0 rounded-xl py-3 px-4 text-base font-bold bg-white text-calc-dark placeholder-gray-400 resize-none leading-snug"></textarea>
                     <button type="button" id="loc-btn" onclick="requestLocation()" aria-label="Joylashuvni yuborish"
-                        class="tactile-input shrink-0 w-[64px] rounded-xl bg-white flex flex-col items-center justify-center gap-0.5 text-2xl leading-none">
-                        <span id="loc-icon">📍</span>
+                        class="tactile-input shrink-0 w-[64px] rounded-xl bg-white flex flex-col items-center justify-center gap-1 leading-none">
+                        <span id="loc-icon" class="text-musavvir-pink transition-transform"><svg viewBox="0 0 24 24" class="w-7 h-7" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg></span>
                         <span id="loc-label" class="text-[10px] font-bold uppercase tracking-wider text-calc-gray">Lokatsiya</span>
                     </button>
                 </div>
+                <p class="flex items-center gap-1 mt-2 ml-2 text-xs font-bold text-calc-dark/70 leading-snug">
+                    <svg viewBox="0 0 24 24" class="w-4 h-4 shrink-0 text-musavvir-pink" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+                    Lokatsiya tugmasini bosing — joylashuvingiz avtomatik yuboriladi
+                </p>
             </div>
 
             <!-- Interactive Element -->
@@ -167,7 +171,7 @@
 
             <!-- Other formats -->
             <p class="text-center text-sm font-bold text-calc-dark/70 leading-snug">
-                Polaroid, A5, A4, A3 — buyurtma asosida.
+                Polaroid, A5, A4, A3 va albomlar — buyurtma asosida.
                 <a href="https://t.me/AzizaxonOmonova" target="_blank" rel="noopener" class="text-musavvir-pink underline underline-offset-4">Adminga yozing</a>
             </p>
         </div>
@@ -262,6 +266,7 @@
         const orderStatus = document.getElementById('order-status');
         const locIcon = document.getElementById('loc-icon');
         const locLabel = document.getElementById('loc-label');
+        const locBtn = document.getElementById('loc-btn');
         let coords = null;
 
         if (inTelegram) {
@@ -288,14 +293,15 @@
 
         function setLocation(lat, lon) {
             coords = { lat, lon };
-            locIcon.textContent = '✅';
+            locIcon.classList.remove('animate-pulse');
             locLabel.textContent = 'Qo\'shildi';
             locLabel.classList.add('text-musavvir-pink');
+            locBtn.classList.add('border-musavvir-pink');
             setStatus('');
         }
 
         function locationFailed() {
-            locIcon.textContent = '📍';
+            locIcon.classList.remove('animate-pulse');
             locLabel.textContent = 'Lokatsiya';
             setStatus("Joylashuvni olib bo'lmadi. Manzilni yozib qoldiring — shu yetarli.", true);
         }
@@ -310,7 +316,8 @@
         }
 
         function requestLocation() {
-            locIcon.textContent = '⏳';
+            locIcon.classList.add('animate-pulse');
+            locLabel.textContent = 'Kuting…';
             const lm = inTelegram && tgApp.LocationManager;
             if (lm && tgApp.isVersionAtLeast && tgApp.isVersionAtLeast('8.0')) {
                 lm.init(() => {
@@ -387,8 +394,16 @@
                 if (!r.ok || !data.ok) throw new Error(data.error || "Xatolik yuz berdi");
                 haptic('success');
                 orderBtn.textContent = 'Qabul qilindi ✓';
-                setStatus('Buyurtmangiz qabul qilindi! Endi rasmlaringizni adminga yuboring.');
-                setTimeout(() => openAdminChat(qty), 600);
+                const doneText = 'Buyurtmangiz qabul qilindi! Tez orada siz bilan bog\'lanamiz.';
+                setStatus(doneText);
+                try {
+                    tgApp.showPopup(
+                        { title: 'Rahmat! ✅', message: doneText, buttons: [{ type: 'ok' }] },
+                        () => openAdminChat(qty)
+                    );
+                } catch (e) {
+                    setTimeout(() => openAdminChat(qty), 1800);
+                }
             } catch (e) {
                 haptic('error');
                 orderBtn.disabled = false;
