@@ -263,6 +263,7 @@
         const urlParams = new URLSearchParams(location.search);
         const phone = urlParams.get('p') || '';
         const phoneSig = urlParams.get('s') || '';
+        const src = urlParams.get('src') || '';
 
         const addressBlock = document.getElementById('address-block');
         const addressInput = document.getElementById('address-input');
@@ -394,7 +395,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         initData: tgApp.initData,
-                        phone, sig: phoneSig, qty, address,
+                        phone, sig: phoneSig, qty, address, src,
                         lat: coords && coords.lat, lon: coords && coords.lon
                     })
                 });

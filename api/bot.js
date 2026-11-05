@@ -1,5 +1,7 @@
 // Telegram webhook: /start → raqam so'rash → Mini App tugmasi
-const { TOKEN, ADMIN_CHAT_ID, SITE_URL, tg, webhookSecret, signPhone, safeEqual } = require('./_lib');
+const {
+  TOKEN, ADMIN_CHAT_ID, SITE_URL, tg, webhookSecret, signPhone, safeEqual, cleanSrc,
+} = require('./_lib');
 
 const ASK_PHONE_TEXT =
   "Assalomu alaykum! Musavvir Print botiga xush kelibsiz 📸\n\n" +
@@ -14,9 +16,29 @@ function phoneKeyboard() {
   };
 }
 
-function appButton(uid, phone) {
-  const url = `${SITE_URL}/?p=${encodeURIComponent(phone)}&s=${signPhone(uid, phone)}`;
+function appUrl(uid, phone, src) {
+  let url = `${SITE_URL}/?p=${encodeURIComponent(phone)}&s=${signPhone(uid, phone)}`;
+  if (src) url += `&src=${src}`;
+  return url;
+}
+
+function appButton(url) {
   return { inline_keyboard: [[{ text: "🖼 Buyurtma berish", web_app: { url } }]] };
+}
+
+// Manbani mijozning bot menyusi tugmasida saqlaymiz (ma'lumotlar bazasisiz)
+async function setMenu(uid, url) {
+  await tg('setChatMenuButton', {
+    chat_id: uid,
+    menu_button: { type: 'web_app', text: 'Buyurtma', web_app: { url } },
+  });
+}
+
+async function readSrc(uid) {
+  const r = await tg('getChatMenuButton', { chat_id: uid });
+  const url = r.result && r.result.web_app && r.result.web_app.url;
+  if (!url) return '';
+  try { return cleanSrc(new URL(url).searchParams.get('src')); } catch { return ''; }
 }
 
 module.exports = async (req, res) => {
@@ -59,6 +81,9 @@ module.exports = async (req, res) => {
       let phone = String(msg.contact.phone_number).replace(/[^\d+]/g, '');
       if (!phone.startsWith('+')) phone = '+' + phone;
 
+      const src = await readSrc(uid);
+      const url = appUrl(uid, phone, src);
+      await setMenu(uid, url);
       await tg('sendMessage', {
         chat_id: uid,
         text: "Rahmat! ✅",
@@ -69,10 +94,15 @@ module.exports = async (req, res) => {
         text:
           "Endi pastdagi tugmani bosing, rasm sonini va manzilingizni yozing. " +
           "Narx darhol hisoblanadi 👇",
-        reply_markup: appButton(uid, phone),
+        reply_markup: appButton(url),
       });
       return res.status(200).send('ok');
     }
+
+    // /start reklama → manbani eslab qolamiz
+    const m = /^\/start(?:@\w+)?\s+(\S+)/.exec(msg.text || '');
+    const src = m ? cleanSrc(m[1]) : '';
+    if (src) await setMenu(uid, `${SITE_URL}/?src=${src}`);
 
     // /start yoki boshqa har qanday xabar — raqam so'raymiz
     await tg('sendMessage', {

@@ -72,10 +72,24 @@ function verifyInitData(initData, maxAgeSec = 24 * 3600) {
   }
 }
 
+// Mijoz qayerdan kelgani (reklama, instagram, ...)
+function cleanSrc(v) {
+  const x = String(v || '').toLowerCase();
+  return /^[a-z0-9_-]{1,32}$/.test(x) ? x : '';
+}
+const SRC_LABELS = {
+  reklama: 'Instagram reklama',
+  instagram: 'Instagram profil',
+  sayt: 'Sayt',
+  link: 'Havola',
+};
+const srcLabel = (src) => SRC_LABELS[src] || src;
+
 const esc = (s) =>
   String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
 module.exports = {
   TOKEN, ADMIN_CHAT_ID, SITE_URL, ADMIN_USERNAME, FREE_DELIVERY_FROM,
   unitPrice, fmt, tg, webhookSecret, signPhone, safeEqual, verifyInitData, esc,
+  cleanSrc, srcLabel,
 };

@@ -1,7 +1,7 @@
 // Mini App'dan kelgan buyurtmani tekshirib, yopiq guruhga yuboradi
 const {
   TOKEN, ADMIN_CHAT_ID, FREE_DELIVERY_FROM,
-  unitPrice, fmt, tg, signPhone, safeEqual, verifyInitData, esc,
+  unitPrice, fmt, tg, signPhone, safeEqual, verifyInitData, esc, cleanSrc, srcLabel,
 } = require('./_lib');
 
 module.exports = async (req, res) => {
@@ -49,6 +49,8 @@ module.exports = async (req, res) => {
       : `🚚 Yetkazish: pullik (bepul bo'lishi uchun yana ${FREE_DELIVERY_FROM - qty} ta kerak edi)`,
   ];
   if (address.length >= 3) lines.push(`🏠 Manzil: ${esc(address)}`);
+  const src = cleanSrc(b.src);
+  lines.push(`📣 Manba: ${src ? esc(srcLabel(src)) : "Bot (to'g'ridan-to'g'ri)"}`);
   if (hasLoc) {
     lines.push(`📍 <a href="https://maps.google.com/?q=${lat},${lon}">Xaritada ochish</a>`);
   }
