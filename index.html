@@ -168,6 +168,10 @@
                 Buyurtma berish
             </button>
             <p id="order-status" class="hidden text-center text-sm font-bold leading-snug"></p>
+            <button id="admin-btn" type="button"
+                class="hidden w-full rounded-xl py-3 text-base font-bold uppercase tracking-widest border-2 border-musavvir-pink text-musavvir-pink bg-white/60">
+                Adminga yozish
+            </button>
 
             <!-- Other formats -->
             <p class="text-center text-sm font-bold text-calc-dark/70 leading-snug">
@@ -264,6 +268,7 @@
         const addressInput = document.getElementById('address-input');
         const orderBtn = document.getElementById('order-btn');
         const orderStatus = document.getElementById('order-status');
+        const adminBtn = document.getElementById('admin-btn');
         const locIcon = document.getElementById('loc-icon');
         const locLabel = document.getElementById('loc-label');
         const locBtn = document.getElementById('loc-btn');
@@ -341,8 +346,7 @@
         }
 
         function customerText(qty) {
-            return 'Assalomu alaykum! Esdalik rasmlarimizni chiqarmoqchi edim. ' +
-                qty + ' ta rasmim bor, narxi bilan tanishdim. Tez orada rasmlarimni yuboraman.';
+            return 'Assalomu alaykum! Men ' + qty + ' ta rasmga buyurtma berdim.';
         }
 
         function openAdminChat(qty) {
@@ -399,14 +403,19 @@
                 orderBtn.textContent = 'Qabul qilindi ✓';
                 const doneText = 'Buyurtmangiz qabul qilindi! Tez orada siz bilan bog\'lanamiz.';
                 setStatus(doneText);
+                // Ixtiyoriy: adminga yozish tugmasi sahifada ham qoladi
+                adminBtn.onclick = () => openAdminChat(qty);
+                adminBtn.classList.remove('hidden');
                 try {
-                    tgApp.showPopup(
-                        { title: 'Rahmat! ✅', message: doneText, buttons: [{ type: 'ok' }] },
-                        () => openAdminChat(qty)
-                    );
-                } catch (e) {
-                    setTimeout(() => openAdminChat(qty), 1800);
-                }
+                    tgApp.showPopup({
+                        title: 'Rahmat! ✅',
+                        message: doneText,
+                        buttons: [
+                            { id: 'admin', type: 'default', text: 'Adminga yozish' },
+                            { id: 'close', type: 'close' }
+                        ]
+                    }, (id) => { if (id === 'admin') openAdminChat(qty); });
+                } catch (e) {}
             } catch (e) {
                 haptic('error');
                 orderBtn.disabled = false;
