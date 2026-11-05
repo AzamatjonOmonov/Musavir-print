@@ -52,18 +52,27 @@ module.exports = async (req, res) => {
     lines.push(`📍 <a href="https://maps.google.com/?q=${lat},${lon}">Xaritada ochish</a>`);
   }
 
-  const sent = await tg('sendMessage', {
+  const payload = {
     chat_id: ADMIN_CHAT_ID,
     text: lines.join('\n'),
     parse_mode: 'HTML',
     disable_web_page_preview: true,
-  });
+  };
+  let sent = await tg('sendMessage', payload);
+  // Guruh supergroup'ga aylangan bo'lsa — yangi ID ga qayta yuboramiz
+  let chatId = ADMIN_CHAT_ID;
+  const migrated = sent.parameters && sent.parameters.migrate_to_chat_id;
+  if (!sent.ok && migrated) {
+    chatId = migrated;
+    console.error('ADMIN_CHAT_ID eskirgan, yangisi:', migrated);
+    sent = await tg('sendMessage', { ...payload, chat_id: chatId });
+  }
   if (!sent.ok) {
     return res.status(502).json({ ok: false, error: "Xabar yuborilmadi, qaytadan urinib ko'ring" });
   }
   if (hasLoc) {
     await tg('sendLocation', {
-      chat_id: ADMIN_CHAT_ID,
+      chat_id: chatId,
       latitude: lat,
       longitude: lon,
       reply_to_message_id: sent.result.message_id,
