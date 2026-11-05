@@ -102,7 +102,7 @@
             <div class="relative z-20 flex flex-col h-full font-screen text-nokia-dark flex-grow">
                 <!-- Top Status bar -->
                 <div class="flex justify-between items-center text-xl mb-2 opacity-90 border-b-2 border-nokia-dark pb-1 font-bold tracking-widest uppercase">
-                    <span>FRMT: <span id="display-format">10X15</span></span>
+                    <span>10X15</span>
                     <span>DONASI: <span id="display-unit-price">0</span></span>
                 </div>
 
@@ -119,7 +119,7 @@
                 <!-- Free Delivery Badge -->
                 <div id="delivery-badge-container" class="mt-auto h-[48px] flex items-end justify-center overflow-hidden">
                     <div id="delivery-badge" class="w-full bg-nokia-dark text-nokia-green px-2 py-2 text-base md:text-lg text-center transform transition-all duration-300 translate-y-full opacity-0 rounded font-bold leading-tight">
-                        Siz uchun yetkazib berish bepul 🚚
+                        Tabriklaymiz! Yetkazib berish bepul 🚚
                     </div>
                 </div>
             </div>
@@ -128,26 +128,9 @@
         <!-- Controls -->
         <div class="space-y-5 relative z-20">
             
-            <!-- Format Selector -->
-            <div>
-                <label class="block text-sm font-bold text-calc-dark mb-1 ml-2 uppercase tracking-wider">Format</label>
-                <div class="relative">
-                    <select id="format-select" class="tactile-input w-full appearance-none rounded-xl py-3 px-4 text-xl font-bold bg-white cursor-pointer">
-                        <option value="polaroid">Polaroid</option>
-                        <option value="10x15" selected>10x15</option>
-                        <option value="a5">A5</option>
-                        <option value="a4">A4</option>
-                        <option value="a3">A3</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-calc-gray">
-                        <svg class="fill-current h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                    </div>
-                </div>
-            </div>
-
             <!-- Quantity Input -->
             <div>
-                <label class="block text-sm font-bold text-calc-dark mb-1 ml-2 uppercase tracking-wider">Nechta rasm?</label>
+                <label class="block text-sm font-bold text-calc-dark mb-1 ml-2 uppercase tracking-wider">Nechta rasm? (10x15)</label>
                 <input type="number" id="qty-input" min="0" max="10000" placeholder="0" 
                     class="tactile-input w-full rounded-xl py-3 px-4 text-2xl font-bold text-center text-musavvir-pink placeholder-gray-400" />
             </div>
@@ -156,65 +139,85 @@
             <button class="retro-btn w-full rounded-xl py-4 text-xl font-bold uppercase tracking-widest mt-4" onclick="placeOrder()">
                 Buyurtma berish
             </button>
+
+            <!-- Price list -->
+            <div class="pt-2">
+                <div class="text-sm font-bold uppercase tracking-wider ml-2 mb-2">10x15 narxlari (1 dona)</div>
+                <ul id="price-list" class="bg-white/60 rounded-xl border-2 border-calc-gray divide-y divide-calc-gray/40 text-base font-bold">
+                    <li data-min="1"   class="flex justify-between px-4 py-2"><span>1–49 ta</span><span>5 000 so'm</span></li>
+                    <li data-min="50"  class="flex justify-between px-4 py-2"><span>50–99 ta</span><span>2 000 so'm</span></li>
+                    <li data-min="100" class="flex justify-between px-4 py-2"><span>100–200 ta</span><span>1 800 so'm</span></li>
+                    <li data-min="201" class="flex justify-between px-4 py-2"><span>201–300 ta</span><span>1 700 so'm</span></li>
+                    <li data-min="301" class="flex justify-between px-4 py-2"><span>301–500 ta</span><span>1 600 so'm</span></li>
+                    <li data-min="501" class="flex justify-between px-4 py-2"><span>501 tadan ko'p</span><span>1 500 so'm</span></li>
+                </ul>
+                <p class="text-sm text-center mt-2 font-bold">🚚 300 tadan boshlab yetkazib berish bepul</p>
+            </div>
+
+            <!-- Other formats -->
+            <div class="rounded-xl border-2 border-dashed border-musavvir-pink p-4 text-center">
+                <p class="text-sm font-bold leading-snug">Polaroid, A5, A4, A3 va boshqa formatlar buyurtma asosida tayyorlanadi.</p>
+                <a href="https://t.me/AzizaxonOmonova" target="_blank" rel="noopener" class="inline-block mt-2 text-musavvir-pink font-bold underline underline-offset-4">Adminga yozing →</a>
+            </div>
         </div>
     </div>
 
     <script>
-        // DOM Elements
-        const formatSelect = document.getElementById('format-select');
         const qtyInput = document.getElementById('qty-input');
-        
-        const displayFormat = document.getElementById('display-format');
         const displayUnitPrice = document.getElementById('display-unit-price');
         const displayPrice = document.getElementById('display-price');
         const deliveryBadge = document.getElementById('delivery-badge');
+        const priceRows = document.querySelectorAll('#price-list li');
 
-        // Number formatter for Uzbek sums (spaces between thousands)
         const formatter = new Intl.NumberFormat('ru-RU');
-        
-        // Confetti State
+        const FREE_DELIVERY_FROM = 300;
         let hasFiredConfetti = false;
 
-        // Logic function
+        // 10x15 narxlari (1 dona)
+        function unitPrice(qty) {
+            if (qty <= 0)   return 0;
+            if (qty < 50)   return 5000;
+            if (qty < 100)  return 2000;
+            if (qty <= 200) return 1800;
+            if (qty <= 300) return 1700;
+            if (qty <= 500) return 1600;
+            return 1500;
+        }
+
+        function showBadge(text, celebrate) {
+            deliveryBadge.textContent = text;
+            deliveryBadge.classList.remove('translate-y-full', 'opacity-0');
+            deliveryBadge.classList.add('translate-y-0', 'opacity-100');
+            deliveryBadge.classList.toggle('bg-nokia-dark', celebrate);
+            deliveryBadge.classList.toggle('text-nokia-green', celebrate);
+            deliveryBadge.classList.toggle('bg-transparent', !celebrate);
+            deliveryBadge.classList.toggle('text-nokia-dark', !celebrate);
+        }
+
+        function hideBadge() {
+            deliveryBadge.classList.add('translate-y-full', 'opacity-0');
+            deliveryBadge.classList.remove('translate-y-0', 'opacity-100');
+        }
+
         function calculate() {
-            // Get values
-            const format = formatSelect.options[formatSelect.selectedIndex].text;
             let qty = parseInt(qtyInput.value);
-            
-            // Limit logic (prevent NaN and negative numbers)
-            if (isNaN(qty) || qty < 0) {
-                qty = 0;
-            }
+            if (isNaN(qty) || qty < 0) qty = 0;
 
-            // Pricing Rules based on image provided
-            let pricePerItem = 0;
-            
-            if (qty > 0 && qty <= 50) {
-                pricePerItem = 2000;
-            } else if (qty >= 51 && qty <= 200) {
-                pricePerItem = 1800;
-            } else if (qty >= 201 && qty <= 300) {
-                pricePerItem = 1700;
-            } else if (qty >= 301 && qty <= 500) {
-                pricePerItem = 1600;
-            } else if (qty >= 501) {
-                pricePerItem = 1500;
-            }
+            const price = unitPrice(qty);
+            displayUnitPrice.textContent = formatter.format(price);
+            displayPrice.textContent = formatter.format(qty * price);
 
-            const totalPrice = qty * pricePerItem;
+            // Jadvalda joriy narx qatorini belgilash
+            let active = null;
+            priceRows.forEach(row => { if (qty >= +row.dataset.min) active = row; });
+            priceRows.forEach(row => {
+                const on = row === active;
+                row.classList.toggle('bg-musavvir-pink', on);
+                row.classList.toggle('text-white', on);
+            });
 
-            // Update Screen UI
-            displayFormat.textContent = formatSelect.value.toUpperCase();
-            displayUnitPrice.textContent = pricePerItem > 0 ? formatter.format(pricePerItem) : '0';
-            displayPrice.textContent = formatter.format(totalPrice);
-
-            // Handle Delivery Badge Animation & Confetti
-            if (qty >= 300) {
-                // Show badge smoothly
-                deliveryBadge.classList.remove('translate-y-full', 'opacity-0');
-                deliveryBadge.classList.add('translate-y-0', 'opacity-100');
-                
-                // Fire Confetti only once when reaching the target
+            if (qty >= FREE_DELIVERY_FROM) {
+                showBadge('Tabriklaymiz! Yetkazib berish bepul 🚚', true);
                 if (!hasFiredConfetti) {
                     confetti({
                         particleCount: 150,
@@ -223,33 +226,24 @@
                         colors: ['#E90052', '#9CBA8F', '#F2EDE4', '#2c2c2c'],
                         disableForReducedMotion: true
                     });
-                    hasFiredConfetti = true; // prevent infinite loops
+                    hasFiredConfetti = true;
                 }
             } else {
-                // Hide badge smoothly
-                deliveryBadge.classList.add('translate-y-full', 'opacity-0');
-                deliveryBadge.classList.remove('translate-y-0', 'opacity-100');
-                
-                // Reset confetti state so it fires again if they drop below 300 and go back up
                 hasFiredConfetti = false;
+                if (qty > 0) {
+                    showBadge('Yana ' + (FREE_DELIVERY_FROM - qty) + ' ta — yetkazish bepul!', false);
+                } else {
+                    hideBadge();
+                }
             }
         }
 
-        // Action for the bottom button
         function placeOrder() {
-            // Add a little haptic vibration if supported on mobile
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
-            // Redirect to Telegram
+            if (navigator.vibrate) navigator.vibrate(50);
             window.open('https://t.me/AzizaxonOmonova', '_blank');
         }
 
-        // Event Listeners
-        formatSelect.addEventListener('change', calculate);
         qtyInput.addEventListener('input', calculate);
-        
-        // Initial Calculation on load
         calculate();
     </script>
 </body>
