@@ -13,6 +13,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playball&family=VT323&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Telegram Mini App -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
@@ -142,10 +145,25 @@
                     class="tactile-input w-full rounded-xl py-3 px-4 text-2xl font-bold text-center text-musavvir-pink placeholder-gray-400" />
             </div>
 
+            <!-- Address (faqat Telegram ichida) -->
+            <div id="address-block" class="hidden">
+                <label for="address-input" class="block text-sm font-bold text-calc-dark mb-1 ml-2 uppercase tracking-wider">Manzil</label>
+                <div class="flex gap-3">
+                    <textarea id="address-input" rows="2" maxlength="300" placeholder="Viloyat, tuman, ko'cha, uy"
+                        class="tactile-input flex-1 min-w-0 rounded-xl py-3 px-4 text-base font-bold bg-white text-calc-dark placeholder-gray-400 resize-none leading-snug"></textarea>
+                    <button type="button" id="loc-btn" onclick="requestLocation()" aria-label="Joylashuvni yuborish"
+                        class="tactile-input shrink-0 w-[64px] rounded-xl bg-white flex flex-col items-center justify-center gap-0.5 text-2xl leading-none">
+                        <span id="loc-icon">📍</span>
+                        <span id="loc-label" class="text-[10px] font-bold uppercase tracking-wider text-calc-gray">Lokatsiya</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- Interactive Element -->
-            <button class="retro-btn w-full rounded-xl py-4 text-xl font-bold uppercase tracking-widest mt-4" onclick="placeOrder()">
+            <button id="order-btn" class="retro-btn w-full rounded-xl py-4 text-xl font-bold uppercase tracking-widest mt-4 disabled:opacity-60" onclick="placeOrder()">
                 Buyurtma berish
             </button>
+            <p id="order-status" class="hidden text-center text-sm font-bold leading-snug"></p>
 
             <!-- Other formats -->
             <p class="text-center text-sm font-bold text-calc-dark/70 leading-snug">
@@ -230,9 +248,156 @@
             }
         }
 
-        function placeOrder() {
-            if (navigator.vibrate) navigator.vibrate(50);
-            window.open('https://t.me/AzizaxonOmonova', '_blank');
+        // ---------- Telegram Mini App ----------
+        const ADMIN = 'AzizaxonOmonova';
+        const tgApp = window.Telegram && window.Telegram.WebApp;
+        const inTelegram = !!(tgApp && tgApp.initData);
+        const urlParams = new URLSearchParams(location.search);
+        const phone = urlParams.get('p') || '';
+        const phoneSig = urlParams.get('s') || '';
+
+        const addressBlock = document.getElementById('address-block');
+        const addressInput = document.getElementById('address-input');
+        const orderBtn = document.getElementById('order-btn');
+        const orderStatus = document.getElementById('order-status');
+        const locIcon = document.getElementById('loc-icon');
+        const locLabel = document.getElementById('loc-label');
+        let coords = null;
+
+        if (inTelegram) {
+            tgApp.ready();
+            tgApp.expand();
+            try {
+                tgApp.setHeaderColor('#e4005e');
+                tgApp.setBackgroundColor('#e4005e');
+            } catch (e) {}
+            addressBlock.classList.remove('hidden');
+        }
+
+        function setStatus(text, isError) {
+            orderStatus.textContent = text;
+            orderStatus.classList.toggle('hidden', !text);
+            orderStatus.classList.toggle('text-musavvir-pink', !!isError);
+            orderStatus.classList.toggle('text-calc-dark', !isError);
+        }
+
+        function haptic(type) {
+            try { tgApp.HapticFeedback.notificationOccurred(type); }
+            catch (e) { if (navigator.vibrate) navigator.vibrate(50); }
+        }
+
+        function setLocation(lat, lon) {
+            coords = { lat, lon };
+            locIcon.textContent = '✅';
+            locLabel.textContent = 'Qo\'shildi';
+            locLabel.classList.add('text-musavvir-pink');
+            setStatus('');
+        }
+
+        function locationFailed() {
+            locIcon.textContent = '📍';
+            locLabel.textContent = 'Lokatsiya';
+            setStatus("Joylashuvni olib bo'lmadi. Manzilni yozib qoldiring — shu yetarli.", true);
+        }
+
+        function browserLocation() {
+            if (!navigator.geolocation) return locationFailed();
+            navigator.geolocation.getCurrentPosition(
+                p => setLocation(p.coords.latitude, p.coords.longitude),
+                locationFailed,
+                { enableHighAccuracy: true, timeout: 15000 }
+            );
+        }
+
+        function requestLocation() {
+            locIcon.textContent = '⏳';
+            const lm = inTelegram && tgApp.LocationManager;
+            if (lm && tgApp.isVersionAtLeast && tgApp.isVersionAtLeast('8.0')) {
+                lm.init(() => {
+                    if (!lm.isLocationAvailable) return browserLocation();
+                    lm.getLocation(loc => {
+                        if (loc) return setLocation(loc.latitude, loc.longitude);
+                        if (lm.isAccessRequested && !lm.isAccessGranted) {
+                            locationFailed();
+                            setStatus("Joylashuvga ruxsat berilmagan. Manzilni yozib qoldiring yoki sozlamalardan ruxsat bering.", true);
+                            return;
+                        }
+                        browserLocation();
+                    });
+                });
+            } else {
+                browserLocation();
+            }
+        }
+
+        function customerText(qty) {
+            return 'Assalomu alaykum! Esdalik rasmlarimizni chiqarmoqchi edim. ' +
+                qty + ' ta rasmim bor, narxi bilan tanishdim. Tez orada rasmlarimni yuboraman.';
+        }
+
+        function openAdminChat(qty) {
+            const link = 'https://t.me/' + ADMIN + '?text=' + encodeURIComponent(customerText(qty));
+            if (inTelegram) tgApp.openTelegramLink(link);
+            else window.open(link, '_blank');
+        }
+
+        async function placeOrder() {
+            let qty = parseInt(qtyInput.value);
+            if (isNaN(qty) || qty < 1) {
+                haptic('error');
+                setStatus('Nechta rasm chiqarmoqchisiz? Sonini yozing.', true);
+                qtyInput.focus();
+                return;
+            }
+
+            // Brauzerda: avvalgidek admin chatini ochamiz
+            if (!inTelegram) {
+                if (navigator.vibrate) navigator.vibrate(50);
+                openAdminChat(qty);
+                return;
+            }
+
+            if (!phone || !phoneSig) {
+                haptic('error');
+                setStatus("Avval botda /start bosib, raqamingizni ulashing.", true);
+                return;
+            }
+            const address = addressInput.value.trim();
+            if (address.length < 3) {
+                haptic('error');
+                setStatus('Manzilingizni yozing: viloyat, tuman, ko\'cha.', true);
+                addressInput.focus();
+                return;
+            }
+
+            orderBtn.disabled = true;
+            orderBtn.textContent = 'Yuborilmoqda…';
+            setStatus('');
+            try {
+                const r = await fetch('/api/order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        initData: tgApp.initData,
+                        phone, sig: phoneSig, qty, address,
+                        lat: coords && coords.lat, lon: coords && coords.lon
+                    })
+                });
+                const data = await r.json().catch(() => ({}));
+                if (!r.ok || !data.ok) throw new Error(data.error || "Xatolik yuz berdi");
+                haptic('success');
+                orderBtn.textContent = 'Qabul qilindi ✓';
+                setStatus('Buyurtmangiz qabul qilindi! Endi rasmlaringizni adminga yuboring.');
+                setTimeout(() => openAdminChat(qty), 600);
+            } catch (e) {
+                haptic('error');
+                orderBtn.disabled = false;
+                orderBtn.textContent = 'Buyurtma berish';
+                const msg = (e instanceof TypeError)
+                    ? "Internet aloqasini tekshirib, qaytadan urinib ko'ring."
+                    : (e.message || "Xatolik yuz berdi, qaytadan urinib ko'ring.");
+                setStatus(msg, true);
+            }
         }
 
         qtyInput.addEventListener('input', calculate);
