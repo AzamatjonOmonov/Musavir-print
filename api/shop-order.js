@@ -99,7 +99,8 @@ module.exports = async (req, res) => {
     if (chosen.length) name += ' + ' + chosen.map((a) => a.name).join(', ');
     total += unit * q;
     printCount += (Number(p.print_qty) || 0) * q;
-    lines.push({ name, qty: q, unit, sum: unit * q, bundle: !!p.is_bundle });
+    const img = Array.isArray(p.images) && p.images[0] ? String(p.images[0]) : '';
+    lines.push({ name, qty: q, unit, sum: unit * q, bundle: !!p.is_bundle, img });
   }
   if (missing.length) {
     return fail(409, `Savatdagi ba'zi tovarlar endi sotuvda yo'q: ${missing.join(', ')}. Savatni yangilang`);
@@ -160,9 +161,28 @@ module.exports = async (req, res) => {
     sent = await tg('sendMessage', { ...payload, chat_id: chatId });
   }
   if (!sent.ok) return fail(502, "Xabar yuborilmadi, qaytadan urinib ko'ring");
+  const replyTo = sent.result.message_id;
+
+  // Qaysi tovar ekanini rasmidan tanish uchun: muqova rasmlari + qisqa izoh
+  const photos = lines
+    .filter((l) => /^https:\/\//.test(l.img || ''))
+    .slice(0, 10)
+    .map((l) => ({
+      type: 'photo',
+      media: l.img,
+      caption: `${l.name} — ${l.qty} ta`.slice(0, 1000),
+    }));
+  if (photos.length === 1) {
+    await tg('sendPhoto', {
+      chat_id: chatId, photo: photos[0].media, caption: photos[0].caption, reply_to_message_id: replyTo,
+    });
+  } else if (photos.length > 1) {
+    await tg('sendMediaGroup', { chat_id: chatId, media: photos, reply_to_message_id: replyTo });
+  }
+
   if (addr.hasLoc) {
     await tg('sendLocation', {
-      chat_id: chatId, latitude: addr.lat, longitude: addr.lon, reply_to_message_id: sent.result.message_id,
+      chat_id: chatId, latitude: addr.lat, longitude: addr.lon, reply_to_message_id: replyTo,
     });
   }
   return res.status(200).json({ ok: true, id: orderId, total, free, prints: printCount });

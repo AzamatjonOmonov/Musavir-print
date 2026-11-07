@@ -126,6 +126,8 @@
   .order ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 14px; }
   .order li { display: flex; justify-content: space-between; gap: 12px; }
   .order li span:last-child { white-space: nowrap; font-weight: 500; }
+  .order li .it { display: flex; gap: 10px; align-items: center; white-space: normal; font-weight: 400; }
+  .order li .it img { width: 40px; height: 48px; object-fit: cover; border-radius: 6px; flex: none; }
   .order .tot { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 8px; font-weight: 700; }
   .order .who { font-size: 14px; display: grid; gap: 2px; }
   .order .who a { color: var(--pink); }
@@ -541,7 +543,8 @@
     }
     $('#olist').innerHTML = orders.map(function (o) {
       var items = (o.items || []).map(function (l) {
-        return '<li><span>' + esc(l.name) + ' — ' + l.qty + ' ta</span><span>' + fmt(l.sum) + '</span></li>';
+        var im = l.img ? '<img src="' + esc(l.img) + '" alt="">' : '';
+        return '<li><span class="it">' + im + '<span>' + esc(l.name) + ' — ' + l.qty + ' ta</span></span><span>' + fmt(l.sum) + '</span></li>';
       }).join('');
       var map = o.lat != null ? ' · <a href="https://maps.google.com/?q=' + o.lat + ',' + o.lon + '" target="_blank" rel="noopener">xaritada</a>' : '';
       return '<article class="order" data-s="' + esc(o.status) + '">' +
