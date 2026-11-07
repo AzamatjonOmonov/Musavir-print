@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Musavvir Print</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playball&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2f1f4; --surface: #fff; --ink: #2c2c2c; --muted: #77727a; --line: #e4e1e6;
+    --pink: #e5005c; --wine: #610027; --paper: #e3dfd5; --ok: #1d7a45; --warn: #a86400;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 'Space Grotesk', system-ui, sans-serif; }
+  button, input, textarea, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--pink); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+  .logo { font-family: 'Playball', cursive; color: var(--pink); font-size: 26px; line-height: 1; text-decoration: none; }
+
+  /* Login */
+  .login { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+  .login form { width: 100%; max-width: 360px; background: var(--surface); border-radius: 20px; padding: 28px 22px; display: grid; gap: 14px; text-align: center; }
+  .login .logo { font-size: 44px; }
+  .login p { margin: 0; color: var(--muted); }
+
+  /* Header */
+  header { position: sticky; top: 0; z-index: 10; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .hrow { display: flex; align-items: center; gap: 12px; height: 56px; }
+  .tabs { display: flex; gap: 4px; margin-left: auto; background: var(--bg); padding: 4px; border-radius: 12px; }
+  .tabs button { border: 0; background: none; padding: 7px 12px; border-radius: 9px; font-weight: 500; }
+  .tabs button[aria-selected="true"] { background: var(--surface); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .out { border: 0; background: none; color: var(--muted); padding: 8px 0 8px 4px; font-size: 14px; }
+  .shop-link { color: var(--muted); font-size: 14px; }
+  @media (max-width: 520px) { .shop-link { display: none; } }
+
+  .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 18px 0 12px; }
+  .toolbar h1 { margin: 0; font-size: 22px; }
+  .btn {
+    height: 44px; border-radius: 12px; border: 0; background: var(--pink); color: #fff; font-weight: 700;
+    padding: 0 18px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn:disabled { opacity: .55; }
+  .btn.light { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+  .btn.danger { background: none; color: #b00035; border: 1.5px solid #f0b7c9; }
+  .notice { background: #fff4d6; color: #6b4e00; padding: 12px 14px; border-radius: 12px; margin-top: 16px; font-size: 14px; }
+  .notice code { background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 4px; }
+  .err { color: #b00035; font-size: 14px; font-weight: 500; margin: 0; }
+  .muted { color: var(--muted); }
+  .empty { text-align: center; padding: 40px 12px; color: var(--muted); background: var(--surface); border-radius: 14px; }
+  .empty b { display: block; color: var(--ink); margin-bottom: 4px; }
+
+  /* Product list */
+  .plist { display: grid; gap: 8px; padding-bottom: 40px; }
+  .prow { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; background: var(--surface); border-radius: 14px; padding: 8px 12px 8px 8px; }
+  .prow .th { width: 56px; height: 66px; border-radius: 8px; background: var(--paper); overflow: hidden; display: grid; place-items: center; color: #b5ad9c; border: 0; padding: 0; }
+  .prow .th img { width: 100%; height: 100%; object-fit: cover; }
+  .prow .info { border: 0; background: none; text-align: left; padding: 0; min-width: 0; }
+  .prow .info b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prow .info span { font-size: 13px; color: var(--muted); }
+  .prow.off .th, .prow.off .info { opacity: .45; }
+  .switch { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); cursor: pointer; }
+  .switch input { appearance: none; width: 44px; height: 26px; border-radius: 13px; background: #d6d2d9; position: relative; margin: 0; cursor: pointer; transition: background .15s; }
+  .switch input::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .switch input:checked { background: var(--ok); }
+  .switch input:checked::after { transform: translateX(18px); }
+
+  /* Editor */
+  .editor { position: fixed; inset: 0; z-index: 30; background: var(--bg); overflow-y: auto; }
+  .editor header .hrow { justify-content: space-between; }
+  .editor form { display: grid; gap: 14px; padding: 16px 0 120px; }
+  .box { background: var(--surface); border-radius: 14px; padding: 16px; display: grid; gap: 14px; }
+  .box h3 { margin: 0; font-size: 16px; }
+  .box .sub { margin: -10px 0 0; font-size: 13px; color: var(--muted); }
+  label.f { display: grid; gap: 6px; font-weight: 500; font-size: 14px; }
+  label.f small { font-weight: 400; color: var(--muted); }
+  input.i, textarea.i, select.i { width: 100%; border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--surface); outline: 0; }
+  input.i:focus, textarea.i:focus, select.i:focus { border-color: var(--pink); }
+  textarea.i { resize: vertical; min-height: 110px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .money { position: relative; }
+  .money::after { content: "so'm"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; pointer-events: none; }
+  .money input { padding-right: 46px; }
+
+  .imgs { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; }
+  .imgs .t { position: relative; aspect-ratio: 4/5; border-radius: 10px; overflow: hidden; background: var(--paper); }
+  .imgs .t img { width: 100%; height: 100%; object-fit: cover; }
+  .imgs .t .cover { position: absolute; left: 6px; bottom: 6px; background: var(--wine); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 5px; }
+  .imgs .t .x, .imgs .t .mv { position: absolute; top: 6px; width: 28px; height: 28px; border-radius: 8px; border: 0; background: rgba(255,255,255,.92); display: grid; place-items: center; font-size: 16px; line-height: 1; }
+  .imgs .t .x { right: 6px; }
+  .imgs .t .mv { left: 6px; }
+  .imgs .t.loading { display: grid; place-items: center; color: var(--muted); font-size: 12px; }
+  .imgs label.add { aspect-ratio: 4/5; border: 2px dashed #cfc9d3; border-radius: 10px; display: grid; place-items: center; text-align: center; color: var(--muted); font-size: 13px; cursor: pointer; padding: 6px; }
+  .imgs label.add:focus-within { border-color: var(--pink); }
+  .imgs label.add input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+
+  .rows { display: grid; gap: 8px; }
+  .prow2 { display: grid; grid-template-columns: 1fr 140px 40px; gap: 8px; align-items: center; }
+  .prow2 .money::after { display: none; }
+  .prow2 .money input { padding-right: 12px; }
+  .prow2 .rmv { width: 40px; height: 42px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 18px; }
+  .addrow { justify-self: start; border: 0; background: none; color: var(--pink); font-weight: 700; padding: 4px 0; }
+  .tick { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; cursor: pointer; }
+  .tick input { width: 20px; height: 20px; accent-color: var(--pink); margin: 1px 0 0; flex: none; }
+  .tick small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+  .savebar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); z-index: 31; padding-bottom: env(safe-area-inset-bottom); }
+  .savebar .wrap { display: flex; gap: 10px; padding-top: 10px; padding-bottom: 10px; align-items: center; }
+  .savebar .err { flex: 1; }
+
+  /* Orders */
+  .filters { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 12px; scrollbar-width: none; }
+  .filters button { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 13px; font-size: 14px; }
+  .filters button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .orders { display: grid; gap: 10px; padding-bottom: 40px; }
+  .order { background: var(--surface); border-radius: 14px; padding: 14px 16px; display: grid; gap: 10px; border-left: 5px solid var(--line); }
+  .order[data-s="yangi"] { border-left-color: var(--pink); }
+  .order[data-s="ishlanmoqda"] { border-left-color: var(--warn); }
+  .order[data-s="yuborildi"] { border-left-color: var(--ok); }
+  .order .head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .order .head b { font-size: 17px; }
+  .order .head span { font-size: 13px; color: var(--muted); display: block; }
+  .order ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 14px; }
+  .order li { display: flex; justify-content: space-between; gap: 12px; }
+  .order li span:last-child { white-space: nowrap; font-weight: 500; }
+  .order .tot { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 8px; font-weight: 700; }
+  .order .who { font-size: 14px; display: grid; gap: 2px; }
+  .order .who a { color: var(--pink); }
+  .order select.i { width: auto; padding: 6px 10px; }
+
+  .toast { position: fixed; left: 50%; bottom: 90px; transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 12px; z-index: 50; opacity: 0; transition: .2s; pointer-events: none; font-size: 14px; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  @media (max-width: 480px) { .prow2 { grid-template-columns: 1fr 118px 40px; } .two { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<!-- ===== Kirish ===== -->
+<section class="login" id="login" hidden>
+  <form id="login-form">
+    <div class="logo">musavir</div>
+    <p>Do'kon boshqaruvi</p>
+    <input class="i" type="password" id="pw" placeholder="Parol" autocomplete="current-password" aria-label="Parol" required>
+    <p class="err" id="login-err" role="alert" hidden></p>
+    <button class="btn" type="submit" id="login-btn">Kirish</button>
+  </form>
+</section>
+
+<!-- ===== Asosiy ===== -->
+<div id="app" hidden>
+  <header>
+    <div class="wrap hrow">
+      <a class="logo" href="/dokon/" target="_blank" rel="noopener" aria-label="Do'konni ochish">musavir</a>
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tab-products" aria-selected="true">Tovarlar</button>
+        <button role="tab" id="tab-orders" aria-selected="false">Buyurtmalar</button>
+      </div>
+      <button class="out" id="logout" type="button">Chiqish</button>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="notice" id="no-db" hidden>
+      Baza hali ulanmagan. Vercel → Settings → Environment Variables ga <code>SUPABASE_URL</code> va <code>SUPABASE_SECRET_KEY</code> qo'shib, saytni qayta deploy qiling. Yo'riqnoma: <code>SOZLASH.md</code>.
+    </div>
+
+    <section id="products-view">
+      <div class="toolbar"><h1>Tovarlar</h1><button class="btn" type="button" id="new-product">+ Yangi tovar</button></div>
+      <div class="plist" id="plist"><p class="muted">Yuklanmoqda…</p></div>
+    </section>
+
+    <section id="orders-view" hidden>
+      <div class="toolbar"><h1>Buyurtmalar</h1><button class="btn light" type="button" id="reload-orders">Yangilash</button></div>
+      <div class="filters" id="filters"></div>
+      <div class="orders" id="olist"></div>
+    </section>
+  </main>
+</div>
+
+<!-- ===== Tovar tahrirlash ===== -->
+<div class="editor" id="editor" hidden role="dialog" aria-modal="true" aria-labelledby="ed-title">
+  <header><div class="wrap hrow">
+    <button class="out" type="button" id="ed-close" style="padding-left:0">‹ Ortga</button>
+    <b id="ed-title">Yangi tovar</b>
+    <span style="width:52px"></span>
+  </div></header>
+  <form class="wrap" id="ed-form" novalidate>
+    <div class="box">
+      <h3>Rasmlar</h3>
+      <p class="sub">Birinchi rasm — muqova. 8 tagacha. Katta rasmlar avtomatik kichraytiriladi.</p>
+      <div class="imgs" id="ed-imgs"></div>
+    </div>
+
+    <div class="box">
+      <label class="f">Nomi<input class="i" id="ed-name" maxlength="120" placeholder="Masalan: Fotoalbom 10x15" required></label>
+      <label class="f">Kategoriya<input class="i" id="ed-cat" maxlength="40" list="cats" placeholder="Albom, Ramka, Polaroid…"></label>
+      <datalist id="cats"></datalist>
+      <div class="two">
+        <label class="f">Narx<span class="money"><input class="i" id="ed-price" inputmode="numeric" placeholder="0"></span>
+          <small>Variantlar bo'lsa, ularning narxi olinadi</small></label>
+        <label class="f">Eski narx <small>(chegirma ko'rsatish uchun, ixtiyoriy)</small><span class="money"><input class="i" id="ed-old" inputmode="numeric" placeholder="—"></span></label>
+      </div>
+      <label class="f">Izoh <small>mijoz tovar sahifasida ko'radi</small><textarea class="i" id="ed-desc" maxlength="3000" placeholder="O'lchami, materiali, nimalar kiradi…"></textarea></label>
+    </div>
+
+    <div class="box">
+      <h3>Variantlar</h3>
+      <p class="sub">Mijoz bittasini tanlaydi. Masalan: 100 talik — 85 000, 200 talik — 130 000.</p>
+      <div class="rows" id="ed-variants"></div>
+      <button type="button" class="addrow" data-addrow="variants">+ Variant qo'shish</button>
+    </div>
+
+    <div class="box">
+      <h3>Qo'shimchalar</h3>
+      <p class="sub">Mijoz xohlasa belgilaydi, narx ustiga qo'shiladi. Masalan: Laminatsiya — 15 000.</p>
+      <div class="rows" id="ed-addons"></div>
+      <button type="button" class="addrow" data-addrow="addons">+ Qo'shimcha qo'shish</button>
+    </div>
+
+    <div class="box">
+      <label class="tick"><input type="checkbox" id="ed-bundle"><span>Bu tayyor to'plam<small>Saytda «To'plam» belgisi bilan chiqadi</small></span></label>
+      <label class="f" id="ed-pq-wrap" hidden>Ichidagi 10x15 rasm soni <small>bepul yetkazish (300 ta) hisobiga qo'shiladi</small><input class="i" id="ed-pq" inputmode="numeric" placeholder="Masalan: 100"></label>
+      <label class="tick"><input type="checkbox" id="ed-active" checked><span>Sotuvda bor<small>O'chirsangiz, saytda ko'rinmaydi, lekin o'chib ketmaydi</small></span></label>
+      <label class="f">Tartib raqami <small>kichigi oldinda turadi</small><input class="i" id="ed-sort" inputmode="numeric" placeholder="0" style="max-width:140px"></label>
+    </div>
+
+    <button class="btn danger" type="button" id="ed-delete" hidden>Tovarni butunlay o'chirish</button>
+  </form>
+  <div class="savebar"><div class="wrap">
+    <p class="err" id="ed-err" role="alert"></p>
+    <button class="btn" type="submit" form="ed-form" id="ed-save">Saqlash</button>
+  </div></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmt(n) { return String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  function num(v) { var n = parseInt(String(v || '').replace(/\D/g, ''), 10); return isNaN(n) ? 0 : n; }
+  var ls = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+  };
+  var toastT;
+  function toast(t) {
+    var el = $('#toast'); el.textContent = t; el.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove('show'); }, 1800);
+  }
+  var PH = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 9"/></svg>';
+
+  var token = ls.get('mp_admin');
+  var products = [];
+  var orders = [];
+  var orderFilter = '';
+
+  function api(action, data) {
+    var body = Object.assign({ action: action, token: token }, data || {});
+    return fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) {
+        return r.json().catch(function () { return { ok: false, error: 'Server javob bermadi (' + r.status + ')' }; })
+          .then(function (d) {
+            if (r.status === 401 && action !== 'login') { logout(); throw new Error('Qaytadan kiring'); }
+            if (r.status === 503) $('#no-db').hidden = false;
+            if (!d.ok) throw new Error(d.error || 'Xatolik');
+            return d;
+          });
+      });
+  }
+
+  // ===== Kirish =====
+  function showLogin() { $('#login').hidden = false; $('#app').hidden = true; setTimeout(function () { $('#pw').focus(); }, 50); }
+  function showApp() { $('#login').hidden = true; $('#app').hidden = false; loadProducts(); }
+  function logout() { token = null; ls.set('mp_admin', null); showLogin(); }
+  $('#login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var b = $('#login-btn'), err = $('#login-err');
+    b.disabled = true; err.hidden = true;
+    api('login', { password: $('#pw').value }).then(function (d) {
+      token = d.token; ls.set('mp_admin', token); $('#pw').value = '';
+      $('#no-db').hidden = d.configured !== false;
+      showApp();
+    }).catch(function (x) { err.textContent = x.message; err.hidden = false; })
+      .then(function () { b.disabled = false; });
+  });
+  $('#logout').onclick = logout;
+
+  // ===== Bo'limlar =====
+  function tab(which) {
+    $('#tab-products').setAttribute('aria-selected', which === 'products');
+    $('#tab-orders').setAttribute('aria-selected', which === 'orders');
+    $('#products-view').hidden = which !== 'products';
+    $('#orders-view').hidden = which !== 'orders';
+    if (which === 'orders') loadOrders();
+  }
+  $('#tab-products').onclick = function () { tab('products'); };
+  $('#tab-orders').onclick = function () { tab('orders'); };
+
+  // ===== Tovarlar ro'yxati =====
+  function loadProducts() {
+    api('products.list').then(function (d) { products = d.products || []; renderProducts(); })
+      .catch(function (e) { $('#plist').innerHTML = '<div class="empty"><b>Tovarlar yuklanmadi</b>' + esc(e.message) + '</div>'; });
+  }
+  function priceText(p) {
+    if (p.variants && p.variants.length) {
+      var min = Math.min.apply(null, p.variants.map(function (v) { return v.price; }));
+      return fmt(min) + " so'mdan · " + p.variants.length + ' variant';
+    }
+    return fmt(p.price) + " so'm";
+  }
+  function renderProducts() {
+    var box = $('#plist');
+    if (!products.length) {
+      box.innerHTML = '<div class="empty"><b>Hali tovar yo\'q</b>«+ Yangi tovar» tugmasini bosib, birinchi tovarni qo\'shing.</div>';
+      return;
+    }
+    box.innerHTML = products.map(function (p) {
+      var img = p.images && p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="" loading="lazy">' : PH;
+      return '<div class="prow' + (p.active ? '' : ' off') + '">' +
+        '<button type="button" class="th" data-edit="' + p.id + '" aria-label="Tahrirlash: ' + esc(p.name) + '">' + img + '</button>' +
+        '<button type="button" class="info" data-edit="' + p.id + '"><b>' + esc(p.name) + '</b><span>' +
+        esc([p.category, priceText(p), p.is_bundle ? "to'plam" : ''].filter(Boolean).join(' · ')) + '</span></button>' +
+        '<label class="switch"><input type="checkbox" data-toggle="' + p.id + '"' + (p.active ? ' checked' : '') + ' aria-label="Sotuvda: ' + esc(p.name) + '"></label></div>';
+    }).join('');
+    $('#cats').innerHTML = ['Albom', 'Ramka', 'Polaroid', 'Laminatsiya', "To'plam"].concat(products.map(function (p) { return p.category; }))
+      .filter(function (c, i, a) { return c && a.indexOf(c) === i; }).map(function (c) { return '<option value="' + esc(c) + '">'; }).join('');
+  }
+  $('#plist').addEventListener('click', function (e) {
+    var ed = e.target.closest('[data-edit]');
+    if (ed) openEditor(products.find(function (p) { return p.id === ed.getAttribute('data-edit'); }));
+  });
+  $('#plist').addEventListener('change', function (e) {
+    var t = e.target.closest('[data-toggle]');
+    if (!t) return;
+    var id = t.getAttribute('data-toggle');
+    api('products.toggle', { id: id, active: t.checked }).then(function (d) {
+      products = products.map(function (p) { return p.id === id ? d.product : p; });
+      renderProducts();
+      toast(d.product.active ? 'Sotuvga qo\'yildi' : 'Sotuvdan olindi');
+    }).catch(function (x) { t.checked = !t.checked; toast(x.message); });
+  });
+  $('#new-product').onclick = function () { openEditor(null); };
+
+  // ===== Tahrirlash oynasi =====
+  var editing = null;   // tahrirlanayotgan tovar id (yangi bo'lsa null)
+  var images = [];      // [{ url } | { loading: true }]
+  var dirty = false;
+
+  function rowHTML(kind, r) {
+    return '<div class="prow2" data-row="' + kind + '">' +
+      '<input class="i" data-k="name" maxlength="60" placeholder="' + (kind === 'variants' ? 'Masalan: 100 talik' : 'Masalan: Laminatsiya') + '" value="' + esc(r.name) + '" aria-label="Nomi">' +
+      '<span class="money"><input class="i" data-k="price" inputmode="numeric" placeholder="Narx, so\'m" value="' + (r.price ? fmt(r.price) : '') + '" aria-label="Narx"></span>' +
+      '<button type="button" class="rmv" aria-label="O\'chirish">×</button></div>';
+  }
+  function readRows(kind) {
+    return [].slice.call(document.querySelectorAll('[data-row="' + kind + '"]')).map(function (r) {
+      return { name: r.querySelector('[data-k="name"]').value.trim(), price: num(r.querySelector('[data-k="price"]').value) };
+    }).filter(function (r) { return r.name; });
+  }
+  function renderImages() {
+    var box = $('#ed-imgs');
+    box.innerHTML = images.map(function (im, i) {
+      if (im.loading) return '<div class="t loading">Yuklanmoqda…</div>';
+      return '<div class="t"><img src="' + esc(im.url) + '" alt="">' +
+        (i === 0 ? '<span class="cover">Muqova</span>' : '<button type="button" class="mv" data-cover="' + i + '" aria-label="Muqova qilish" title="Muqova qilish">★</button>') +
+        '<button type="button" class="x" data-rmimg="' + i + '" aria-label="Rasmni olib tashlash">×</button></div>';
+    }).join('') + (images.length < 8 ? '<label class="add">+ Rasm qo\'shish<input type="file" id="ed-file" accept="image/*" multiple></label>' : '');
+    var f = $('#ed-file');
+    if (f) f.addEventListener('change', function () { addFiles([].slice.call(f.files)); });
+  }
+  $('#ed-imgs').addEventListener('click', function (e) {
+    var r = e.target.closest('[data-rmimg]'), c = e.target.closest('[data-cover]');
+    if (r) { images.splice(+r.getAttribute('data-rmimg'), 1); dirty = true; renderImages(); }
+    if (c) { var i = +c.getAttribute('data-cover'); images.unshift(images.splice(i, 1)[0]); dirty = true; renderImages(); }
+  });
+
+  // Rasmni brauzerda kichraytirib, JPEG qilib yuklaydi
+  function shrink(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        var max = 1600, w = img.naturalWidth, h = img.naturalHeight, k = Math.min(1, max / Math.max(w, h));
+        var c = document.createElement('canvas');
+        c.width = Math.round(w * k); c.height = Math.round(h * k);
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        var data = c.toDataURL('image/jpeg', 0.86);
+        resolve(data.slice(data.indexOf(',') + 1));
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('Rasm ochilmadi: ' + file.name)); };
+      img.src = url;
+    });
+  }
+  function addFiles(files) {
+    files = files.filter(function (f) { return /^image\//.test(f.type); }).slice(0, 8 - images.length);
+    if (!files.length) return;
+    dirty = true;
+    var slots = files.map(function () { var s = { loading: true }; images.push(s); return s; });
+    renderImages();
+    files.reduce(function (chain, file, i) {
+      return chain.then(function () {
+        return shrink(file).then(function (b64) { return api('upload', { data: b64, type: 'image/jpeg' }); })
+          .then(function (d) { slots[i].url = d.url; slots[i].loading = false; })
+          .catch(function (x) { images.splice(images.indexOf(slots[i]), 1); toast(x.message); })
+          .then(renderImages);
+      });
+    }, Promise.resolve());
+  }
+
+  function openEditor(p) {
+    editing = p ? p.id : null;
+    dirty = false;
+    $('#ed-title').textContent = p ? 'Tovarni tahrirlash' : 'Yangi tovar';
+    images = (p ? p.images || [] : []).map(function (u) { return { url: u }; });
+    renderImages();
+    $('#ed-name').value = p ? p.name : '';
+    $('#ed-cat').value = p ? p.category : '';
+    $('#ed-price').value = p && p.price ? fmt(p.price) : '';
+    $('#ed-old').value = p && p.old_price ? fmt(p.old_price) : '';
+    $('#ed-desc').value = p ? p.description : '';
+    $('#ed-variants').innerHTML = (p ? p.variants : []).map(function (r) { return rowHTML('variants', r); }).join('');
+    $('#ed-addons').innerHTML = (p ? p.addons : []).map(function (r) { return rowHTML('addons', r); }).join('');
+    $('#ed-bundle').checked = !!(p && p.is_bundle);
+    $('#ed-pq').value = p && p.print_qty ? p.print_qty : '';
+    $('#ed-pq-wrap').hidden = !$('#ed-bundle').checked;
+    $('#ed-active').checked = p ? p.active : true;
+    $('#ed-sort').value = p && p.sort ? p.sort : '';
+    $('#ed-delete').hidden = !p;
+    $('#ed-err').textContent = '';
+    $('#editor').hidden = false;
+    $('#editor').scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+    if (!p) setTimeout(function () { $('#ed-name').focus(); }, 50);
+  }
+  function closeEditor(force) {
+    if (!force && dirty && !confirm("O'zgarishlar saqlanmagan. Chiqib ketasizmi?")) return;
+    $('#editor').hidden = true;
+    document.body.style.overflow = '';
+  }
+  $('#ed-close').onclick = function () { closeEditor(false); };
+  $('#ed-form').addEventListener('input', function (e) {
+    dirty = true;
+    if (e.target.closest('.money')) {   // narxni 85 000 ko'rinishida yozish
+      var v = num(e.target.value); e.target.value = v ? fmt(v) : '';
+    }
+  });
+  $('#ed-bundle').addEventListener('change', function () { $('#ed-pq-wrap').hidden = !this.checked; });
+  document.querySelectorAll('[data-addrow]').forEach(function (b) {
+    b.onclick = function () {
+      var kind = b.getAttribute('data-addrow');
+      $('#ed-' + kind).insertAdjacentHTML('beforeend', rowHTML(kind, { name: '', price: 0 }));
+      $('#ed-' + kind).lastElementChild.querySelector('input').focus();
+      dirty = true;
+    };
+  });
+  $('#ed-form').addEventListener('click', function (e) {
+    var r = e.target.closest('.rmv'); if (r) { r.parentNode.remove(); dirty = true; }
+  });
+
+  $('#ed-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var err = $('#ed-err');
+    if (images.some(function (i) { return i.loading; })) { err.textContent = 'Rasmlar yuklanishini kuting'; return; }
+    var product = {
+      name: $('#ed-name').value.trim(),
+      category: $('#ed-cat').value.trim(),
+      price: num($('#ed-price').value),
+      old_price: num($('#ed-old').value) || null,
+      description: $('#ed-desc').value.trim(),
+      images: images.map(function (i) { return i.url; }),
+      variants: readRows('variants'),
+      addons: readRows('addons'),
+      is_bundle: $('#ed-bundle').checked,
+      print_qty: $('#ed-bundle').checked ? num($('#ed-pq').value) : 0,
+      active: $('#ed-active').checked,
+      sort: parseInt($('#ed-sort').value, 10) || 0
+    };
+    if (!product.name) { err.textContent = 'Tovar nomini yozing'; $('#ed-name').focus(); return; }
+    if (!product.price && !product.variants.length) { err.textContent = 'Narx yoki kamida bitta variant kiriting'; $('#ed-price').focus(); return; }
+    err.textContent = '';
+    var b = $('#ed-save'); b.disabled = true; b.textContent = 'Saqlanmoqda…';
+    api('products.save', { id: editing, product: product }).then(function (d) {
+      if (editing) products = products.map(function (p) { return p.id === editing ? d.product : p; });
+      else products.unshift(d.product);
+      products.sort(function (a, b) { return (a.sort - b.sort) || (b.created_at > a.created_at ? 1 : -1); });
+      renderProducts();
+      closeEditor(true);
+      toast(editing ? 'Saqlandi' : "Tovar qo'shildi");
+    }).catch(function (x) { err.textContent = x.message; })
+      .then(function () { b.disabled = false; b.textContent = 'Saqlash'; });
+  });
+
+  $('#ed-delete').onclick = function () {
+    var p = products.find(function (x) { return x.id === editing; });
+    if (!p || !confirm('«' + p.name + "» butunlay o'chirilsinmi? Buni qaytarib bo'lmaydi.\n\nVaqtincha yashirish uchun «Sotuvda bor» belgisini olib tashlash kifoya.")) return;
+    api('products.delete', { id: editing }).then(function () {
+      products = products.filter(function (x) { return x.id !== editing; });
+      renderProducts(); closeEditor(true); toast("O'chirildi");
+    }).catch(function (x) { $('#ed-err').textContent = x.message; });
+  };
+
+  // ===== Buyurtmalar =====
+  var STATUSES = [['', 'Hammasi'], ['yangi', 'Yangi'], ['ishlanmoqda', 'Ishlanmoqda'], ['yuborildi', 'Yuborildi'], ['bekor', 'Bekor qilingan']];
+  function renderFilters() {
+    $('#filters').innerHTML = STATUSES.map(function (s) {
+      return '<button type="button" data-f="' + s[0] + '" aria-pressed="' + (s[0] === orderFilter) + '">' + s[1] + '</button>';
+    }).join('');
+  }
+  $('#filters').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-f]'); if (!b) return;
+    orderFilter = b.getAttribute('data-f'); renderFilters(); loadOrders();
+  });
+  $('#reload-orders').onclick = loadOrders;
+  function loadOrders() {
+    renderFilters();
+    $('#olist').innerHTML = '<p class="muted">Yuklanmoqda…</p>';
+    api('orders.list', { status: orderFilter }).then(function (d) { orders = d.orders || []; renderOrders(); })
+      .catch(function (e) { $('#olist').innerHTML = '<div class="empty"><b>Buyurtmalar yuklanmadi</b>' + esc(e.message) + '</div>'; });
+  }
+  function when(iso) {
+    var d = new Date(iso);
+    return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }) + ', ' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  }
+  function renderOrders() {
+    if (!orders.length) {
+      $('#olist').innerHTML = '<div class="empty"><b>Buyurtma yo\'q</b>' + (orderFilter ? 'Bu holatda buyurtma topilmadi.' : "Do'kondan buyurtma kelganda shu yerda ko'rinadi.") + '</div>';
+      return;
+    }
+    $('#olist').innerHTML = orders.map(function (o) {
+      var items = (o.items || []).map(function (l) {
+        return '<li><span>' + esc(l.name) + ' — ' + l.qty + ' ta</span><span>' + fmt(l.sum) + '</span></li>';
+      }).join('');
+      var map = o.lat != null ? ' · <a href="https://maps.google.com/?q=' + o.lat + ',' + o.lon + '" target="_blank" rel="noopener">xaritada</a>' : '';
+      return '<article class="order" data-s="' + esc(o.status) + '">' +
+        '<div class="head"><div><b>№' + o.id + '</b><span>' + when(o.created_at) + ' · ' + esc(o.source) + '</span></div>' +
+        '<select class="i" data-status="' + o.id + '" aria-label="Holati">' + STATUSES.slice(1).map(function (s) {
+          return '<option value="' + s[0] + '"' + (s[0] === o.status ? ' selected' : '') + '>' + s[1] + '</option>';
+        }).join('') + '</select></div>' +
+        '<div class="who"><a href="tel:' + esc(o.phone) + '">' + esc(o.phone) + '</a><span>' + (esc(o.address) || 'Manzil yozilmagan') + map + '</span></div>' +
+        '<ul>' + items + '</ul>' +
+        '<div class="tot"><span>Jami' + (o.free_delivery ? ' · yetkazish bepul' : ' · yetkazish pullik') + '</span><span>' + fmt(o.total) + " so'm</span></div></article>";
+    }).join('');
+  }
+  $('#olist').addEventListener('change', function (e) {
+    var s = e.target.closest('[data-status]'); if (!s) return;
+    var id = +s.getAttribute('data-status');
+    api('orders.status', { id: id, status: s.value }).then(function (d) {
+      orders = orders.map(function (o) { return o.id === id ? d.order : o; });
+      s.closest('.order').setAttribute('data-s', d.order.status);
+      toast('Holat o\'zgartirildi');
+    }).catch(function (x) { toast(x.message); loadOrders(); });
+  });
+
+  if (token) showApp(); else showLogin();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Musavvir Print — do'kon</title>
+<meta name="description" content="Rasm chop etish, albomlar, ramkalar va tayyor to'plamlar. O'zbekiston bo'ylab BTS orqali yetkazamiz.">
+<meta property="og:title" content="Musavvir Print — do'kon">
+<meta property="og:description" content="Rasm chop etish, albomlar, ramkalar va tayyor to'plamlar.">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playball&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2f1f4;
+    --surface: #ffffff;
+    --ink: #2c2c2c;
+    --muted: #77727a;
+    --line: #e4e1e6;
+    --pink: #e5005c;
+    --wine: #610027;
+    --paper: #e3dfd5;
+    --ok: #1d7a45;
+    --radius: 14px;
+    --nav-h: 64px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.45 'Space Grotesk', system-ui, sans-serif;
+    padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
+  }
+  button, input, textarea, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  a { color: inherit; }
+  img { display: block; max-width: 100%; }
+  :focus-visible { outline: 3px solid var(--pink); outline-offset: 2px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  /* ---------- Header ---------- */
+  header.top {
+    position: sticky; top: 0; z-index: 20; background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-row { display: flex; align-items: center; gap: 12px; padding-top: 10px; padding-bottom: 10px; }
+  .logo {
+    font-family: 'Playball', cursive; color: var(--pink); font-size: 30px; line-height: 1;
+    text-decoration: none; white-space: nowrap; display: flex; flex-direction: column; align-items: center;
+  }
+  .logo small { font-family: 'Space Grotesk'; font-size: 9px; letter-spacing: .35em; font-weight: 700; margin-top: 1px; }
+  .search {
+    flex: 1; display: flex; align-items: center; gap: 8px; background: var(--bg);
+    border-radius: 12px; padding: 0 12px; height: 44px; min-width: 0;
+  }
+  .search svg { flex: none; color: var(--muted); }
+  .search input { border: 0; background: transparent; outline: 0; width: 100%; min-width: 0; height: 100%; }
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+    padding: 7px 14px; font-weight: 500; font-size: 14px;
+  }
+  .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* ---------- Print hero ---------- */
+  .hero {
+    margin: 16px 0 6px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px;
+    width: 100%; text-align: left; border: 0; border-radius: 18px; padding: 18px 18px 18px 20px;
+    background: var(--pink); color: #fff; position: relative; overflow: hidden;
+  }
+  .hero h2 { margin: 0; font-size: 22px; line-height: 1.15; }
+  .hero p { margin: 6px 0 0; font-size: 14px; opacity: .92; }
+  .hero .go {
+    display: inline-block; margin-top: 14px; background: #fff; color: var(--wine); font-weight: 700;
+    padding: 10px 16px; border-radius: 12px; box-shadow: 3px 3px 0 var(--wine);
+  }
+  .stack { position: relative; width: 96px; height: 112px; flex: none; }
+  .stack span {
+    position: absolute; inset: 0; background: #fff; border-radius: 3px; padding: 6px 6px 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.18);
+  }
+  .stack span i { display: block; height: 100%; border-radius: 1px; }
+  .stack span:nth-child(1) { transform: rotate(-11deg) translate(-8px, 4px); }
+  .stack span:nth-child(1) i { background: #f6b7cf; }
+  .stack span:nth-child(2) { transform: rotate(6deg) translate(6px, -2px); }
+  .stack span:nth-child(2) i { background: var(--paper); }
+  .stack span:nth-child(3) i { background: linear-gradient(160deg, #ffd9a8, #e98aa7 70%); }
+
+  /* ---------- Grid ---------- */
+  .section-title { display: flex; justify-content: space-between; align-items: baseline; margin: 22px 0 10px; }
+  .section-title h3 { margin: 0; font-size: 19px; }
+  .section-title span { color: var(--muted); font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 10px; }
+  @media (min-width: 640px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 14px; } }
+  @media (min-width: 960px) { .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
+  .card { display: flex; flex-direction: column; text-decoration: none; min-width: 0; }
+  .shot {
+    position: relative; aspect-ratio: 4 / 5; background: var(--surface); border-radius: var(--radius);
+    padding: 7px 7px 24px; box-shadow: 0 1px 0 var(--line);
+  }
+  .shot .img { position: absolute; inset: 7px 7px 24px; border-radius: 8px; overflow: hidden; background: var(--paper); }
+  .shot img { width: 100%; height: 100%; object-fit: cover; }
+  .ph { width: 100%; height: 100%; display: grid; place-items: center; color: #b5ad9c; }
+  .badge {
+    position: absolute; top: 13px; left: 13px; background: var(--wine); color: #fff; font-size: 12px;
+    font-weight: 700; padding: 3px 8px; border-radius: 6px;
+  }
+  .badge.sale { background: var(--pink); }
+  .add-fab {
+    position: absolute; right: 12px; bottom: 6px; width: 36px; height: 36px; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; color: var(--ink);
+  }
+  .card .price { margin: 8px 2px 0; font-weight: 700; font-size: 17px; }
+  .card .price s { display: block; font-weight: 400; color: var(--muted); font-size: 13px; line-height: 1.2; }
+  .card .name {
+    margin: 2px 2px 0; font-size: 14px; color: #4b464e; display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .empty { text-align: center; color: var(--muted); padding: 48px 16px; }
+  .empty b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 4px; }
+  .demo-note {
+    margin-top: 14px; padding: 10px 12px; border-radius: 12px; background: #fff4d6; color: #6b4e00; font-size: 13px;
+  }
+  .skeleton { background: linear-gradient(90deg, #e9e7ec 0, #f4f3f6 50%, #e9e7ec 100%); background-size: 200% 100%;
+    animation: sk 1.2s infinite linear; border-radius: var(--radius); aspect-ratio: 4/5; }
+  @keyframes sk { to { background-position: -200% 0; } }
+
+  /* ---------- Product page ---------- */
+  .pp { padding-bottom: 96px; }
+  @media (min-width: 860px) {
+    .pp-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; padding-top: 24px; }
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 12px 0;
+    font-weight: 500; color: var(--muted);
+  }
+  .gallery { position: relative; margin: 0 -16px; }
+  @media (min-width: 860px) { .gallery { margin: 0; } }
+  .slides {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: var(--surface);
+  }
+  @media (min-width: 860px) { .slides { border-radius: 18px; } }
+  .slides::-webkit-scrollbar { display: none; }
+  .slides > div { flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1; background: var(--paper); }
+  .slides img { width: 100%; height: 100%; object-fit: cover; }
+  .dots { position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; }
+  .dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.6); box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
+  .dots i.on { background: var(--pink); width: 18px; border-radius: 4px; }
+  .pp h1 { font-size: 22px; line-height: 1.2; margin: 16px 0 6px; }
+  .pp .big-price { font-size: 26px; font-weight: 700; }
+  .pp .big-price s { font-size: 16px; font-weight: 400; color: var(--muted); margin-left: 8px; }
+  .opt-title { font-weight: 700; margin: 20px 0 8px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px; padding: 9px 14px;
+    text-align: left; line-height: 1.25;
+  }
+  .pill small { display: block; color: var(--muted); font-size: 13px; }
+  .pill[aria-pressed="true"] { border-color: var(--pink); box-shadow: inset 0 0 0 1px var(--pink); }
+  .checks { display: grid; gap: 8px; }
+  .check {
+    display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1.5px solid var(--line);
+    border-radius: 12px; padding: 11px 14px;
+  }
+  .check input { width: 20px; height: 20px; accent-color: var(--pink); margin: 0; }
+  .check span { flex: 1; }
+  .check b { white-space: nowrap; }
+  .desc { white-space: pre-line; color: #45404a; margin-top: 20px; background: var(--surface); padding: 14px 16px; border-radius: 14px; }
+  .bundle-note { margin-top: 12px; font-size: 14px; color: var(--wine); background: #fde6ef; padding: 10px 14px; border-radius: 12px; }
+
+  .buybar {
+    position: fixed; left: 0; right: 0; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)); z-index: 15;
+    background: var(--surface); border-top: 1px solid var(--line);
+  }
+  .buybar .wrap { display: flex; gap: 10px; align-items: center; padding-top: 10px; padding-bottom: 10px; }
+  .stepper { display: flex; align-items: center; background: var(--bg); border-radius: 12px; height: 48px; }
+  .stepper button { width: 42px; height: 48px; border: 0; background: none; font-size: 22px; }
+  .stepper output { min-width: 28px; text-align: center; font-weight: 700; }
+  .btn {
+    flex: 1; height: 48px; border-radius: 12px; border: 0; background: var(--pink); color: #fff;
+    font-weight: 700; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    text-decoration: none; padding: 0 16px;
+  }
+  .btn:disabled { opacity: .55; }
+  .btn.ghost { background: var(--surface); color: var(--pink); border: 1.5px solid var(--pink); }
+  .btn small { font-weight: 500; opacity: .9; }
+
+  /* ---------- Cart ---------- */
+  .cart h1 { font-size: 24px; margin: 18px 0 12px; }
+  .lines { display: grid; gap: 10px; }
+  .line { display: grid; grid-template-columns: 76px 1fr; gap: 12px; background: var(--surface); border-radius: 14px; padding: 10px; }
+  .line .thumb { width: 76px; height: 92px; border-radius: 8px; overflow: hidden; background: var(--paper); }
+  .line .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .line h4 { margin: 0; font-size: 15px; font-weight: 500; }
+  .line .meta { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .line .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+  .line .stepper { height: 38px; }
+  .line .stepper button { height: 38px; width: 36px; font-size: 19px; }
+  .line .sum { font-weight: 700; }
+  .line .rm { border: 0; background: none; color: var(--muted); font-size: 13px; padding: 4px 0; text-decoration: underline; }
+  .line.gone { opacity: .55; }
+  .summary { background: var(--surface); border-radius: 14px; padding: 14px 16px; margin-top: 12px; }
+  .summary .r { display: flex; justify-content: space-between; padding: 4px 0; }
+  .summary .total { font-size: 20px; font-weight: 700; }
+  .meter { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  .meter .bar { height: 6px; background: var(--bg); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+  .meter .bar i { display: block; height: 100%; background: var(--pink); border-radius: 3px; }
+  .meter.done { color: var(--ok); font-weight: 700; }
+
+  form.checkout { background: var(--surface); border-radius: 14px; padding: 16px; margin-top: 12px; display: grid; gap: 14px; }
+  form.checkout h3 { margin: 0; font-size: 18px; }
+  label.f { display: grid; gap: 6px; font-weight: 500; font-size: 14px; }
+  .field { display: flex; align-items: stretch; background: var(--bg); border-radius: 12px; border: 1.5px solid transparent; }
+  .field:focus-within { border-color: var(--pink); background: var(--surface); }
+  .field input, .field textarea { flex: 1; border: 0; background: transparent; outline: 0; padding: 12px 14px; min-width: 0; resize: none; }
+  .field .pre { padding: 12px 0 12px 14px; color: var(--muted); }
+  .loc {
+    border: 0; background: none; padding: 0 14px; color: var(--pink); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px; font-size: 11px; font-weight: 700; border-left: 1px solid var(--line);
+  }
+  .loc.set { color: var(--ok); }
+  .hint { font-size: 13px; color: var(--muted); }
+  .err { color: #b00035; font-weight: 500; font-size: 14px; }
+  .hp { position: absolute; left: -9999px; }
+
+  .done-box { text-align: center; padding: 36px 8px; }
+  .done-box .tick { width: 72px; height: 72px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; margin: 0 auto 16px; }
+  .done-box h1 { margin: 0 0 8px; font-size: 24px; }
+  .done-box p { color: #4b464e; max-width: 420px; margin: 0 auto 20px; }
+  .done-box .btn { max-width: 340px; margin: 0 auto 10px; }
+
+  /* ---------- Print calculator sheet ---------- */
+  .sheet-bg { position: fixed; inset: 0; background: rgba(30,20,28,.45); z-index: 40; opacity: 0; transition: opacity .2s; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; background: var(--surface);
+    border-radius: 22px 22px 0 0; max-width: 560px; margin: 0 auto; padding: 10px 18px calc(18px + env(safe-area-inset-bottom));
+    transform: translateY(100%); transition: transform .25s ease-out; max-height: 92vh; overflow-y: auto;
+  }
+  .sheet.open { transform: none; }
+  .sheet-bg.open { opacity: 1; }
+  .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto 12px; }
+  .sheet h2 { margin: 0 0 4px; font-size: 21px; }
+  .sheet .sub { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+  .qty-big { display: flex; align-items: center; gap: 8px; background: var(--bg); border-radius: 14px; padding: 6px; }
+  .qty-big button { width: 52px; height: 52px; border: 0; border-radius: 10px; background: var(--surface); font-size: 24px; }
+  .qty-big input { flex: 1; min-width: 0; border: 0; background: transparent; text-align: center; font-size: 28px; font-weight: 700; outline: 0; }
+  .quick { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .quick button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 6px 12px; font-size: 14px; }
+  .tiers { margin: 14px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); font-size: 14px; }
+  .tiers div { display: flex; justify-content: space-between; padding: 7px 12px; }
+  .tiers div + div { border-top: 1px solid var(--line); }
+  .tiers div.on { background: #fde6ef; color: var(--wine); font-weight: 700; }
+  .calc-total { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+  .calc-total b { font-size: 26px; }
+
+  /* ---------- Bottom nav ---------- */
+  nav.bottom {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--surface); border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  nav.bottom .wrap { display: grid; grid-template-columns: repeat(3, 1fr); height: var(--nav-h); }
+  nav.bottom a {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    text-decoration: none; font-size: 12px; color: var(--muted); position: relative;
+  }
+  nav.bottom a.on { color: var(--pink); }
+  .count {
+    position: absolute; top: 7px; left: calc(50% + 6px); min-width: 18px; height: 18px; border-radius: 9px;
+    background: var(--pink); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; padding: 0 5px;
+  }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(var(--nav-h) + 84px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px);
+    background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 12px; z-index: 50; opacity: 0;
+    transition: .2s; pointer-events: none; font-size: 14px; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-row">
+    <a class="logo" href="#/" aria-label="Musavvir Print — bosh sahifa">musavir<small>PRINT</small></a>
+    <label class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <span class="sr">Qidirish</span>
+      <input id="q" type="search" placeholder="Albom, ramka, to'plam…" autocomplete="off">
+    </label>
+  </div>
+  <div class="wrap chips" id="chips" role="toolbar" aria-label="Kategoriyalar"></div>
+</header>
+
+<main id="view"></main>
+
+<nav class="bottom" aria-label="Asosiy menyu">
+  <div class="wrap">
+    <a href="#/" data-nav="home">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+      Bosh sahifa
+    </a>
+    <a href="#/savat" data-nav="cart">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 7h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg>
+      Savat
+      <span class="count" id="cart-count" hidden>0</span>
+    </a>
+    <a href="https://t.me/AzizaxonOmonova" target="_blank" rel="noopener">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 4 3 11l6 2.5L11.5 20 15 15l5 4z"/><path d="m9 13.5 6-4"/></svg>
+      Adminga yozish
+    </a>
+  </div>
+</nav>
+
+<div class="sheet-bg" id="sheet-bg" hidden></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden></section>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ================= Sozlamalar =================
+  var ADMIN = 'AzizaxonOmonova';
+  var FREE_FROM = 300;
+  var TIERS = [ // 10x15 narxlari — api/_lib.js dagi bilan bir xil
+    [1, 20, 5000], [21, 40, 4000], [41, 49, 3000], [50, 99, 2000],
+    [100, 200, 1800], [201, 300, 1700], [301, 500, 1600], [501, Infinity, 1500]
+  ];
+  function unitPrice(q) {
+    for (var i = 0; i < TIERS.length; i++) if (q >= TIERS[i][0] && q <= TIERS[i][1]) return TIERS[i][2];
+    return 0;
+  }
+
+  var params = new URLSearchParams(location.search);
+  var rawSrc = (params.get('src') || params.get('from') || '').toLowerCase();
+  var SRC = /^[a-z0-9_-]{1,32}$/.test(rawSrc) ? rawSrc : '';
+  // Mijoz qayerdan kelganini sahifalar orasida yo'qotmaslik uchun
+  try { if (SRC) sessionStorage.setItem('mp_src', SRC); else SRC = sessionStorage.getItem('mp_src') || ''; } catch (e) {}
+
+  // ================= Yordamchilar =================
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var view = $('#view');
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmt(n) { return String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  function sum(n) { return fmt(n) + " so'm"; }
+  var store = {
+    get: function (k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+  var toastTimer;
+  function toast(text) {
+    var t = $('#toast');
+    t.textContent = text;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 1800);
+  }
+  var ICON_PHOTO = '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 9"/></svg>';
+  var ICON_PLUS = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+
+  // ================= Holat =================
+  var products = [];
+  var demo = false;
+  var loaded = false;
+  var loadError = '';
+  var category = 'Hammasi';
+  var query = '';
+  // Savat: { prints: son, items: [{ id, v, a: [..], q }] }
+  var cart = store.get('mp_cart', { prints: 0, items: [] });
+  if (!cart || !Array.isArray(cart.items)) cart = { prints: 0, items: [] };
+  var draft = store.get('mp_checkout', { phone: '', address: '' });
+  var loc = null;
+
+  function saveCart() { store.set('mp_cart', cart); updateCount(); }
+  function byId(id) { for (var i = 0; i < products.length; i++) if (products[i].id === id) return products[i]; return null; }
+  function minPrice(p) {
+    if (p.variants && p.variants.length) return Math.min.apply(null, p.variants.map(function (v) { return v.price; }));
+    return p.price;
+  }
+  function lineUnit(p, it) {
+    var unit = p.variants && p.variants.length ? (p.variants[it.v] || p.variants[0]).price : p.price;
+    (it.a || []).forEach(function (i) { if (p.addons[i]) unit += p.addons[i].price; });
+    return unit;
+  }
+  function cartLines() {
+    return cart.items.map(function (it) {
+      var p = byId(it.id);
+      return { it: it, p: p, unit: p ? lineUnit(p, it) : 0 };
+    });
+  }
+  function totals() {
+    var t = 0, count = 0, prints = cart.prints;
+    if (cart.prints > 0) { t += cart.prints * unitPrice(cart.prints); count += 1; }
+    cartLines().forEach(function (l) {
+      if (!l.p) return;
+      t += l.unit * l.it.q;
+      count += l.it.q;
+      prints += (l.p.print_qty || 0) * l.it.q;
+    });
+    return { total: t, count: count, prints: prints };
+  }
+  function updateCount() {
+    var n = cart.items.reduce(function (a, it) { return a + it.q; }, 0) + (cart.prints > 0 ? 1 : 0);
+    var c = $('#cart-count');
+    c.hidden = !n;
+    c.textContent = n > 99 ? '99+' : n;
+  }
+  function addToCart(id, v, a, q) {
+    a = (a || []).slice().sort();
+    var key = id + '|' + v + '|' + a.join(',');
+    var found = cart.items.find(function (it) { return it.id + '|' + it.v + '|' + (it.a || []).join(',') === key; });
+    if (found) found.q = Math.min(1000, found.q + q);
+    else cart.items.push({ id: id, v: v, a: a, q: q });
+    saveCart();
+  }
+
+  // ================= Yuklash =================
+  function load() {
+    fetch('/api/catalog', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.ok) throw new Error(d.error || '');
+        products = (d.products || []).map(function (p) {
+          p.variants = p.variants || []; p.addons = p.addons || []; p.images = p.images || [];
+          return p;
+        });
+        demo = !!d.demo;
+        loaded = true;
+        // Sotuvdan olingan tovarlarni savatdan tozalash
+        updateCount();
+        renderChips();
+        route();
+      })
+      .catch(function (e) {
+        loaded = true;
+        loadError = e.message || "Tovarlar yuklanmadi. Internetni tekshirib, sahifani yangilang.";
+        route();
+      });
+  }
+
+  // ================= Kategoriyalar =================
+  function categories() {
+    var seen = {}, list = [];
+    products.forEach(function (p) { if (p.category && !seen[p.category]) { seen[p.category] = 1; list.push(p.category); } });
+    return ['Hammasi'].concat(list);
+  }
+  function renderChips() {
+    var box = $('#chips');
+    box.innerHTML = categories().map(function (c) {
+      return '<button class="chip" type="button" data-cat="' + esc(c) + '" aria-pressed="' + (c === category) + '">' + esc(c) + '</button>';
+    }).join('');
+  }
+  $('#chips').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-cat]');
+    if (!b) return;
+    category = b.getAttribute('data-cat');
+    renderChips();
+    if (location.hash !== '#/' && location.hash !== '') location.hash = '#/';
+    else renderHome();
+  });
+  $('#q').addEventListener('input', function (e) {
+    query = e.target.value.trim().toLowerCase();
+    if (location.hash !== '#/' && location.hash !== '') location.hash = '#/';
+    else renderHome();
+  });
+
+  // ================= Bosh sahifa =================
+  function cardHTML(p) {
+    var img = p.images[0]
+      ? '<img src="' + esc(p.images[0]) + '" alt="" loading="lazy">'
+      : '<div class="ph">' + ICON_PHOTO + '</div>';
+    var badge = '';
+    if (p.old_price && p.old_price > p.price && !p.variants.length) {
+      badge = '<span class="badge sale">−' + Math.round((1 - p.price / p.old_price) * 100) + '%</span>';
+    } else if (p.is_bundle) badge = "<span class=\"badge\">To'plam</span>";
+    var price = p.variants.length ? sum(minPrice(p)) + 'dan' : sum(p.price);
+    var old = p.old_price && p.old_price > p.price && !p.variants.length ? '<s>' + fmt(p.old_price) + '</s>' : '';
+    return '<a class="card" href="#/p/' + encodeURIComponent(p.id) + '">' +
+      '<div class="shot"><div class="img">' + img + '</div>' + badge +
+      '<button class="add-fab" type="button" data-quick="' + esc(p.id) + '" aria-label="Savatga qo\'shish: ' + esc(p.name) + '">' + ICON_PLUS + '</button></div>' +
+      '<div class="price">' + price + old + '</div>' +
+      '<div class="name">' + esc(p.name) + '</div></a>';
+  }
+
+  function renderHome() {
+    setNav('home');
+    document.title = "Musavvir Print — do'kon";
+    var list = products.filter(function (p) {
+      if (category !== 'Hammasi' && p.category !== category) return false;
+      if (query && (p.name + ' ' + p.category + ' ' + p.description).toLowerCase().indexOf(query) < 0) return false;
+      return true;
+    });
+    var showHero = !query && category === 'Hammasi';
+    var html = '<div class="wrap">';
+    if (demo) html += '<div class="demo-note">Bu sinov ko\'rinishi: tovarlar namuna sifatida qo\'yilgan. Admin paneldan haqiqiy tovarlar kiritilgach, ular ko\'rinadi.</div>';
+    if (showHero) {
+      var inCart = cart.prints > 0 ? '<p>Savatda: ' + cart.prints + ' ta rasm</p>' : '<p>RC fotoqog\'ozga, 1 donadan. 300 tadan yetkazish bepul.</p>';
+      html += '<button class="hero" type="button" id="open-calc"><div><h2>10x15 rasm chiqarish — 1 500 so\'mdan</h2>' + inCart +
+        '<span class="go">' + (cart.prints > 0 ? "Sonini o'zgartirish" : 'Narxni hisoblash') + '</span></div>' +
+        '<div class="stack" aria-hidden="true"><span><i></i></span><span><i></i></span><span><i></i></span></div></button>';
+    }
+    if (!loaded) {
+      html += '<div class="section-title"><h3>Tovarlar</h3></div><div class="grid">' +
+        '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>';
+    } else if (loadError) {
+      html += '<div class="empty"><b>Tovarlar yuklanmadi</b>' + esc(loadError) + '</div>';
+    } else if (!list.length) {
+      html += query
+        ? '<div class="empty"><b>«' + esc(query) + '» bo\'yicha hech narsa topilmadi</b>Boshqa so\'z bilan qidirib ko\'ring.</div>'
+        : '<div class="empty"><b>Hozircha bu yerda tovar yo\'q</b>Tez orada qo\'shamiz. Savolingiz bo\'lsa, adminga yozing.</div>';
+    } else {
+      var title = query ? 'Qidiruv natijasi' : category === 'Hammasi' ? 'Albomlar, ramkalar va to\'plamlar' : category;
+      html += '<div class="section-title"><h3>' + esc(title) + '</h3><span>' + list.length + ' ta</span></div>';
+      html += '<div class="grid">' + list.map(cardHTML).join('') + '</div>';
+    }
+    html += '<p class="hint" style="text-align:center;margin:28px 0 12px">Polaroid, A5, A4, A3 va boshqa o\'lchamlar — <a href="https://t.me/' + ADMIN + '" target="_blank" rel="noopener">adminga yozing</a>.</p>';
+    html += '</div>';
+    view.innerHTML = html;
+    var oc = $('#open-calc');
+    if (oc) oc.addEventListener('click', openCalc);
+  }
+
+  view.addEventListener('click', function (e) {
+    var q = e.target.closest('[data-quick]');
+    if (!q) return;
+    e.preventDefault();
+    var p = byId(q.getAttribute('data-quick'));
+    if (!p) return;
+    // Variant yoki qo'shimcha bo'lsa — tanlash uchun tovar sahifasiga
+    if (p.variants.length > 1 || p.addons.length) { location.hash = '#/p/' + encodeURIComponent(p.id); return; }
+    addToCart(p.id, 0, [], 1);
+    toast("Savatga qo'shildi");
+  });
+
+  // ================= Tovar sahifasi =================
+  function renderProduct(id) {
+    setNav('');
+    var p = byId(id);
+    if (!p) {
+      view.innerHTML = '<div class="wrap"><button class="back" type="button" onclick="history.back()">‹ Orqaga</button>' +
+        '<div class="empty"><b>Bu tovar topilmadi</b>U sotuvdan olingan bo\'lishi mumkin. <a href="#/">Bosh sahifaga qaytish</a></div></div>';
+      return;
+    }
+    document.title = p.name + ' — Musavvir Print';
+    var sel = { v: 0, a: [], q: 1 };
+    var imgs = p.images.length ? p.images : [null];
+    var slides = imgs.map(function (u, i) {
+      return '<div>' + (u ? '<img src="' + esc(u) + '" alt="' + esc(p.name) + (imgs.length > 1 ? ', ' + (i + 1) + '-rasm' : '') + '"' + (i ? ' loading="lazy"' : '') + '>' : '<div class="ph">' + ICON_PHOTO + '</div>') + '</div>';
+    }).join('');
+    var dots = imgs.length > 1 ? '<div class="dots" aria-hidden="true">' + imgs.map(function (_, i) { return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('') + '</div>' : '';
+
+    var html = '<div class="wrap pp"><button class="back" type="button" id="back">‹ Orqaga</button>' +
+      '<div class="pp-grid"><div class="gallery"><div class="slides" id="slides">' + slides + '</div>' + dots + '</div><div>' +
+      '<h1>' + esc(p.name) + '</h1><div class="big-price" id="pp-price"></div>';
+    if (p.is_bundle && p.print_qty) html += '<div class="bundle-note">Ichida ' + p.print_qty + ' ta 10x15 rasm bor. Rasmlarni buyurtmadan keyin Telegram orqali yuborasiz.</div>';
+    if (p.variants.length) {
+      html += '<div class="opt-title">Variantni tanlang</div><div class="pills" id="variants" role="radiogroup">' +
+        p.variants.map(function (v, i) {
+          return '<button type="button" class="pill" role="radio" data-v="' + i + '" aria-pressed="' + (i === 0) + '" aria-checked="' + (i === 0) + '">' + esc(v.name) + '<small>' + sum(v.price) + '</small></button>';
+        }).join('') + '</div>';
+    }
+    if (p.addons.length) {
+      html += '<div class="opt-title">Qo\'shimcha</div><div class="checks">' +
+        p.addons.map(function (a, i) {
+          return '<label class="check"><input type="checkbox" data-a="' + i + '"><span>' + esc(a.name) + '</span><b>+' + sum(a.price) + '</b></label>';
+        }).join('') + '</div>';
+    }
+    if (p.description) html += '<div class="desc">' + esc(p.description) + '</div>';
+    html += '</div></div></div>' +
+      '<div class="buybar"><div class="wrap"><div class="stepper"><button type="button" id="minus" aria-label="Kamaytirish">−</button><output id="qty">1</output><button type="button" id="plus" aria-label="Ko\'paytirish">+</button></div>' +
+      '<button class="btn" type="button" id="add">Savatga · <span id="add-sum"></span></button></div></div>';
+    view.innerHTML = html;
+    window.scrollTo(0, 0);
+
+    function refresh() {
+      var unit = lineUnit(p, sel);
+      var base = p.variants.length ? p.variants[sel.v].price : p.price;
+      var old = !p.variants.length && p.old_price > p.price ? '<s>' + sum(p.old_price) + '</s>' : '';
+      $('#pp-price').innerHTML = sum(base) + old;
+      $('#qty').textContent = sel.q;
+      $('#add-sum').textContent = sum(unit * sel.q);
+    }
+    refresh();
+    $('#back').onclick = function () { if (history.length > 1) history.back(); else location.hash = '#/'; };
+    var vbox = $('#variants');
+    if (vbox) vbox.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-v]');
+      if (!b) return;
+      sel.v = +b.getAttribute('data-v');
+      vbox.querySelectorAll('[data-v]').forEach(function (x) {
+        var on = x === b; x.setAttribute('aria-pressed', on); x.setAttribute('aria-checked', on);
+      });
+      refresh();
+    });
+    view.querySelectorAll('[data-a]').forEach(function (c) {
+      c.addEventListener('change', function () {
+        sel.a = [].slice.call(view.querySelectorAll('[data-a]:checked')).map(function (x) { return +x.getAttribute('data-a'); });
+        refresh();
+      });
+    });
+    $('#minus').onclick = function () { sel.q = Math.max(1, sel.q - 1); refresh(); };
+    $('#plus').onclick = function () { sel.q = Math.min(1000, sel.q + 1); refresh(); };
+    $('#add').onclick = function () {
+      addToCart(p.id, sel.v, sel.a, sel.q);
+      toast("Savatga qo'shildi");
+      var b = $('#add');
+      b.innerHTML = 'Savatga o\'tish';
+      b.onclick = function () { location.hash = '#/savat'; };
+    };
+    var sl = $('#slides');
+    if (imgs.length > 1) sl.addEventListener('scroll', function () {
+      var i = Math.round(sl.scrollLeft / sl.clientWidth);
+      view.querySelectorAll('.dots i').forEach(function (d, j) { d.classList.toggle('on', i === j); });
+    }, { passive: true });
+  }
+
+  // ================= 10x15 kalkulyator =================
+  function openCalc() {
+    var sheet = $('#sheet'), bg = $('#sheet-bg');
+    var q = cart.prints || 100;
+    sheet.innerHTML =
+      '<div class="grab"></div><h2 id="sheet-title">10x15 rasm chiqarish</h2>' +
+      '<p class="sub">Qancha ko\'p bo\'lsa, donasi shuncha arzon. Rasmlarni buyurtmadan keyin Telegram orqali yuborasiz.</p>' +
+      '<label class="sr" for="calc-q">Rasm soni</label>' +
+      '<div class="qty-big"><button type="button" data-d="-10" aria-label="10 taga kamaytirish">−</button>' +
+      '<input id="calc-q" type="number" inputmode="numeric" min="0" max="100000"><button type="button" data-d="10" aria-label="10 taga ko\'paytirish">+</button></div>' +
+      '<div class="quick">' + [50, 100, 200, 300, 500].map(function (n) { return '<button type="button" data-set="' + n + '">' + n + ' ta</button>'; }).join('') + '</div>' +
+      '<div class="tiers" id="tiers"></div>' +
+      '<div class="calc-total"><span id="calc-unit"></span><b id="calc-sum"></b></div>' +
+      '<p class="hint" id="calc-free" style="margin:-4px 0 12px"></p>' +
+      '<button class="btn" type="button" id="calc-add" style="width:100%"></button>' +
+      (cart.prints > 0 ? '<button class="btn ghost" type="button" id="calc-rm" style="width:100%;margin-top:8px">Savatdan olib tashlash</button>' : '');
+    var inp = $('#calc-q');
+    inp.value = q;
+    function upd() {
+      var n = Math.max(0, Math.min(100000, parseInt(inp.value, 10) || 0));
+      var up = unitPrice(n);
+      $('#tiers').innerHTML = TIERS.map(function (t) {
+        var label = t[1] === Infinity ? t[0] + ' va undan ko\'p' : t[0] + '–' + t[1] + ' ta';
+        var on = n >= t[0] && n <= t[1];
+        return '<div' + (on ? ' class="on"' : '') + '><span>' + label + '</span><span>' + fmt(t[2]) + " so'm</span></div>";
+      }).join('');
+      $('#calc-unit').textContent = n ? n + ' × ' + fmt(up) : 'Sonini kiriting';
+      $('#calc-sum').textContent = sum(n * up);
+      var other = totals().prints - cart.prints;
+      var all = n + other;
+      $('#calc-free').textContent = all >= FREE_FROM ? 'Yetkazish bepul bo\'ladi.' : 'Bepul yetkazish uchun yana ' + (FREE_FROM - all) + ' ta rasm.';
+      var b = $('#calc-add');
+      b.disabled = !n;
+      b.textContent = cart.prints > 0 ? 'Savatni yangilash' : "Savatga qo'shish";
+    }
+    inp.addEventListener('input', upd);
+    sheet.addEventListener('click', function (e) {
+      var d = e.target.closest('[data-d]'), s = e.target.closest('[data-set]');
+      if (d) { inp.value = Math.max(0, (parseInt(inp.value, 10) || 0) + +d.getAttribute('data-d')); upd(); }
+      if (s) { inp.value = s.getAttribute('data-set'); upd(); }
+    });
+    $('#calc-add').onclick = function () {
+      var n = Math.max(0, Math.min(100000, parseInt(inp.value, 10) || 0));
+      if (!n) return;
+      var was = cart.prints;
+      cart.prints = n; saveCart(); closeSheet();
+      toast(was ? 'Rasm soni yangilandi' : "Savatga qo'shildi");
+      route();
+    };
+    var rm = $('#calc-rm');
+    if (rm) rm.onclick = function () { cart.prints = 0; saveCart(); closeSheet(); route(); };
+    upd();
+    bg.hidden = false; sheet.hidden = false;
+    requestAnimationFrame(function () { bg.classList.add('open'); sheet.classList.add('open'); });
+    setTimeout(function () { inp.focus(); inp.select(); }, 260);
+    document.addEventListener('keydown', escClose);
+  }
+  function escClose(e) { if (e.key === 'Escape') closeSheet(); }
+  function closeSheet() {
+    var sheet = $('#sheet'), bg = $('#sheet-bg');
+    sheet.classList.remove('open'); bg.classList.remove('open');
+    document.removeEventListener('keydown', escClose);
+    setTimeout(function () { sheet.hidden = true; bg.hidden = true; }, 250);
+  }
+  $('#sheet-bg').addEventListener('click', closeSheet);
+
+  // ================= Savat =================
+  function renderCart() {
+    setNav('cart');
+    document.title = 'Savat — Musavvir Print';
+    var lines = cartLines();
+    var html = '<div class="wrap cart"><h1>Savat</h1>';
+    if (!cart.prints && !lines.length) {
+      view.innerHTML = html + '<div class="empty"><b>Savat bo\'sh</b>Rasm sonini hisoblang yoki albom, ramka tanlang.' +
+        '<div style="margin-top:18px"><a class="btn" href="#/" style="max-width:280px;margin:0 auto">Tovarlarni ko\'rish</a></div></div></div>';
+      return;
+    }
+    html += '<div class="lines">';
+    if (cart.prints > 0) {
+      var up = unitPrice(cart.prints);
+      html += '<div class="line"><div class="thumb"><div class="ph" style="background:#fde6ef;color:var(--pink)">' + ICON_PHOTO + '</div></div><div>' +
+        '<h4>10x15 rasm chop etish</h4><div class="meta">' + cart.prints + ' ta × ' + sum(up) + '</div>' +
+        '<div class="row"><button type="button" class="rm" id="edit-prints">Sonini o\'zgartirish</button><span class="sum">' + sum(cart.prints * up) + '</span></div>' +
+        '<button type="button" class="rm" id="rm-prints">Olib tashlash</button></div></div>';
+    }
+    lines.forEach(function (l, i) {
+      var p = l.p, it = l.it;
+      if (!p) {
+        html += '<div class="line gone"><div class="thumb"><div class="ph">' + ICON_PHOTO + '</div></div><div><h4>Tovar sotuvdan olingan</h4>' +
+          '<div class="meta">Buyurtma berish uchun uni olib tashlang.</div><button type="button" class="rm" data-rm="' + i + '">Olib tashlash</button></div></div>';
+        return;
+      }
+      var meta = [];
+      if (p.variants.length) meta.push((p.variants[it.v] || p.variants[0]).name);
+      (it.a || []).forEach(function (a) { if (p.addons[a]) meta.push('+ ' + p.addons[a].name); });
+      meta.push(sum(l.unit));
+      var thumb = p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '<div class="ph">' + ICON_PHOTO + '</div>';
+      html += '<div class="line"><a class="thumb" href="#/p/' + encodeURIComponent(p.id) + '">' + thumb + '</a><div>' +
+        '<h4>' + esc(p.name) + '</h4><div class="meta">' + esc(meta.join(' · ')) + '</div>' +
+        '<div class="row"><div class="stepper"><button type="button" data-dec="' + i + '" aria-label="Kamaytirish">−</button><output>' + it.q + '</output>' +
+        '<button type="button" data-inc="' + i + '" aria-label="Ko\'paytirish">+</button></div><span class="sum">' + sum(l.unit * it.q) + '</span></div>' +
+        '<button type="button" class="rm" data-rm="' + i + '">Olib tashlash</button></div></div>';
+    });
+    html += '</div>';
+
+    var t = totals();
+    var free = t.prints >= FREE_FROM;
+    html += '<div class="summary"><div class="r total"><span>Jami</span><span>' + sum(t.total) + '</span></div>' +
+      '<div class="meter' + (free ? ' done' : '') + '">' +
+      (free ? 'BTS orqali yetkazish bepul' : 'Bepul yetkazish uchun yana ' + (FREE_FROM - t.prints) + ' ta rasm kerak. Hozir yetkazish pullik.') +
+      (free ? '' : '<div class="bar"><i style="width:' + Math.min(100, t.prints / FREE_FROM * 100) + '%"></i></div>') + '</div></div>';
+
+    var hasGone = lines.some(function (l) { return !l.p; });
+    html += '<form class="checkout" id="checkout" novalidate><h3>Buyurtma berish</h3>' +
+      '<label class="f">Telefon raqam<div class="field"><span class="pre">+998</span><input id="phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="12" placeholder="90 123 45 67" required></div></label>' +
+      '<label class="f" for="address">Manzil yoki lokatsiya</label>' +
+      '<div class="field" style="margin-top:-8px"><textarea id="address" rows="2" maxlength="300" placeholder="Viloyat, shahar/tuman"></textarea>' +
+      '<button type="button" class="loc' + (loc ? ' set' : '') + '" id="loc"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg><span id="loc-label">' + (loc ? 'Olindi' : 'Lokatsiya') + '</span></button></div>' +
+      '<p class="hint" style="margin:-6px 0 0">Eng yaqin BTS filialini o\'zimiz tanlab, sizga qo\'ng\'iroq qilamiz.</p>' +
+      '<input class="hp" type="text" id="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+      '<p class="err" id="err" role="alert" hidden></p>' +
+      '<button class="btn" type="submit" id="submit"' + (hasGone ? ' disabled' : '') + '>Buyurtma berish · ' + sum(t.total) + '</button>' +
+      (cart.prints > 0 || lines.some(function (l) { return l.p && l.p.print_qty; }) ? '<p class="hint" style="margin:0;text-align:center">Rasmlaringizni buyurtmadan keyin Telegram orqali yuborasiz.</p>' : '') +
+      '</form></div>';
+    view.innerHTML = html;
+
+    var ph = $('#phone'), ad = $('#address');
+    ph.value = draft.phone || '';
+    ad.value = draft.address || '';
+    ph.addEventListener('input', function () {
+      var d = ph.value.replace(/\D/g, '').replace(/^998/, '').slice(0, 9);
+      ph.value = [d.slice(0, 2), d.slice(2, 5), d.slice(5, 7), d.slice(7, 9)].filter(Boolean).join(' ');
+      draft.phone = ph.value; store.set('mp_checkout', draft);
+    });
+    ad.addEventListener('input', function () { draft.address = ad.value; store.set('mp_checkout', draft); });
+    $('#loc').onclick = getLocation;
+
+    view.querySelectorAll('[data-inc],[data-dec],[data-rm]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i;
+        if (b.hasAttribute('data-inc')) { i = +b.getAttribute('data-inc'); cart.items[i].q = Math.min(1000, cart.items[i].q + 1); }
+        if (b.hasAttribute('data-dec')) { i = +b.getAttribute('data-dec'); cart.items[i].q = Math.max(1, cart.items[i].q - 1); }
+        if (b.hasAttribute('data-rm')) { i = +b.getAttribute('data-rm'); cart.items.splice(i, 1); }
+        saveCart(); keepScroll(renderCart);
+      });
+    });
+    var ep = $('#edit-prints'); if (ep) ep.onclick = openCalc;
+    var rp = $('#rm-prints'); if (rp) rp.onclick = function () { cart.prints = 0; saveCart(); keepScroll(renderCart); };
+    $('#checkout').addEventListener('submit', submitOrder);
+  }
+  function keepScroll(fn) { var y = window.scrollY; fn(); window.scrollTo(0, y); }
+
+  function getLocation() {
+    var label = $('#loc-label');
+    if (!navigator.geolocation) return locFail();
+    label.textContent = 'Kuting…';
+    navigator.geolocation.getCurrentPosition(function (p) {
+      loc = { lat: p.coords.latitude, lon: p.coords.longitude };
+      label.textContent = 'Olindi';
+      $('#loc').classList.add('set');
+    }, locFail, { enableHighAccuracy: true, timeout: 15000 });
+  }
+  function locFail() {
+    var label = $('#loc-label');
+    if (label) label.textContent = 'Lokatsiya';
+    showErr("Joylashuvni olib bo'lmadi. Manzilni yozib qoldiring — shu yetarli.");
+  }
+  function showErr(t) { var e = $('#err'); if (!e) return; e.textContent = t; e.hidden = !t; }
+
+  function submitOrder(e) {
+    e.preventDefault();
+    var digits = $('#phone').value.replace(/\D/g, '');
+    var address = $('#address').value.trim();
+    if (digits.length !== 9) { showErr("Telefon raqamini to'liq kiriting: 9 ta raqam."); $('#phone').focus(); return; }
+    if (address.length < 3 && !loc) { showErr('Manzilni yozing yoki lokatsiya tugmasini bosing.'); $('#address').focus(); return; }
+    showErr('');
+    var btn = $('#submit');
+    btn.disabled = true; btn.textContent = 'Yuborilmoqda…';
+    var t = totals();
+    fetch('/api/shop-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone: digits, address: address, lat: loc && loc.lat, lon: loc && loc.lon, src: SRC,
+        website: $('#website').value,
+        cart: {
+          prints: cart.prints,
+          items: cart.items.map(function (it) { return { id: it.id, v: it.v, a: it.a, q: it.q }; })
+        }
+      })
+    }).then(function (r) { return r.json().then(function (d) { return { status: r.status, d: d }; }); })
+      .then(function (res) {
+        if (!res.d.ok) throw new Error(res.d.error || "Buyurtma yuborilmadi. Qaytadan urinib ko'ring.");
+        var hadPrints = t.prints > 0;
+        cart = { prints: 0, items: [] }; saveCart();
+        renderDone(res.d, hadPrints);
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = 'Buyurtma berish · ' + sum(t.total);
+        showErr(err.message || "Internet bilan muammo. Qaytadan urinib ko'ring.");
+      });
+  }
+
+  function renderDone(d, hadPrints) {
+    setNav('');
+    var num = d.id ? ' №' + d.id : '';
+    var text = 'Assalomu alaykum! Saytda buyurtma berdim' + num + '.' + (hadPrints ? ' Rasmlarimni yuboryapman.' : '');
+    view.innerHTML = '<div class="wrap"><div class="done-box"><div class="tick"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></div>' +
+      '<h1>Buyurtma' + esc(num) + ' qabul qilindi</h1>' +
+      '<p>Jami: <b>' + sum(d.total) + '</b>. ' + (d.free ? 'Yetkazish bepul. ' : '') + 'Tez orada siz bilan bog\'lanamiz' +
+      (hadPrints ? '. Endi chop etiladigan rasmlaringizni Telegram orqali yuboring.' : '.') + '</p>' +
+      '<a class="btn" href="https://t.me/' + ADMIN + '?text=' + encodeURIComponent(text) + '" target="_blank" rel="noopener">' + (hadPrints ? "Rasmlarni Telegramda yuborish" : "Telegramda yozish") + '</a>' +
+      '<a class="btn ghost" href="#/">Bosh sahifaga qaytish</a></div></div>';
+    window.scrollTo(0, 0);
+  }
+
+  // ================= Yo'naltirish =================
+  function setNav(which) {
+    $('#chips').hidden = which !== 'home';
+    document.querySelectorAll('[data-nav]').forEach(function (a) {
+      var on = a.getAttribute('data-nav') === which;
+      a.classList.toggle('on', on);
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+  }
+  function route() {
+    var h = location.hash || '#/';
+    var m = h.match(/^#\/p\/(.+)$/);
+    if (h === '#/savat' && !loaded && cart.items.length) { setNav('cart'); view.innerHTML = '<div class="wrap cart"><h1>Savat</h1><div class="skeleton" style="aspect-ratio:3/1"></div></div>'; }
+    else if (h === '#/savat') renderCart();
+    else if (m && loaded) renderProduct(decodeURIComponent(m[1]));
+    else if (m) view.innerHTML = '<div class="wrap" style="padding-top:20px"><div class="skeleton" style="aspect-ratio:1"></div></div>';
+    else renderHome();
+  }
+  window.addEventListener('hashchange', function () { route(); if (!/^#\/savat/.test(location.hash)) window.scrollTo(0, 0); });
+
+  updateCount();
+  route();
+  load();
+})();
+</script>
+</body>
+</html>
