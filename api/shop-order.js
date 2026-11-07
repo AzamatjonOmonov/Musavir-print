@@ -1,7 +1,7 @@
 // Do'kon savatidan kelgan buyurtma: POST /api/shop-order
 // Narxlar mijozdan emas, bazadan qayta hisoblanadi.
-const { TOKEN, ADMIN_CHAT_ID, FREE_DELIVERY_FROM, unitPrice, fmt, tg, esc, cleanSrc, srcLabel } = require('./_lib');
-const { configured, rest, DEMO_PRODUCTS } = require('./_store');
+const { TOKEN, ADMIN_CHAT_ID, FREE_DELIVERY_FROM, fmt, tg, esc, cleanSrc, srcLabel } = require('./_lib');
+const { configured, rest, DEMO_PRODUCTS, priceItem, getSettings, tierPrice } = require('./_store');
 
 const ALLOWED_HOSTS = /(^|\.)musavvirprint\.uz$|\.vercel\.app$|^localhost$|^127\.0\.0\.1$/;
 
@@ -60,11 +60,20 @@ module.exports = async (req, res) => {
 
   // ---- Savatni qayta hisoblash ----
   const cart = b.cart || {};
-  const prints = int(cart.prints, 0, 100000);
+  // Chop etish: { "10x15": 120, "a4": 10 }  (eski ko'rinish: prints → 10x15)
+  const calcQty = {};
+  if (cart.calcs && typeof cart.calcs === 'object') {
+    for (const [k, v] of Object.entries(cart.calcs).slice(0, 12)) calcQty[String(k).slice(0, 24)] = int(v, 0, 100000);
+  }
+  if (cart.prints) calcQty['10x15'] = int(cart.prints, 0, 100000);
   const rawItems = Array.isArray(cart.items) ? cart.items.slice(0, 50) : [];
   let products;
+  let calculators;
   try {
-    products = await loadProducts([...new Set(rawItems.map((x) => String(x && x.id)))]);
+    [products, { calculators }] = await Promise.all([
+      loadProducts([...new Set(rawItems.map((x) => String(x && x.id)))]),
+      getSettings(),
+    ]);
   } catch {
     return fail(502, "Buyurtma qabul qilinmadi, qaytadan urinib ko'ring");
   }
@@ -72,31 +81,22 @@ module.exports = async (req, res) => {
 
   const lines = [];
   let total = 0;
-  let printCount = prints;
-  if (prints > 0) {
-    const up = unitPrice(prints);
-    total += prints * up;
-    lines.push({ name: '10x15 rasm chop etish', qty: prints, unit: up, sum: prints * up });
-  }
+  let printCount = 0;
   const missing = [];
+  for (const [id, qty] of Object.entries(calcQty)) {
+    if (qty <= 0) continue;
+    const calc = calculators.find((c) => c.id === id && c.on !== false);
+    if (!calc) { missing.push(`${id} rasm`); continue; }
+    const up = tierPrice(calc, qty);
+    total += qty * up;
+    if (calc.free) printCount += qty;
+    lines.push({ name: `${calc.name} rasm chop etish`, qty, unit: up, sum: qty * up, print: true });
+  }
   for (const it of rawItems) {
     const p = byId.get(String(it && it.id));
     if (!p) { missing.push(it && it.name ? String(it.name).slice(0, 60) : 'tovar'); continue; }
     const q = int(it.q, 1, 1000);
-    const variants = Array.isArray(p.variants) ? p.variants : [];
-    const addons = Array.isArray(p.addons) ? p.addons : [];
-    let unit = p.price;
-    let name = p.name;
-    if (variants.length) {
-      const v = variants[int(it.v, 0, variants.length - 1)];
-      unit = v.price;
-      name += ` — ${v.name}`;
-    }
-    const chosen = [...new Set(Array.isArray(it.a) ? it.a.map((i) => int(i, -1, 99)) : [])]
-      .filter((i) => i >= 0 && i < addons.length)
-      .map((i) => addons[i]);
-    for (const a of chosen) unit += a.price;
-    if (chosen.length) name += ' + ' + chosen.map((a) => a.name).join(', ');
+    const { unit, name } = priceItem(p, { v: it.v, o: it.o, a: it.a });
     total += unit * q;
     printCount += (Number(p.print_qty) || 0) * q;
     const img = Array.isArray(p.images) && p.images[0] ? String(p.images[0]) : '';
@@ -138,7 +138,7 @@ module.exports = async (req, res) => {
     : "🧪 <b>SINOV buyurtma (namuna tovarlar)</b>";
   const msg = [title, `📞 ${esc(phone)}`, ''];
   for (const l of lines) {
-    const icon = l.name.startsWith('10x15') ? '🖼' : l.bundle ? '🎁' : '📦';
+    const icon = l.print ? '🖼' : l.bundle ? '🎁' : '📦';
     msg.push(`${icon} ${esc(l.name)}\n     ${l.qty} × ${fmt(l.unit)} = <b>${fmt(l.sum)}</b>`);
   }
   msg.push(
@@ -185,5 +185,8 @@ module.exports = async (req, res) => {
       chat_id: chatId, latitude: addr.lat, longitude: addr.lon, reply_to_message_id: replyTo,
     });
   }
-  return res.status(200).json({ ok: true, id: orderId, total, free, prints: printCount });
+  return res.status(200).json({
+    ok: true, id: orderId, total, free, prints: printCount, phone,
+    lines: lines.map((l) => ({ name: l.name, qty: l.qty, sum: l.sum, print: !!l.print })),
+  });
 };

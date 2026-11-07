@@ -20,12 +20,14 @@
   :focus-visible { outline: 3px solid var(--pink); outline-offset: 2px; }
   [hidden] { display: none !important; }
   .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
-  .logo { font-family: 'Playball', cursive; color: var(--pink); font-size: 26px; line-height: 1; text-decoration: none; }
+  .logo { display: block; line-height: 0; }
+  .logo img { height: 32px; width: auto; }
 
   /* Login */
   .login { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
   .login form { width: 100%; max-width: 360px; background: var(--surface); border-radius: 20px; padding: 28px 22px; display: grid; gap: 14px; text-align: center; }
-  .login .logo { font-size: 44px; }
+  .login .logo { justify-self: center; }
+  .login .logo img { height: 64px; }
   .login p { margin: 0; color: var(--muted); }
 
   /* Header */
@@ -33,6 +35,12 @@
   .hrow { display: flex; align-items: center; gap: 12px; height: 56px; }
   .tabs { display: flex; gap: 4px; margin-left: auto; background: var(--bg); padding: 4px; border-radius: 12px; }
   .tabs button { border: 0; background: none; padding: 7px 12px; border-radius: 9px; font-weight: 500; }
+  @media (max-width: 560px) {
+    #app > header .hrow { flex-wrap: wrap; height: auto; padding-top: 8px; padding-bottom: 8px; row-gap: 8px; }
+    #app > header .out { margin-left: auto; }
+    .tabs { order: 3; width: 100%; margin-left: 0; }
+    .tabs button { flex: 1; padding: 7px 4px; font-size: 14px; }
+  }
   .tabs button[aria-selected="true"] { background: var(--surface); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
   .out { border: 0; background: none; color: var(--muted); padding: 8px 0 8px 4px; font-size: 14px; }
   .shop-link { color: var(--muted); font-size: 14px; }
@@ -99,7 +107,10 @@
   .imgs label.add input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 
   .rows { display: grid; gap: 8px; }
-  .prow2 { display: grid; grid-template-columns: 1fr 140px 40px; gap: 8px; align-items: center; }
+  .rows { gap: 14px !important; }
+  .prow2 { display: grid; grid-template-columns: 1fr 140px 40px; gap: 6px 8px; align-items: center; }
+  .prow2 .ru { grid-column: 1 / 3; font-size: 14px; padding: 7px 12px; background: #faf9fb; }
+  .prow2.tier { grid-template-columns: 1fr 1fr 40px; }
   .prow2 .money::after { display: none; }
   .prow2 .money input { padding-right: 12px; }
   .prow2 .rmv { width: 40px; height: 42px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 18px; }
@@ -125,7 +136,8 @@
   .order .head span { font-size: 13px; color: var(--muted); display: block; }
   .order ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 14px; }
   .order li { display: flex; justify-content: space-between; gap: 12px; }
-  .order li span:last-child { white-space: nowrap; font-weight: 500; }
+  .order li > span:last-child { white-space: nowrap; font-weight: 500; }
+  .order li .it span { min-width: 0; overflow-wrap: anywhere; }
   .order li .it { display: flex; gap: 10px; align-items: center; white-space: normal; font-weight: 400; }
   .order li .it img { width: 40px; height: 48px; object-fit: cover; border-radius: 6px; flex: none; }
   .order .tot { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 8px; font-weight: 700; }
@@ -136,6 +148,17 @@
   .toast { position: fixed; left: 50%; bottom: 90px; transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 12px; z-index: 50; opacity: 0; transition: .2s; pointer-events: none; font-size: 14px; }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
   @media (max-width: 480px) { .prow2 { grid-template-columns: 1fr 118px 40px; } .two { grid-template-columns: 1fr; } }
+  .ogroup, .calc { border: 1.5px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 12px; }
+  .ogroup .head, .calc .head { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+  .ogroup .head b, .calc .head b { font-size: 15px; }
+  .mini { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 5px 10px; font-size: 13px; color: var(--muted); }
+  .mini:disabled { opacity: .4; }
+  .colhead { display: grid; grid-template-columns: 1fr 1fr 40px; gap: 8px; font-size: 12px; color: var(--muted); margin-bottom: -6px; }
+  .annrow { display: grid; grid-template-columns: 1fr auto 40px; gap: 6px 8px; align-items: center; }
+  .annrow .ru { grid-column: 1 / 2; }
+  .stack-list { display: grid; gap: 12px; }
+  .settings-save { position: sticky; bottom: 0; background: var(--bg); padding: 12px 0 16px; display: flex; gap: 12px; align-items: center; justify-content: flex-end; }
+  .settings-save .err { flex: 1; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -144,7 +167,7 @@
 <!-- ===== Kirish ===== -->
 <section class="login" id="login" hidden>
   <form id="login-form">
-    <div class="logo">musavir</div>
+    <div class="logo"><img src="/dokon/logo.png" alt="Musavvir Print"></div>
     <p>Do'kon boshqaruvi</p>
     <div id="step-pw">
       <input class="i" type="password" id="pw" placeholder="Parol" autocomplete="current-password" aria-label="Parol">
@@ -163,10 +186,11 @@
 <div id="app" hidden>
   <header>
     <div class="wrap hrow">
-      <a class="logo" href="/dokon/" target="_blank" rel="noopener" aria-label="Do'konni ochish">musavir</a>
+      <a class="logo" href="/dokon/" target="_blank" rel="noopener" aria-label="Do'konni ochish"><img src="/dokon/logo.png" alt="Musavvir Print"></a>
       <div class="tabs" role="tablist">
         <button role="tab" id="tab-products" aria-selected="true">Tovarlar</button>
         <button role="tab" id="tab-orders" aria-selected="false">Buyurtmalar</button>
+        <button role="tab" id="tab-settings" aria-selected="false">Sozlamalar</button>
       </div>
       <button class="out" id="logout" type="button">Chiqish</button>
     </div>
@@ -186,6 +210,23 @@
       <div class="filters" id="filters"></div>
       <div class="orders" id="olist"></div>
     </section>
+
+    <section id="settings-view" hidden>
+      <div class="toolbar"><h1>Sozlamalar</h1></div>
+      <div class="box">
+        <h3>Rasm chiqarish narxlari</h3>
+        <p class="sub">Do'kondagi kalkulyator, Telegram bot va asosiy sahifa shu narxlardan foydalanadi. Har bir pog'ona: shu sondan boshlab 1 dona narxi.</p>
+        <div class="stack-list" id="calcs"><p class="muted">Yuklanmoqda…</p></div>
+        <button type="button" class="addrow" id="add-calc">+ Yangi format (masalan A5, A4)</button>
+      </div>
+      <div class="box" style="margin-top:14px">
+        <h3>E'lonlar</h3>
+        <p class="sub">Do'konning eng tepasida navbat bilan chiqadi. 3 tagacha. Masalan: «🚚 300 ta rasmdan butun O'zbekiston bo'ylab bepul yetkazamiz».</p>
+        <div class="stack-list" id="anns"></div>
+        <button type="button" class="addrow" id="add-ann">+ E'lon qo'shish</button>
+      </div>
+      <div class="settings-save"><p class="err" id="set-err" role="alert"></p><button class="btn" type="button" id="set-save">Saqlash</button></div>
+    </section>
   </main>
 </div>
 
@@ -204,15 +245,17 @@
     </div>
 
     <div class="box">
-      <label class="f">Nomi<input class="i" id="ed-name" maxlength="120" placeholder="Masalan: Fotoalbom 10x15" required></label>
+      <label class="f">Nomi<input class="i" id="ed-name" maxlength="120" placeholder="Masalan: Fotokniga (albom)" required></label>
+      <label class="f">Ruscha nomi <small>ixtiyoriy — bo'sh bo'lsa, o'zbekchasi ko'rinadi. Kirillcha avtomatik.</small><input class="i" id="ed-name-ru" maxlength="120" placeholder="Например: Фотокнига"></label>
       <label class="f">Kategoriya<input class="i" id="ed-cat" maxlength="40" list="cats" placeholder="Albom, Ramka, Polaroid…"></label>
       <datalist id="cats"></datalist>
       <div class="two">
         <label class="f">Narx<span class="money"><input class="i" id="ed-price" inputmode="numeric" placeholder="0"></span>
-          <small>Variantlar bo'lsa, ularning narxi olinadi</small></label>
+          <small>Variant bo'lsa, uning narxi olinadi. Tanlov guruhlari narxi ustiga qo'shiladi.</small></label>
         <label class="f">Eski narx <small>(chegirma ko'rsatish uchun, ixtiyoriy)</small><span class="money"><input class="i" id="ed-old" inputmode="numeric" placeholder="—"></span></label>
       </div>
       <label class="f">Izoh <small>mijoz tovar sahifasida ko'radi</small><textarea class="i" id="ed-desc" maxlength="3000" placeholder="O'lchami, materiali, nimalar kiradi…"></textarea></label>
+      <label class="f">Ruscha izoh <small>ixtiyoriy</small><textarea class="i" id="ed-desc-ru" maxlength="3000" style="min-height:80px"></textarea></label>
     </div>
 
     <div class="box">
@@ -220,6 +263,13 @@
       <p class="sub">Mijoz bittasini tanlaydi. Masalan: 100 talik — 85 000, 200 talik — 130 000.</p>
       <div class="rows" id="ed-variants"></div>
       <button type="button" class="addrow" data-addrow="variants">+ Variant qo'shish</button>
+    </div>
+
+    <div class="box">
+      <h3>Tanlov guruhlari</h3>
+      <p class="sub">Masalan fotokniga uchun: «Format» (A5 +0, A4 +60 000), «Sahifa soni» (10 bet +0, 20 bet +40 000), «Muqova» (Yumshoq +0, Qattiq +30 000). Mijoz har guruhdan bittasini tanlaydi, narx asosiy narx ustiga qo'shiladi.</p>
+      <div class="stack-list" id="ed-options"></div>
+      <button type="button" class="addrow" id="add-group">+ Tanlov guruhi qo'shish</button>
     </div>
 
     <div class="box">
@@ -329,12 +379,16 @@
   function tab(which) {
     $('#tab-products').setAttribute('aria-selected', which === 'products');
     $('#tab-orders').setAttribute('aria-selected', which === 'orders');
+    $('#tab-settings').setAttribute('aria-selected', which === 'settings');
     $('#products-view').hidden = which !== 'products';
     $('#orders-view').hidden = which !== 'orders';
+    $('#settings-view').hidden = which !== 'settings';
     if (which === 'orders') loadOrders();
+    if (which === 'settings') loadSettings();
   }
   $('#tab-products').onclick = function () { tab('products'); };
   $('#tab-orders').onclick = function () { tab('orders'); };
+  $('#tab-settings').onclick = function () { tab('settings'); };
 
   // ===== Tovarlar ro'yxati =====
   function loadProducts() {
@@ -342,6 +396,7 @@
       .catch(function (e) { $('#plist').innerHTML = '<div class="empty"><b>Tovarlar yuklanmadi</b>' + esc(e.message) + '</div>'; });
   }
   function priceText(p) {
+    if (p.options && p.options.length) return fmt(p.price) + " so'mdan · " + p.options.length + ' tanlov guruhi';
     if (p.variants && p.variants.length) {
       var min = Math.min.apply(null, p.variants.map(function (v) { return v.price; }));
       return fmt(min) + " so'mdan · " + p.variants.length + ' variant';
@@ -386,16 +441,30 @@
   var images = [];      // [{ url } | { loading: true }]
   var dirty = false;
 
+  var PH_NAME = { variants: 'Masalan: 100 talik', addons: 'Masalan: Laminatsiya', choice: 'Masalan: A4' };
   function rowHTML(kind, r) {
     return '<div class="prow2" data-row="' + kind + '">' +
-      '<input class="i" data-k="name" maxlength="60" placeholder="' + (kind === 'variants' ? 'Masalan: 100 talik' : 'Masalan: Laminatsiya') + '" value="' + esc(r.name) + '" aria-label="Nomi">' +
-      '<span class="money"><input class="i" data-k="price" inputmode="numeric" placeholder="Narx, so\'m" value="' + (r.price ? fmt(r.price) : '') + '" aria-label="Narx"></span>' +
-      '<button type="button" class="rmv" aria-label="O\'chirish">×</button></div>';
+      '<input class="i" data-k="name" maxlength="60" placeholder="' + PH_NAME[kind] + '" value="' + esc(r.name) + '" aria-label="Nomi">' +
+      '<span class="money"><input class="i" data-k="price" inputmode="numeric" placeholder="' + (kind === 'variants' ? "Narx, so'm" : "+ so'm") + '" value="' + (r.price ? fmt(r.price) : '') + '" aria-label="Narx"></span>' +
+      '<button type="button" class="rmv" aria-label="O\'chirish">×</button>' +
+      '<input class="i ru" data-k="name_ru" maxlength="60" placeholder="Ruscha (ixtiyoriy)" value="' + esc(r.name_ru || '') + '" aria-label="Ruscha nomi"></div>';
   }
-  function readRows(kind) {
-    return [].slice.call(document.querySelectorAll('[data-row="' + kind + '"]')).map(function (r) {
-      return { name: r.querySelector('[data-k="name"]').value.trim(), price: num(r.querySelector('[data-k="price"]').value) };
+  function readRows(kind, root) {
+    return [].slice.call((root || document).querySelectorAll('[data-row="' + kind + '"]')).map(function (r) {
+      return { name: r.querySelector('[data-k="name"]').value.trim(), name_ru: r.querySelector('[data-k="name_ru"]').value.trim(), price: num(r.querySelector('[data-k="price"]').value) };
     }).filter(function (r) { return r.name; });
+  }
+  function groupHTML(g) {
+    return '<div class="ogroup"><div class="head"><b>Guruh</b><button type="button" class="mini" data-rmgroup>Guruhni o\'chirish</button></div>' +
+      '<div class="two"><input class="i" data-g="name" maxlength="40" placeholder="Guruh nomi: Format, Sahifa soni, Muqova…" value="' + esc(g.name || '') + '" aria-label="Guruh nomi">' +
+      '<input class="i" data-g="name_ru" maxlength="40" placeholder="Ruscha (ixtiyoriy)" value="' + esc(g.name_ru || '') + '" aria-label="Guruh ruscha nomi"></div>' +
+      '<div class="rows ochoices">' + (g.choices || []).map(function (c) { return rowHTML('choice', c); }).join('') + '</div>' +
+      '<button type="button" class="addrow" data-addchoice>+ Tanlov qo\'shish</button></div>';
+  }
+  function readGroups() {
+    return [].slice.call(document.querySelectorAll('#ed-options .ogroup')).map(function (g) {
+      return { name: g.querySelector('[data-g="name"]').value.trim(), name_ru: g.querySelector('[data-g="name_ru"]').value.trim(), choices: readRows('choice', g) };
+    }).filter(function (g) { return g.name && g.choices.length; });
   }
   function renderImages() {
     var box = $('#ed-imgs');
@@ -457,6 +526,9 @@
     images = (p ? p.images || [] : []).map(function (u) { return { url: u }; });
     renderImages();
     $('#ed-name').value = p ? p.name : '';
+    $('#ed-name-ru').value = p ? p.name_ru || '' : '';
+    $('#ed-desc-ru').value = p ? p.description_ru || '' : '';
+    $('#ed-options').innerHTML = (p ? p.options || [] : []).map(groupHTML).join('');
     $('#ed-cat').value = p ? p.category : '';
     $('#ed-price').value = p && p.price ? fmt(p.price) : '';
     $('#ed-old').value = p && p.old_price ? fmt(p.old_price) : '';
@@ -479,6 +551,7 @@
     if (!force && dirty && !confirm("O'zgarishlar saqlanmagan. Chiqib ketasizmi?")) return;
     $('#editor').hidden = true;
     document.body.style.overflow = '';
+    dirty = false;
   }
   $('#ed-close').onclick = function () { closeEditor(false); };
   $('#ed-form').addEventListener('input', function (e) {
@@ -497,8 +570,20 @@
     };
   });
   $('#ed-form').addEventListener('click', function (e) {
-    var r = e.target.closest('.rmv'); if (r) { r.parentNode.remove(); dirty = true; }
+    var r = e.target.closest('.rmv'); if (r) { r.parentNode.remove(); dirty = true; return; }
+    var g = e.target.closest('[data-rmgroup]');
+    if (g) { if (confirm("Guruh o'chirilsinmi?")) { g.closest('.ogroup').remove(); dirty = true; } return; }
+    var ac = e.target.closest('[data-addchoice]');
+    if (ac) {
+      var box = ac.parentNode.querySelector('.ochoices');
+      box.insertAdjacentHTML('beforeend', rowHTML('choice', { name: '', price: 0 }));
+      box.lastElementChild.querySelector('input').focus(); dirty = true;
+    }
   });
+  $('#add-group').onclick = function () {
+    $('#ed-options').insertAdjacentHTML('beforeend', groupHTML({ choices: [{ name: '', price: 0 }, { name: '', price: 0 }] }));
+    $('#ed-options').lastElementChild.querySelector('input').focus(); dirty = true;
+  };
 
   $('#ed-form').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -506,6 +591,9 @@
     if (images.some(function (i) { return i.loading; })) { err.textContent = 'Rasmlar yuklanishini kuting'; return; }
     var product = {
       name: $('#ed-name').value.trim(),
+      name_ru: $('#ed-name-ru').value.trim(),
+      description_ru: $('#ed-desc-ru').value.trim(),
+      options: readGroups(),
       category: $('#ed-cat').value.trim(),
       price: num($('#ed-price').value),
       old_price: num($('#ed-old').value) || null,
@@ -519,7 +607,7 @@
       sort: parseInt($('#ed-sort').value, 10) || 0
     };
     if (!product.name) { err.textContent = 'Tovar nomini yozing'; $('#ed-name').focus(); return; }
-    if (!product.price && !product.variants.length) { err.textContent = 'Narx yoki kamida bitta variant kiriting'; $('#ed-price').focus(); return; }
+    if (!product.price && !product.variants.length && !product.options.length) { err.textContent = 'Narx, variant yoki tanlov guruhidan kamida bittasini kiriting'; $('#ed-price').focus(); return; }
     err.textContent = '';
     var b = $('#ed-save'); b.disabled = true; b.textContent = 'Saqlanmoqda…';
     api('products.save', { id: editing, product: product }).then(function (d) {
@@ -594,6 +682,112 @@
       toast('Holat o\'zgartirildi');
     }).catch(function (x) { toast(x.message); loadOrders(); });
   });
+
+  // ===== Sozlamalar: narxlar va e'lonlar =====
+  var setDirty = false;
+  function tierHTML(t) {
+    return '<div class="prow2 tier" data-row="tier">' +
+      '<input class="i" data-k="from" inputmode="numeric" placeholder="Masalan: 50" value="' + (t.from || '') + '" aria-label="Nechtadan">' +
+      '<span class="money"><input class="i" data-k="price" inputmode="numeric" placeholder="1 dona narxi" value="' + (t.price ? fmt(t.price) : '') + '" aria-label="1 dona narxi"></span>' +
+      '<button type="button" class="rmv" aria-label="Pog\'onani o\'chirish">×</button></div>';
+  }
+  function calcHTML(c, i, n) {
+    var main = c.id === '10x15';
+    return '<div class="calc" data-id="' + esc(c.id || '') + '">' +
+      '<div class="head"><b>' + esc(c.name || 'Yangi format') + '</b><span style="display:flex;gap:6px">' +
+      '<button type="button" class="mini" data-mv="-1"' + (i === 0 ? ' disabled' : '') + ' aria-label="Yuqoriga">↑</button>' +
+      '<button type="button" class="mini" data-mv="1"' + (i === n - 1 ? ' disabled' : '') + ' aria-label="Pastga">↓</button>' +
+      (main ? '' : '<button type="button" class="mini" data-rmcalc>O\'chirish</button>') + '</span></div>' +
+      '<div class="two"><label class="f">Nomi<input class="i" data-c="name" maxlength="30" placeholder="Masalan: A4" value="' + esc(c.name || '') + '"></label>' +
+      '<label class="f">Ruscha nomi <small>ixtiyoriy</small><input class="i" data-c="name_ru" maxlength="30" value="' + esc(c.name_ru || '') + '"></label></div>' +
+      '<label class="tick"><input type="checkbox" data-c="on"' + (c.on !== false ? ' checked' : '') + '><span>Saytda ko\'rinsin</span></label>' +
+      '<label class="tick"><input type="checkbox" data-c="free"' + (c.free ? ' checked' : '') + '><span>Bepul yetkazishga hisoblansin<small>300 ta rasm hisobiga qo\'shiladi</small></span></label>' +
+      (main ? '<p class="sub" style="margin:0">Telegram bot va asosiy sahifadagi kalkulyator shu formatdan foydalanadi, shuning uchun uni o\'chirib bo\'lmaydi.</p>' : '') +
+      '<div class="colhead"><span>Nechtadan (ta)</span><span>1 dona narxi</span><span></span></div>' +
+      '<div class="rows tiers">' + (c.tiers || []).map(tierHTML).join('') + '</div>' +
+      '<button type="button" class="addrow" data-addtier>+ Pog\'ona qo\'shish</button></div>';
+  }
+  function annHTML(a) {
+    return '<div class="annrow">' +
+      '<input class="i" data-a="text" maxlength="140" placeholder="E\'lon matni" value="' + esc(a.text || '') + '" aria-label="E\'lon matni">' +
+      '<label class="switch"><input type="checkbox" data-a="on"' + (a.on ? ' checked' : '') + ' aria-label="Ko\'rinsin"></label>' +
+      '<button type="button" class="rmv" style="width:40px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--muted)" aria-label="E\'lonni o\'chirish">×</button>' +
+      '<input class="i ru" data-a="text_ru" maxlength="140" placeholder="Ruscha (ixtiyoriy)" value="' + esc(a.text_ru || '') + '" aria-label="Ruscha matn" style="font-size:14px;padding:7px 12px"></div>';
+  }
+  function readCalcs(keepEmpty) {
+    return [].slice.call(document.querySelectorAll('#calcs .calc')).map(function (el) {
+      return {
+        id: el.getAttribute('data-id'),
+        name: el.querySelector('[data-c="name"]').value.trim(),
+        name_ru: el.querySelector('[data-c="name_ru"]').value.trim(),
+        on: el.querySelector('[data-c="on"]').checked,
+        free: el.querySelector('[data-c="free"]').checked,
+        tiers: [].slice.call(el.querySelectorAll('[data-row="tier"]')).map(function (r) {
+          return { from: num(r.querySelector('[data-k="from"]').value), price: num(r.querySelector('[data-k="price"]').value) };
+        }).filter(function (t) { return keepEmpty || (t.from && t.price); })
+      };
+    });
+  }
+  function readAnns() {
+    return [].slice.call(document.querySelectorAll('#anns .annrow')).map(function (el) {
+      return { text: el.querySelector('[data-a="text"]').value.trim(), text_ru: el.querySelector('[data-a="text_ru"]').value.trim(), on: el.querySelector('[data-a="on"]').checked };
+    }).filter(function (a) { return a.text; });
+  }
+  function paintSettings(st) {
+    var cs = st.calculators || [];
+    $('#calcs').innerHTML = cs.map(function (c, i) { return calcHTML(c, i, cs.length); }).join('');
+    $('#anns').innerHTML = (st.announcements || []).map(annHTML).join('');
+    $('#add-ann').hidden = (st.announcements || []).length >= 3;
+    setDirty = false;
+  }
+  function loadSettings() {
+    $('#set-err').textContent = '';
+    api('settings.get').then(paintSettings).catch(function (e) { $('#calcs').innerHTML = '<div class="empty"><b>Yuklanmadi</b>' + esc(e.message) + '</div>'; });
+  }
+  $('#settings-view').addEventListener('input', function (e) {
+    setDirty = true;
+    if (e.target.closest('.money')) { var v = num(e.target.value); e.target.value = v ? fmt(v) : ''; }
+    if (e.target.matches('[data-c="name"]')) e.target.closest('.calc').querySelector('.head b').textContent = e.target.value || 'Yangi format';
+  });
+  $('#settings-view').addEventListener('click', function (e) {
+    var b;
+    if ((b = e.target.closest('[data-addtier]'))) {
+      var box = b.parentNode.querySelector('.tiers'); box.insertAdjacentHTML('beforeend', tierHTML({}));
+      box.lastElementChild.querySelector('input').focus(); setDirty = true;
+    } else if ((b = e.target.closest('.rmv'))) {
+      var row = b.closest('.annrow') || b.closest('[data-row]'); row.remove(); setDirty = true;
+      $('#add-ann').hidden = document.querySelectorAll('#anns .annrow').length >= 3;
+    } else if ((b = e.target.closest('[data-rmcalc]'))) {
+      if (confirm("Bu format o'chirilsinmi? (Saqlash bosilgandan keyin o'chadi)")) { b.closest('.calc').remove(); setDirty = true; repaintCalcs(); }
+    } else if ((b = e.target.closest('[data-mv]'))) {
+      var list = readCalcs(true), el = b.closest('.calc'), i = [].indexOf.call(el.parentNode.children, el), j = i + +b.getAttribute('data-mv');
+      var x = list.splice(i, 1)[0]; list.splice(j, 0, x);
+      $('#calcs').innerHTML = list.map(function (c, k) { return calcHTML(c, k, list.length); }).join(''); setDirty = true;
+    }
+  });
+  function repaintCalcs() { var list = readCalcs(true); $('#calcs').innerHTML = list.map(function (c, k) { return calcHTML(c, k, list.length); }).join(''); }
+  $('#add-calc').onclick = function () {
+    $('#calcs').insertAdjacentHTML('beforeend', calcHTML({ name: '', on: true, free: false, tiers: [{ from: 1, price: 0 }] }, 1, 1));
+    repaintCalcs();
+    var last = $('#calcs').lastElementChild; last.querySelector('[data-c="name"]').focus(); setDirty = true;
+  };
+  $('#add-ann').onclick = function () {
+    $('#anns').insertAdjacentHTML('beforeend', annHTML({ text: '', on: true }));
+    $('#anns').lastElementChild.querySelector('input').focus();
+    $('#add-ann').hidden = document.querySelectorAll('#anns .annrow').length >= 3; setDirty = true;
+  };
+  $('#set-save').onclick = function () {
+    var err = $('#set-err'), b = $('#set-save');
+    var calcsList = readCalcs();
+    var bad = calcsList.find(function (c) { return !c.name || !c.tiers.length; });
+    if (bad) { err.textContent = 'Har bir formatga nom va kamida bitta narx kiriting'; return; }
+    err.textContent = ''; b.disabled = true; b.textContent = 'Saqlanmoqda…';
+    api('settings.save', { calculators: calcsList, announcements: readAnns() })
+      .then(function (d) { paintSettings(d); toast('Saqlandi. Saytda ~20 soniyada yangilanadi'); })
+      .catch(function (x) { err.textContent = x.message; })
+      .then(function () { b.disabled = false; b.textContent = 'Saqlash'; });
+  };
+  window.addEventListener('beforeunload', function (e) { if (setDirty || dirty) { e.preventDefault(); e.returnValue = ''; } });
 
   if (token) showApp(); else showLogin();
 })();

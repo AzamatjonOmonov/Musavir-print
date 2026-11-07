@@ -3,6 +3,7 @@
 const {
   configured, rest, uploadImage, makeToken, checkToken, checkPassword, cleanProduct,
   makeChallenge, checkChallenge, logEvent, countEvents, sniffImage,
+  getSettings, saveSetting, cleanCalcs, cleanAnnouncements,
 } = require('./_store');
 const { ADMIN_CHAT_ID, tg, esc } = require('./_lib');
 
@@ -169,6 +170,27 @@ module.exports = async (req, res) => {
           method: 'PATCH', body: { status: b.status }, prefer: 'return=representation',
         });
         return res.status(200).json({ ok: true, order: row });
+      }
+
+      case 'settings.get': {
+        const st = await getSettings({ fresh: true });
+        return res.status(200).json({ ok: true, ...st });
+      }
+
+      case 'settings.save': {
+        if (b.calculators !== undefined) {
+          const c = cleanCalcs(b.calculators);
+          if (c.error) return fail(400, c.error);
+          if (!c.value.length) return fail(400, 'Kamida bitta narx formati qolsin');
+          await saveSetting('calculators', c.value);
+        }
+        if (b.announcements !== undefined) {
+          const a = cleanAnnouncements(b.announcements);
+          if (a.error) return fail(400, a.error);
+          await saveSetting('announcements', a.value);
+        }
+        const st = await getSettings({ fresh: true });
+        return res.status(200).json({ ok: true, ...st });
       }
 
       default:

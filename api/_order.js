@@ -1,5 +1,6 @@
 // Bot va sayt buyurtmalari uchun umumiy: tekshirish va guruhga yuborish
-const { ADMIN_CHAT_ID, FREE_DELIVERY_FROM, unitPrice, fmt, tg, esc } = require('./_lib');
+const { ADMIN_CHAT_ID, FREE_DELIVERY_FROM, fmt, tg, esc } = require('./_lib');
+const { printUnitPrice } = require('./_store');
 
 // qty, manzil va lokatsiyani tekshiradi; xato bo'lsa { error } qaytaradi
 function parseOrder(b) {
@@ -21,7 +22,8 @@ function parseOrder(b) {
 // whoLine: '👤 ...' qatori (sayt buyurtmasida bo'lmasligi mumkin)
 async function sendOrder({ title, whoLine, phone, order, sourceText }) {
   const { qty, address, lat, lon, hasLoc } = order;
-  const price = unitPrice(qty);
+  // Narx admin paneldagi 10x15 sozlamasidan (bot, sayt va do'kon uchun bitta)
+  const price = await printUnitPrice(qty);
   const total = qty * price;
   const free = qty >= FREE_DELIVERY_FROM;
 

@@ -4,13 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Musavvir Print — do'kon</title>
-<meta name="description" content="Rasm chop etish, albomlar, ramkalar va tayyor to'plamlar. O'zbekiston bo'ylab BTS orqali yetkazamiz.">
+<meta name="description" content="Rasm chop etish, fotokniga, albomlar, ramkalar va tayyor to'plamlar. O'zbekiston bo'ylab BTS orqali yetkazamiz.">
 <meta property="og:title" content="Musavvir Print — do'kon">
-<meta property="og:description" content="Rasm chop etish, albomlar, ramkalar va tayyor to'plamlar.">
-<meta name="theme-color" content="#ffffff">
+<meta property="og:description" content="Rasm chop etish, fotokniga, albomlar, ramkalar va tayyor to'plamlar.">
+<meta property="og:image" content="/dokon/logo.png">
+<meta name="theme-color" content="#e4005e">
+<link rel="icon" href="/dokon/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playball&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #f2f1f4;
@@ -19,8 +21,12 @@
     --muted: #77727a;
     --line: #e4e1e6;
     --pink: #e5005c;
+    --pink-bg: #e4005e;
     --wine: #610027;
     --paper: #e3dfd5;
+    --gray: #a3a3a3;
+    --nokia: #9bb48f;
+    --nokia-dark: #2a3b22;
     --ok: #1d7a45;
     --radius: 14px;
     --nav-h: 64px;
@@ -37,113 +43,133 @@
   button { cursor: pointer; }
   a { color: inherit; }
   img { display: block; max-width: 100%; }
-  :focus-visible { outline: 3px solid var(--pink); outline-offset: 2px; }
+  :focus-visible { outline: 3px solid var(--wine); outline-offset: 2px; }
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
-  /* ---------- Header ---------- */
-  header.top {
-    position: sticky; top: 0; z-index: 20; background: var(--surface);
-    border-bottom: 1px solid var(--line);
-  }
-  .top-row { display: flex; align-items: center; gap: 12px; padding-top: 10px; padding-bottom: 10px; }
-  .logo {
-    font-family: 'Playball', cursive; color: var(--pink); font-size: 30px; line-height: 1;
-    text-decoration: none; white-space: nowrap; display: flex; flex-direction: column; align-items: center;
-  }
-  .logo small { font-family: 'Space Grotesk'; font-size: 9px; letter-spacing: .35em; font-weight: 700; margin-top: 1px; }
-  .search {
-    flex: 1; display: flex; align-items: center; gap: 8px; background: var(--bg);
-    border-radius: 12px; padding: 0 12px; height: 44px; min-width: 0;
-  }
-  .search svg { flex: none; color: var(--muted); }
-  .search input { border: 0; background: transparent; outline: 0; width: 100%; min-width: 0; height: 100%; }
-  .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
-  .chips::-webkit-scrollbar { display: none; }
-  .chip {
-    flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
-    padding: 7px 14px; font-weight: 500; font-size: 14px;
-  }
-  .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  /* ---------- E'lon chizig'i ---------- */
+  .ann { background: var(--wine); color: #fff; font-size: 14px; font-weight: 500; text-align: center; }
+  .ann .wrap { min-height: 36px; display: grid; place-items: center; padding-top: 7px; padding-bottom: 7px; }
+  .ann span { transition: opacity .35s; }
+  .ann span.fade { opacity: 0; }
 
-  /* ---------- Print hero ---------- */
-  .hero {
-    margin: 16px 0 6px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px;
-    width: 100%; text-align: left; border: 0; border-radius: 18px; padding: 18px 18px 18px 20px;
-    background: var(--pink); color: #fff; position: relative; overflow: hidden;
-  }
-  .hero h2 { margin: 0; font-size: 22px; line-height: 1.15; }
-  .hero p { margin: 6px 0 0; font-size: 14px; opacity: .92; }
-  .hero .go {
-    display: inline-block; margin-top: 14px; background: #fff; color: var(--wine); font-weight: 700;
-    padding: 10px 16px; border-radius: 12px; box-shadow: 3px 3px 0 var(--wine);
-  }
-  .stack { position: relative; width: 96px; height: 112px; flex: none; }
-  .stack span {
-    position: absolute; inset: 0; background: #fff; border-radius: 3px; padding: 6px 6px 18px;
-    box-shadow: 0 2px 6px rgba(0,0,0,.18);
-  }
-  .stack span i { display: block; height: 100%; border-radius: 1px; }
-  .stack span:nth-child(1) { transform: rotate(-11deg) translate(-8px, 4px); }
-  .stack span:nth-child(1) i { background: #f6b7cf; }
-  .stack span:nth-child(2) { transform: rotate(6deg) translate(6px, -2px); }
-  .stack span:nth-child(2) i { background: var(--paper); }
-  .stack span:nth-child(3) i { background: linear-gradient(160deg, #ffd9a8, #e98aa7 70%); }
+  /* ---------- Til tanlash ---------- */
+  .langs { display: inline-flex; background: rgba(255,255,255,.18); border-radius: 10px; padding: 3px; gap: 2px; }
+  .langs button { border: 0; background: none; color: #fff; padding: 5px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; }
+  .langs button[aria-pressed="true"] { background: #fff; color: var(--pink); }
+  .top-white .langs { background: var(--bg); }
+  .top-white .langs button { color: var(--muted); }
+  .top-white .langs button[aria-pressed="true"] { background: var(--surface); color: var(--pink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
 
-  /* ---------- Grid ---------- */
-  .section-title { display: flex; justify-content: space-between; align-items: baseline; margin: 22px 0 10px; }
-  .section-title h3 { margin: 0; font-size: 19px; }
-  .section-title span { color: var(--muted); font-size: 14px; }
+  /* ---------- Oq sarlavha (ichki sahifalarda) ---------- */
+  header.top-white { position: sticky; top: 0; z-index: 20; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 60px; }
+  .top-row .logo img { height: 38px; width: auto; }
+
+  /* ---------- Eski kalkulyator (asl dizayn) ---------- */
+  .calc-band { background: var(--pink-bg); padding: 12px 0 36px; }
+  .calc-band .bar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+  .calc-card {
+    max-width: 448px; margin: 0 auto; background: var(--paper); border-radius: 24px; padding: 24px;
+    border: 4px solid var(--gray); box-shadow: 6px 6px 0 0 var(--ink); position: relative;
+  }
+  @media (min-width: 768px) { .calc-card { padding: 32px; } }
+  .calc-logo { display: flex; justify-content: center; padding: 8px 0; margin-bottom: 20px; }
+  .calc-logo img { width: 100%; max-width: 300px; height: auto; }
+  .fmt-tabs { display: flex; gap: 8px; margin: -4px 0 16px; flex-wrap: wrap; }
+  .fmt-tabs button {
+    flex: 1; min-width: 64px; padding: 8px 6px; border-radius: 10px; background: #fff; border: 2px solid var(--gray);
+    font-weight: 700; letter-spacing: .06em; box-shadow: 2px 2px 0 var(--gray);
+  }
+  .fmt-tabs button[aria-pressed="true"] { background: var(--nokia-dark); color: var(--nokia); border-color: var(--nokia-dark); box-shadow: 2px 2px 0 var(--ink); }
+  .fmt-tabs button .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--pink); margin-left: 5px; vertical-align: middle; }
+  .screen {
+    background: var(--nokia); border-radius: 12px; padding: 16px; margin-bottom: 28px; position: relative; overflow: hidden;
+    border: 4px solid #7a996b; min-height: 14rem; display: flex; flex-direction: column;
+    box-shadow: inset 4px 4px 10px rgba(0,0,0,.3), inset -2px -2px 5px rgba(255,255,255,.2);
+  }
+  .scanline {
+    position: absolute; inset: 0; z-index: 1; opacity: .4; pointer-events: none;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,.1) 50%, rgba(0,0,0,.1));
+    background-size: 100% 4px;
+  }
+  .scr { position: relative; z-index: 2; display: flex; flex-direction: column; flex: 1; font-family: 'VT323', monospace; color: var(--nokia-dark); }
+  .scr-top { display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; border-bottom: 2px solid var(--nokia-dark); padding-bottom: 4px; margin-bottom: 8px; opacity: .9; }
+  .scr-main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; padding: 8px 0; }
+  .scr-main .l { font-size: 24px; opacity: .8; font-weight: 700; margin-bottom: 4px; }
+  .scr-main .n { font-size: clamp(40px, 15vw, 60px); line-height: 1; display: flex; align-items: flex-end; white-space: nowrap; }
+  @media (min-width: 768px) { .scr-main .n { font-size: 72px; } }
+  .scr-main .n i { font-style: normal; font-size: 36px; margin: 0 0 4px 4px; animation: blink 1s step-end infinite; }
+  .scr-main .c { font-size: 24px; opacity: .9; margin-top: 4px; font-weight: 700; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .scr-free { position: relative; height: 56px; margin-top: auto; }
+  .scr-free > div { position: absolute; inset: 0; transition: opacity .3s, transform .3s; opacity: 0; transform: translateY(8px); }
+  .scr-free > div.on { opacity: 1; transform: none; }
+  .scr-free .prog { display: flex; flex-direction: column; justify-content: flex-end; }
+  .scr-free .prog .t { display: flex; justify-content: space-between; align-items: flex-end; font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; line-height: 1; margin-bottom: 4px; }
+  .cells { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; border: 2px solid var(--nokia-dark); padding: 3px; border-radius: 2px; }
+  .cells i { height: 10px; border-radius: 1px; }
+  .cells i.f { background: var(--nokia-dark); }
+  .scr-free .badge-free { top: auto; bottom: 0; background: var(--nokia-dark); color: var(--nokia); padding: 8px; text-align: center; font-size: 18px; font-weight: 700; line-height: 1.15; border-radius: 4px; }
+  .calc-label { display: block; font-size: 14px; font-weight: 700; margin: 0 0 4px 8px; text-transform: uppercase; letter-spacing: .06em; }
+  .tactile {
+    width: 100%; border-radius: 12px; padding: 12px 16px; background: #fff; text-align: center; font-size: 24px; font-weight: 700;
+    color: var(--pink); border: 2px solid var(--gray); box-shadow: inset 2px 2px 5px rgba(0,0,0,.1); transition: .2s; outline: 0;
+  }
+  .tactile::placeholder { color: #9ca3af; }
+  .tactile:focus { border-color: var(--pink); box-shadow: inset 2px 2px 5px rgba(229,0,92,.15); }
+  .retro-btn {
+    width: 100%; margin-top: 20px; border-radius: 12px; padding: 16px; font-size: 20px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .12em; background: var(--pink); color: #fff; border: 2px solid var(--wine); box-shadow: 4px 4px 0 var(--wine);
+    transition: transform .1s, box-shadow .1s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+  }
+  .retro-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--wine); }
+  .retro-btn:disabled { opacity: .6; }
+  .calc-note { text-align: center; font-size: 14px; font-weight: 700; color: rgba(44,44,44,.72); margin: 16px 0 0; line-height: 1.4; }
+  .calc-note button { border: 0; background: none; padding: 0; color: var(--pink); text-decoration: underline; text-underline-offset: 3px; font-weight: 700; }
+
+  /* ---------- Tovarlar ---------- */
+  .section-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 28px 0 12px; }
+  .section-title h2 { margin: 0; font-size: 20px; }
+  .section-title span { color: var(--muted); font-size: 14px; white-space: nowrap; }
+  .search { display: flex; align-items: center; gap: 8px; background: var(--surface); border-radius: 12px; padding: 0 12px; height: 44px; margin-bottom: 14px; border: 1px solid var(--line); }
+  .search input { border: 0; background: transparent; outline: 0; width: 100%; height: 100%; }
   .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 10px; }
   @media (min-width: 640px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 14px; } }
   @media (min-width: 960px) { .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
-
   .card { display: flex; flex-direction: column; text-decoration: none; min-width: 0; }
-  .shot {
-    position: relative; aspect-ratio: 4 / 5; background: var(--surface); border-radius: var(--radius);
-    padding: 7px 7px 24px; box-shadow: 0 1px 0 var(--line);
-  }
+  .shot { position: relative; aspect-ratio: 4 / 5; background: var(--surface); border-radius: var(--radius); box-shadow: 0 1px 0 var(--line); }
   .shot .img { position: absolute; inset: 7px 7px 24px; border-radius: 8px; overflow: hidden; background: var(--paper); }
   .shot img { width: 100%; height: 100%; object-fit: cover; }
   .ph { width: 100%; height: 100%; display: grid; place-items: center; color: #b5ad9c; }
-  .badge {
-    position: absolute; top: 13px; left: 13px; background: var(--wine); color: #fff; font-size: 12px;
-    font-weight: 700; padding: 3px 8px; border-radius: 6px;
-  }
+  .badge { position: absolute; top: 13px; left: 13px; background: var(--wine); color: #fff; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
   .badge.sale { background: var(--pink); }
-  .add-fab {
-    position: absolute; right: 12px; bottom: 6px; width: 36px; height: 36px; border-radius: 10px;
-    background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; color: var(--ink);
-  }
+  .add-fab { position: absolute; right: 12px; bottom: 6px; width: 36px; height: 36px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; color: var(--ink); }
   .card .price { margin: 8px 2px 0; font-weight: 700; font-size: 17px; }
   .card .price s { display: block; font-weight: 400; color: var(--muted); font-size: 13px; line-height: 1.2; }
-  .card .name {
-    margin: 2px 2px 0; font-size: 14px; color: #4b464e; display: -webkit-box; -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical; overflow: hidden;
-  }
-  .empty { text-align: center; color: var(--muted); padding: 48px 16px; }
+  .card .name { margin: 2px 2px 0; font-size: 14px; color: #4b464e; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .empty { text-align: center; color: var(--muted); padding: 40px 16px; }
   .empty b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 4px; }
-  .demo-note {
-    margin-top: 14px; padding: 10px 12px; border-radius: 12px; background: #fff4d6; color: #6b4e00; font-size: 13px;
-  }
-  .skeleton { background: linear-gradient(90deg, #e9e7ec 0, #f4f3f6 50%, #e9e7ec 100%); background-size: 200% 100%;
-    animation: sk 1.2s infinite linear; border-radius: var(--radius); aspect-ratio: 4/5; }
+  .demo-note { margin-top: 16px; padding: 10px 12px; border-radius: 12px; background: #fff4d6; color: #6b4e00; font-size: 13px; }
+  .skeleton { background: linear-gradient(90deg, #e9e7ec 0, #f4f3f6 50%, #e9e7ec 100%); background-size: 200% 100%; animation: sk 1.2s infinite linear; border-radius: var(--radius); aspect-ratio: 4/5; }
   @keyframes sk { to { background-position: -200% 0; } }
 
-  /* ---------- Product page ---------- */
+  /* ---------- Pastki qism: ijtimoiy tarmoqlar ---------- */
+  footer.foot { margin-top: 36px; padding: 28px 0 24px; background: var(--surface); border-top: 1px solid var(--line); text-align: center; }
+  footer.foot img { height: 44px; width: auto; margin: 0 auto 8px; }
+  footer.foot p { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+  .socials { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .socials a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--line); text-decoration: none; font-weight: 500; font-size: 14px; }
+  .socials a svg { flex: none; }
+  .socials .tg svg { color: #229ed9; } .socials .ig svg { color: #d62976; } .socials .yt svg { color: #ff0000; } .socials .ad svg { color: var(--pink); }
+
+  /* ---------- Tovar sahifasi ---------- */
   .pp { padding-bottom: 96px; }
-  @media (min-width: 860px) {
-    .pp-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; padding-top: 24px; }
-  }
-  .back {
-    display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 12px 0;
-    font-weight: 500; color: var(--muted);
-  }
+  @media (min-width: 860px) { .pp-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; padding-top: 24px; } }
+  .back { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 12px 0; font-weight: 500; color: var(--muted); }
   .gallery { position: relative; margin: 0 -16px; }
   @media (min-width: 860px) { .gallery { margin: 0; } }
-  .slides {
-    display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: var(--surface);
-  }
+  .slides { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: var(--surface); }
   @media (min-width: 860px) { .slides { border-radius: 18px; } }
   .slides::-webkit-scrollbar { display: none; }
   .slides > div { flex: 0 0 100%; scroll-snap-align: center; aspect-ratio: 1; background: var(--paper); }
@@ -156,62 +182,47 @@
   .pp .big-price s { font-size: 16px; font-weight: 400; color: var(--muted); margin-left: 8px; }
   .opt-title { font-weight: 700; margin: 20px 0 8px; }
   .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pill {
-    border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px; padding: 9px 14px;
-    text-align: left; line-height: 1.25;
-  }
+  .pill { border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px; padding: 9px 14px; text-align: left; line-height: 1.25; }
   .pill small { display: block; color: var(--muted); font-size: 13px; }
-  .pill[aria-pressed="true"] { border-color: var(--pink); box-shadow: inset 0 0 0 1px var(--pink); }
+  .pill[aria-checked="true"] { border-color: var(--pink); box-shadow: inset 0 0 0 1px var(--pink); }
   .checks { display: grid; gap: 8px; }
-  .check {
-    display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1.5px solid var(--line);
-    border-radius: 12px; padding: 11px 14px;
-  }
+  .check { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 14px; cursor: pointer; }
   .check input { width: 20px; height: 20px; accent-color: var(--pink); margin: 0; }
   .check span { flex: 1; }
   .check b { white-space: nowrap; }
   .desc { white-space: pre-line; color: #45404a; margin-top: 20px; background: var(--surface); padding: 14px 16px; border-radius: 14px; }
   .bundle-note { margin-top: 12px; font-size: 14px; color: var(--wine); background: #fde6ef; padding: 10px 14px; border-radius: 12px; }
-
-  .buybar {
-    position: fixed; left: 0; right: 0; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)); z-index: 15;
-    background: var(--surface); border-top: 1px solid var(--line);
-  }
+  .buybar { position: fixed; left: 0; right: 0; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)); z-index: 15; background: var(--surface); border-top: 1px solid var(--line); }
   .buybar .wrap { display: flex; gap: 10px; align-items: center; padding-top: 10px; padding-bottom: 10px; }
   .stepper { display: flex; align-items: center; background: var(--bg); border-radius: 12px; height: 48px; }
   .stepper button { width: 42px; height: 48px; border: 0; background: none; font-size: 22px; }
   .stepper output { min-width: 28px; text-align: center; font-weight: 700; }
-  .btn {
-    flex: 1; height: 48px; border-radius: 12px; border: 0; background: var(--pink); color: #fff;
-    font-weight: 700; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px;
-    text-decoration: none; padding: 0 16px;
-  }
+  .btn { flex: 1; height: 48px; border-radius: 12px; border: 0; background: var(--pink); color: #fff; font-weight: 700; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 0 16px; }
   .btn:disabled { opacity: .55; }
-  .btn.ghost { background: var(--surface); color: var(--pink); border: 1.5px solid var(--pink); }
-  .btn small { font-weight: 500; opacity: .9; }
+  .btn.ghost { background: var(--surface); color: var(--ink); border: 1.5px solid var(--line); }
 
-  /* ---------- Cart ---------- */
+  /* ---------- Savat ---------- */
   .cart h1 { font-size: 24px; margin: 18px 0 12px; }
   .lines { display: grid; gap: 10px; }
   .line { display: grid; grid-template-columns: 76px 1fr; gap: 12px; background: var(--surface); border-radius: 14px; padding: 10px; }
   .line .thumb { width: 76px; height: 92px; border-radius: 8px; overflow: hidden; background: var(--paper); }
   .line .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .line .thumb.print { background: var(--nokia); color: var(--nokia-dark); display: grid; place-items: center; font: 700 22px/1 'VT323', monospace; text-align: center; padding: 4px; }
   .line h4 { margin: 0; font-size: 15px; font-weight: 500; }
   .line .meta { color: var(--muted); font-size: 13px; margin-top: 2px; }
   .line .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
   .line .stepper { height: 38px; }
   .line .stepper button { height: 38px; width: 36px; font-size: 19px; }
-  .line .sum { font-weight: 700; }
+  .line .sum { font-weight: 700; white-space: nowrap; }
+  .line .acts { display: flex; gap: 14px; flex-wrap: wrap; }
   .line .rm { border: 0; background: none; color: var(--muted); font-size: 13px; padding: 4px 0; text-decoration: underline; }
   .line.gone { opacity: .55; }
   .summary { background: var(--surface); border-radius: 14px; padding: 14px 16px; margin-top: 12px; }
-  .summary .r { display: flex; justify-content: space-between; padding: 4px 0; }
-  .summary .total { font-size: 20px; font-weight: 700; }
+  .summary .total { display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; }
   .meter { margin-top: 10px; font-size: 13px; color: var(--muted); }
   .meter .bar { height: 6px; background: var(--bg); border-radius: 3px; margin-top: 6px; overflow: hidden; }
   .meter .bar i { display: block; height: 100%; background: var(--pink); border-radius: 3px; }
   .meter.done { color: var(--ok); font-weight: 700; }
-
   form.checkout { background: var(--surface); border-radius: 14px; padding: 16px; margin-top: 12px; display: grid; gap: 14px; }
   form.checkout h3 { margin: 0; font-size: 18px; }
   label.f { display: grid; gap: 6px; font-weight: 500; font-size: 14px; }
@@ -219,105 +230,65 @@
   .field:focus-within { border-color: var(--pink); background: var(--surface); }
   .field input, .field textarea { flex: 1; border: 0; background: transparent; outline: 0; padding: 12px 14px; min-width: 0; resize: none; }
   .field .pre { padding: 12px 0 12px 14px; color: var(--muted); }
-  .loc {
-    border: 0; background: none; padding: 0 14px; color: var(--pink); display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 2px; font-size: 11px; font-weight: 700; border-left: 1px solid var(--line);
-  }
+  .loc { border: 0; background: none; padding: 0 14px; color: var(--pink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11px; font-weight: 700; border-left: 1px solid var(--line); }
   .loc.set { color: var(--ok); }
   .hint { font-size: 13px; color: var(--muted); }
-  .err { color: #b00035; font-weight: 500; font-size: 14px; }
+  .err { color: #b00035; font-weight: 500; font-size: 14px; margin: 0; }
   .hp { position: absolute; left: -9999px; }
 
-  .done-box { text-align: center; padding: 36px 8px; }
-  .done-box .tick { width: 72px; height: 72px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; margin: 0 auto 16px; }
-  .done-box h1 { margin: 0 0 8px; font-size: 24px; }
-  .done-box p { color: #4b464e; max-width: 420px; margin: 0 auto 20px; }
-  .done-box .btn { max-width: 340px; margin: 0 auto 10px; }
+  /* ---------- Buyurtma qabul qilindi ---------- */
+  .done-band { background: var(--pink-bg); padding: 28px 0 40px; }
+  .done-card { max-width: 448px; margin: 0 auto; background: var(--paper); border-radius: 24px; padding: 28px 22px; border: 4px solid var(--gray); box-shadow: 6px 6px 0 0 var(--ink); text-align: center; }
+  .done-card .tick { width: 64px; height: 64px; border-radius: 50%; background: var(--nokia-dark); color: var(--nokia); display: grid; place-items: center; margin: 0 auto 14px; }
+  .done-card h1 { margin: 0 0 6px; font-size: 24px; }
+  .done-card p { margin: 0 0 4px; color: #4b464e; }
+  .msg-preview { margin: 18px 0 0; text-align: left; background: #fff; border: 2px solid var(--gray); border-radius: 12px; padding: 12px 14px; font-size: 14px; white-space: pre-line; box-shadow: inset 2px 2px 5px rgba(0,0,0,.06); }
+  .msg-preview b { display: block; font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 4px; }
+  .done-card .retro-btn { font-size: 17px; letter-spacing: .06em; }
+  .done-card .alt { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .done-card .alt a, .done-card .alt button { height: 46px; border-radius: 12px; border: 2px solid var(--gray); background: #fff; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
+  .done-card .home { display: inline-block; margin-top: 16px; color: var(--muted); font-weight: 500; }
 
-  /* ---------- Print calculator sheet ---------- */
-  .sheet-bg { position: fixed; inset: 0; background: rgba(30,20,28,.45); z-index: 40; opacity: 0; transition: opacity .2s; }
-  .sheet {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; background: var(--surface);
-    border-radius: 22px 22px 0 0; max-width: 560px; margin: 0 auto; padding: 10px 18px calc(18px + env(safe-area-inset-bottom));
-    transform: translateY(100%); transition: transform .25s ease-out; max-height: 92vh; overflow-y: auto;
-  }
-  .sheet.open { transform: none; }
-  .sheet-bg.open { opacity: 1; }
-  .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto 12px; }
-  .sheet h2 { margin: 0 0 4px; font-size: 21px; }
-  .sheet .sub { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
-  .qty-big { display: flex; align-items: center; gap: 8px; background: var(--bg); border-radius: 14px; padding: 6px; }
-  .qty-big button { width: 52px; height: 52px; border: 0; border-radius: 10px; background: var(--surface); font-size: 24px; }
-  .qty-big input { flex: 1; min-width: 0; border: 0; background: transparent; text-align: center; font-size: 28px; font-weight: 700; outline: 0; }
-  .quick { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-  .quick button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 6px 12px; font-size: 14px; }
-  .tiers { margin: 14px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); font-size: 14px; }
-  .tiers div { display: flex; justify-content: space-between; padding: 7px 12px; }
-  .tiers div + div { border-top: 1px solid var(--line); }
-  .tiers div.on { background: #fde6ef; color: var(--wine); font-weight: 700; }
-  .calc-total { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
-  .calc-total b { font-size: 26px; }
-
-  /* ---------- Bottom nav ---------- */
-  nav.bottom {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--surface); border-top: 1px solid var(--line);
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+  /* ---------- Pastki menyu ---------- */
+  nav.bottom { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
   nav.bottom .wrap { display: grid; grid-template-columns: repeat(3, 1fr); height: var(--nav-h); }
-  nav.bottom a {
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-    text-decoration: none; font-size: 12px; color: var(--muted); position: relative;
-  }
+  nav.bottom a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 12px; color: var(--muted); position: relative; }
   nav.bottom a.on { color: var(--pink); }
-  .count {
-    position: absolute; top: 7px; left: calc(50% + 6px); min-width: 18px; height: 18px; border-radius: 9px;
-    background: var(--pink); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; padding: 0 5px;
-  }
-  .toast {
-    position: fixed; left: 50%; bottom: calc(var(--nav-h) + 84px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px);
-    background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 12px; z-index: 50; opacity: 0;
-    transition: .2s; pointer-events: none; font-size: 14px; white-space: nowrap;
-  }
+  .count { position: absolute; top: 7px; left: calc(50% + 6px); min-width: 18px; height: 18px; border-radius: 9px; background: var(--pink); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
+  .toast { position: fixed; left: 50%; bottom: calc(var(--nav-h) + 84px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 12px; z-index: 50; opacity: 0; transition: .2s; pointer-events: none; font-size: 14px; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 </style>
 </head>
 <body>
 
-<header class="top">
+<div class="ann" id="ann" hidden><div class="wrap"><span id="ann-text"></span></div></div>
+<header class="top-white" id="top-white" hidden>
   <div class="wrap top-row">
-    <a class="logo" href="#/" aria-label="Musavvir Print — bosh sahifa">musavir<small>PRINT</small></a>
-    <label class="search">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-      <span class="sr">Qidirish</span>
-      <input id="q" type="search" placeholder="Albom, ramka, to'plam…" autocomplete="off">
-    </label>
+    <a class="logo" href="#/" aria-label="Musavvir Print"><img src="/dokon/logo.png" alt="Musavvir Print" width="119" height="38"></a>
+    <div class="langs" data-langs></div>
   </div>
-  <div class="wrap chips" id="chips" role="toolbar" aria-label="Kategoriyalar"></div>
 </header>
 
 <main id="view"></main>
 
-<nav class="bottom" aria-label="Asosiy menyu">
+<nav class="bottom" aria-label="Menu">
   <div class="wrap">
     <a href="#/" data-nav="home">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
-      Bosh sahifa
+      <span data-t="nav_home"></span>
     </a>
     <a href="#/savat" data-nav="cart">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 7h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg>
-      Savat
+      <span data-t="nav_cart"></span>
       <span class="count" id="cart-count" hidden>0</span>
     </a>
     <a href="https://t.me/AzizaxonOmonova" target="_blank" rel="noopener">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 4 3 11l6 2.5L11.5 20 15 15l5 4z"/><path d="m9 13.5 6-4"/></svg>
-      Adminga yozish
+      <span data-t="nav_admin"></span>
     </a>
   </div>
 </nav>
-
-<div class="sheet-bg" id="sheet-bg" hidden></div>
-<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden></section>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -327,19 +298,144 @@
   // ================= Sozlamalar =================
   var ADMIN = 'AzizaxonOmonova';
   var FREE_FROM = 300;
-  var TIERS = [ // 10x15 narxlari — api/_lib.js dagi bilan bir xil
-    [1, 20, 5000], [21, 40, 4000], [41, 49, 3000], [50, 99, 2000],
-    [100, 200, 1800], [201, 300, 1700], [301, 500, 1600], [501, Infinity, 1500]
-  ];
-  function unitPrice(q) {
-    for (var i = 0; i < TIERS.length; i++) if (q >= TIERS[i][0] && q <= TIERS[i][1]) return TIERS[i][2];
-    return 0;
+  var LINKS = {
+    tg: 'https://t.me/musavvirprint',
+    ig: 'https://www.instagram.com/musavvirprint.uz/',
+    igdm: 'https://ig.me/m/musavvirprint.uz',
+    yt: 'https://www.youtube.com/@musavvirprint',
+    admin: 'https://t.me/' + ADMIN
+  };
+
+  // ================= Tillar =================
+  // Lotincha o'zbekcha → kirillcha (avtomatik)
+  function toCyr(str) {
+    if (!str) return '';
+    var AP = "['ʻʼ`’‘]";
+    var map = { a: 'а', b: 'б', d: 'д', f: 'ф', g: 'г', h: 'ҳ', i: 'и', j: 'ж', k: 'к', l: 'л', m: 'м', n: 'н', o: 'о',
+      p: 'п', q: 'қ', r: 'р', s: 'с', t: 'т', u: 'у', v: 'в', x: 'х', y: 'й', z: 'з', c: 'с', w: 'в' };
+    var re = new RegExp('(o' + AP + '|g' + AP + '|sh|ch|yo(?!' + AP + ')|yu|ya|ye|' + AP + '|[a-z])', 'gi');
+    var vowels = /[aeiouаеиоуэёюяў]/i;
+    var out = '', prev = '';
+    var i = 0;
+    while (i < str.length) {
+      re.lastIndex = i;
+      var m = re.exec(str);
+      if (!m || m.index !== i) { out += str[i]; prev = str[i]; i++; continue; }
+      var tok = m[0], low = tok.toLowerCase().replace(new RegExp(AP, 'g'), "'"), res;
+      if (low === "o'") res = 'ў';
+      else if (low === "g'") res = 'ғ';
+      else if (low === "'") res = 'ъ';
+      else if (low === 'sh') res = 'ш';
+      else if (low === 'ch') res = 'ч';
+      else if (low === 'yo') res = 'ё';
+      else if (low === 'yu') res = 'ю';
+      else if (low === 'ya') res = 'я';
+      else if (low === 'ye') res = 'е';
+      else if (low === 'e') res = (!prev || !/[a-zа-яёўқғҳ]/i.test(prev) || vowels.test(prev)) ? 'э' : 'е';
+      else res = map[low] || tok;
+      if (tok[0] !== tok[0].toLowerCase()) {
+        var allUp = tok.length > 1 && tok.replace(new RegExp(AP, 'g'), '') === tok.replace(new RegExp(AP, 'g'), '').toUpperCase();
+        var nextUp = str[i + tok.length] && str[i + tok.length] !== str[i + tok.length].toLowerCase();
+        res = (allUp || nextUp) ? res.toUpperCase() : res[0].toUpperCase() + res.slice(1);
+      }
+      out += res; prev = tok[tok.length - 1]; i += tok.length;
+    }
+    return out;
+  }
+
+  var T = {
+    uz: {
+      title: "Musavvir Print — do'kon",
+      nav_home: 'Bosh sahifa', nav_cart: 'Savat', nav_admin: 'Adminga yozish',
+      each: 'Donasi', total: 'Jami', som: "so'm", left: 'Yana {n} ta', free_short: 'bepul 🚚',
+      free_badge: 'Tabriklaymiz! Yetkazib berish bepul 🚚', how_many: 'Nechta rasm?',
+      add_cart: "Savatga qo'shish", update_cart: 'Savatni yangilash', in_cart: 'Savatda: {n} ta',
+      remove: 'Olib tashlash', added: "Savatga qo'shildi", updated: 'Savat yangilandi',
+      other_formats: "Polaroid va boshqa o'lchamlar — {a}adminga yozing{b}.",
+      products: 'Fotokniga, albom va boshqalar', count: '{n} ta', search: 'Qidirish…',
+      demo: "Bu sinov ko'rinishi: tovarlar namuna sifatida qo'yilgan. Admin paneldan haqiqiy tovarlar kiritilgach, ular ko'rinadi.",
+      not_found: "«{q}» bo'yicha hech narsa topilmadi", empty_shop: "Hozircha tovar yo'q", load_err: 'Tovarlar yuklanmadi',
+      load_err_t: 'Internetni tekshirib, sahifani yangilang.',
+      from: '{p}dan', bundle: "To'plam", back: '‹ Orqaga', not_avail: 'Bu tovar topilmadi', not_avail_t: "U sotuvdan olingan bo'lishi mumkin.",
+      choose: 'Tanlang', extras: "Qo'shimcha", to_cart: 'Savatga', go_cart: "Savatga o'tish",
+      bundle_note: 'Ichida {n} ta 10x15 rasm bor. Rasmlarni buyurtmadan keyin Telegram orqali yuborasiz.',
+      cart: 'Savat', cart_empty: "Savat bo'sh", cart_empty_t: 'Rasm sonini hisoblang yoki fotokniga, albom tanlang.', to_shop: "Bosh sahifaga o'tish",
+      print_line: '{f} rasm chop etish', change: "O'zgartirish", gone: 'Tovar sotuvdan olingan', gone_t: 'Buyurtma berish uchun uni olib tashlang.',
+      free_ok: 'BTS orqali yetkazish bepul', free_need: 'Bepul yetkazish uchun yana {n} ta rasm kerak. Hozir yetkazish pullik.',
+      order: 'Buyurtma berish', phone: 'Telefon raqam', addr: 'Manzil yoki lokatsiya', addr_ph: 'Viloyat, shahar/tuman',
+      loc: 'Lokatsiya', loc_wait: 'Kuting…', loc_ok: 'Olindi', bts: "Eng yaqin BTS filialini o'zimiz tanlab, sizga qo'ng'iroq qilamiz.",
+      send_photos_after: 'Rasmlaringizni buyurtmadan keyin Telegram orqali yuborasiz.',
+      e_phone: "Telefon raqamini to'liq kiriting: 9 ta raqam.", e_addr: 'Manzilni yozing yoki lokatsiya tugmasini bosing.',
+      e_loc: "Joylashuvni olib bo'lmadi. Manzilni yozib qoldiring — shu yetarli.", e_net: "Internet bilan muammo. Qaytadan urinib ko'ring.",
+      sending: 'Yuborilmoqda…',
+      done: 'Buyurtmangiz{n} qabul qilindi', done_t: "Tez orada siz bilan bog'lanamiz.",
+      done_photos: "Endi rasmlaringizni adminga Telegramda yuboring — xabar tayyor, faqat «Yuborish»ni bosing.",
+      done_msg: "Endi adminga Telegramda yozing — xabar tayyor, faqat «Yuborish»ni bosing.",
+      msg_title: 'Adminga boradigan xabar', write_tg: 'Telegramda adminga yozish', copy: 'Matnni nusxalash', copied: 'Nusxalandi',
+      ig: 'Instagram', home: "Bosh sahifaga qaytish",
+      m_hello: 'Assalomu alaykum! Saytda buyurtma berdim{n}.', m_total: 'Jami: {s}', m_phone: 'Telefon: {p}',
+      m_photos: 'Rasmlarimni yuboryapman.', m_free: 'Yetkazish: bepul', pcs: 'ta',
+      foot: 'Esdalik rasmlaringizni sifatli chop etamiz', tg: 'Telegram kanal', yt: 'YouTube', admin: 'Adminga yozish'
+    },
+    ru: {
+      title: 'Musavvir Print — магазин',
+      nav_home: 'Главная', nav_cart: 'Корзина', nav_admin: 'Написать админу',
+      each: 'Цена шт.', total: 'Итого', som: 'сум', left: 'Ещё {n} шт', free_short: 'бесплатно 🚚',
+      free_badge: 'Поздравляем! Доставка бесплатно 🚚', how_many: 'Сколько фото?',
+      add_cart: 'В корзину', update_cart: 'Обновить корзину', in_cart: 'В корзине: {n} шт',
+      remove: 'Удалить', added: 'Добавлено в корзину', updated: 'Корзина обновлена',
+      other_formats: 'Полароид и другие размеры — {a}напишите админу{b}.',
+      products: 'Фотокниги, альбомы и другое', count: '{n} шт', search: 'Поиск…',
+      demo: 'Это тестовый вид: товары показаны для примера. Настоящие товары появятся после добавления в админ-панели.',
+      not_found: 'По запросу «{q}» ничего не найдено', empty_shop: 'Пока нет товаров', load_err: 'Товары не загрузились',
+      load_err_t: 'Проверьте интернет и обновите страницу.',
+      from: 'от {p}', bundle: 'Набор', back: '‹ Назад', not_avail: 'Товар не найден', not_avail_t: 'Возможно, его сняли с продажи.',
+      choose: 'Выберите', extras: 'Дополнительно', to_cart: 'В корзину', go_cart: 'Перейти в корзину',
+      bundle_note: 'Внутри {n} фото 10x15. Фото отправите в Telegram после заказа.',
+      cart: 'Корзина', cart_empty: 'Корзина пуста', cart_empty_t: 'Посчитайте печать фото или выберите фотокнигу, альбом.', to_shop: 'На главную',
+      print_line: 'Печать фото {f}', change: 'Изменить', gone: 'Товар снят с продажи', gone_t: 'Удалите его, чтобы оформить заказ.',
+      free_ok: 'Доставка BTS бесплатно', free_need: 'До бесплатной доставки ещё {n} фото. Сейчас доставка платная.',
+      order: 'Оформить заказ', phone: 'Номер телефона', addr: 'Адрес или геолокация', addr_ph: 'Область, город/район',
+      loc: 'Локация', loc_wait: 'Ждите…', loc_ok: 'Получено', bts: 'Сами выберем ближайший филиал BTS и позвоним вам.',
+      send_photos_after: 'Фото отправите в Telegram после заказа.',
+      e_phone: 'Введите номер полностью: 9 цифр.', e_addr: 'Напишите адрес или нажмите кнопку локации.',
+      e_loc: 'Не удалось определить место. Напишите адрес — этого достаточно.', e_net: 'Проблема с интернетом. Попробуйте ещё раз.',
+      sending: 'Отправляем…',
+      done: 'Заказ{n} принят', done_t: 'Скоро свяжемся с вами.',
+      done_photos: 'Теперь отправьте фото админу в Telegram — сообщение готово, просто нажмите «Отправить».',
+      done_msg: 'Теперь напишите админу в Telegram — сообщение готово, просто нажмите «Отправить».',
+      msg_title: 'Сообщение админу', write_tg: 'Написать админу в Telegram', copy: 'Скопировать текст', copied: 'Скопировано',
+      ig: 'Instagram', home: 'Вернуться на главную',
+      m_hello: 'Здравствуйте! Я оформил(а) заказ на сайте{n}.', m_total: 'Итого: {s}', m_phone: 'Телефон: {p}',
+      m_photos: 'Отправляю свои фото.', m_free: 'Доставка: бесплатно', pcs: 'шт',
+      foot: 'Качественно печатаем ваши памятные фото', tg: 'Telegram канал', yt: 'YouTube', admin: 'Написать админу'
+    }
+  };
+  var LANGS = [['uz', "Oʻz"], ['uzc', 'Ўз'], ['ru', 'Ру']];
+  var store = {
+    get: function (k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+  var lang = store.get('mp_lang', 'uz');
+  if (!/^(uz|uzc|ru)$/.test(lang)) lang = 'uz';
+  function t(key, vars) {
+    var s = (lang === 'ru' ? T.ru[key] : T.uz[key]) || T.uz[key] || key;
+    if (lang === 'uzc') s = s.split(/(\{[a-z]+\})/).map(function (x) { return /^\{[a-z]+\}$/.test(x) ? x : toCyr(x); }).join('');
+    if (vars) Object.keys(vars).forEach(function (k) { s = s.split('{' + k + '}').join(vars[k]); });
+    return s;
+  }
+  // Admin yozgan matn: ruscha bo'lsa — o'sha, kirillchada — avtomatik
+  function L(obj, key) {
+    if (!obj) return '';
+    var uz = obj[key] || '';
+    if (lang === 'ru') return obj[key + '_ru'] || uz;
+    if (lang === 'uzc') return toCyr(uz);
+    return uz;
   }
 
   var params = new URLSearchParams(location.search);
   var rawSrc = (params.get('src') || params.get('from') || '').toLowerCase();
   var SRC = /^[a-z0-9_-]{1,32}$/.test(rawSrc) ? rawSrc : '';
-  // Mijoz qayerdan kelganini sahifalar orasida yo'qotmaslik uchun
   try { if (SRC) sessionStorage.setItem('mp_src', SRC); else SRC = sessionStorage.getItem('mp_src') || ''; } catch (e) {}
 
   // ================= Yordamchilar =================
@@ -351,76 +447,109 @@
     });
   }
   function fmt(n) { return String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
-  function sum(n) { return fmt(n) + " so'm"; }
-  var store = {
-    get: function (k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
-    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  };
+  function sum(n) { return fmt(n) + ' ' + t('som'); }
   var toastTimer;
   function toast(text) {
-    var t = $('#toast');
-    t.textContent = text;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 1800);
+    var el = $('#toast'); el.textContent = text; el.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { el.classList.remove('show'); }, 1800);
   }
   var ICON_PHOTO = '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 9"/></svg>';
   var ICON_PLUS = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+  var ICON = {
+    tg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.4 4.2 2.9 11.3c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.5c.3-1.3-.5-1.9-1.4-1.6zM8.6 13.9l9.1-5.8c.4-.3.8-.1.5.2l-7.6 6.9-.3 3.2z"/></svg>',
+    ig: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>',
+    yt: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.5 7.2a2.8 2.8 0 0 0-2-2C18.7 4.7 12 4.7 12 4.7s-6.7 0-8.5.5a2.8 2.8 0 0 0-2 2C1 9 1 12 1 12s0 3 .5 4.8a2.8 2.8 0 0 0 2 2c1.8.5 8.5.5 8.5.5s6.7 0 8.5-.5a2.8 2.8 0 0 0 2-2C23 15 23 12 23 12s0-3-.5-4.8zM9.8 15.3V8.7l5.7 3.3z"/></svg>',
+    ad: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1-4.9A8 8 0 1 1 21 12z"/></svg>'
+  };
 
   // ================= Holat =================
-  var products = [];
-  var demo = false;
-  var loaded = false;
-  var loadError = '';
-  var category = 'Hammasi';
+  var products = [], calcs = [], announcements = [];
+  var demo = false, loaded = false, loadError = '';
   var query = '';
-  // Savat: { prints: son, items: [{ id, v, a: [..], q }] }
-  var cart = store.get('mp_cart', { prints: 0, items: [] });
-  if (!cart || !Array.isArray(cart.items)) cart = { prints: 0, items: [] };
+  var calcId = store.get('mp_calc', '10x15');
+  // Savat: { calcs: { "10x15": 120 }, items: [{ id, v, o: [], a: [], q }] }
+  var cart = store.get('mp_cart', null);
+  if (!cart || typeof cart !== 'object') cart = {};
+  if (!cart.calcs) cart.calcs = {};
+  if (cart.prints) { cart.calcs['10x15'] = cart.prints; delete cart.prints; }
+  if (!Array.isArray(cart.items)) cart.items = [];
   var draft = store.get('mp_checkout', { phone: '', address: '' });
   var loc = null;
 
   function saveCart() { store.set('mp_cart', cart); updateCount(); }
   function byId(id) { for (var i = 0; i < products.length; i++) if (products[i].id === id) return products[i]; return null; }
+  function calcById(id) { for (var i = 0; i < calcs.length; i++) if (calcs[i].id === id) return calcs[i]; return null; }
+  function tierPrice(c, q) { var p = 0; if (!c || q <= 0) return 0; c.tiers.forEach(function (x) { if (q >= x.from) p = x.price; }); return p; }
   function minPrice(p) {
-    if (p.variants && p.variants.length) return Math.min.apply(null, p.variants.map(function (v) { return v.price; }));
-    return p.price;
+    var base = p.variants.length ? Math.min.apply(null, p.variants.map(function (v) { return v.price; })) : p.price;
+    p.options.forEach(function (g) { base += Math.min.apply(null, g.choices.map(function (c) { return c.price; })); });
+    return base;
   }
-  function lineUnit(p, it) {
-    var unit = p.variants && p.variants.length ? (p.variants[it.v] || p.variants[0]).price : p.price;
-    (it.a || []).forEach(function (i) { if (p.addons[i]) unit += p.addons[i].price; });
-    return unit;
+  function hasChoice(p) { return p.variants.length > 1 || p.options.length || p.addons.length; }
+  function clampIdx(v, n) { v = Math.floor(Number(v) || 0); return Math.min(Math.max(0, v), Math.max(0, n - 1)); }
+  function lineInfo(p, it) {
+    var unit = p.price, parts = [];
+    if (p.variants.length) { var v = p.variants[clampIdx(it.v, p.variants.length)]; unit = v.price; parts.push(L(v, 'name')); }
+    p.options.forEach(function (g, i) { var c = g.choices[clampIdx((it.o || [])[i], g.choices.length)]; unit += c.price; parts.push(L(c, 'name')); });
+    (it.a || []).forEach(function (i) { var a = p.addons[i]; if (a) { unit += a.price; parts.push('+ ' + L(a, 'name')); } });
+    return { unit: unit, parts: parts };
   }
-  function cartLines() {
-    return cart.items.map(function (it) {
-      var p = byId(it.id);
-      return { it: it, p: p, unit: p ? lineUnit(p, it) : 0 };
-    });
+  function freeCount() {
+    var n = 0;
+    Object.keys(cart.calcs).forEach(function (id) { var c = calcById(id); if (c && c.free) n += cart.calcs[id] || 0; });
+    cart.items.forEach(function (it) { var p = byId(it.id); if (p) n += (p.print_qty || 0) * it.q; });
+    return n;
   }
   function totals() {
-    var t = 0, count = 0, prints = cart.prints;
-    if (cart.prints > 0) { t += cart.prints * unitPrice(cart.prints); count += 1; }
-    cartLines().forEach(function (l) {
-      if (!l.p) return;
-      t += l.unit * l.it.q;
-      count += l.it.q;
-      prints += (l.p.print_qty || 0) * l.it.q;
-    });
-    return { total: t, count: count, prints: prints };
+    var total = 0;
+    Object.keys(cart.calcs).forEach(function (id) { var c = calcById(id), q = cart.calcs[id]; if (c && q > 0) total += q * tierPrice(c, q); });
+    cart.items.forEach(function (it) { var p = byId(it.id); if (p) total += lineInfo(p, it).unit * it.q; });
+    return { total: total, free: freeCount() };
   }
   function updateCount() {
-    var n = cart.items.reduce(function (a, it) { return a + it.q; }, 0) + (cart.prints > 0 ? 1 : 0);
-    var c = $('#cart-count');
-    c.hidden = !n;
-    c.textContent = n > 99 ? '99+' : n;
+    var n = cart.items.reduce(function (a, it) { return a + it.q; }, 0);
+    Object.keys(cart.calcs).forEach(function (id) { if (cart.calcs[id] > 0) n++; });
+    var c = $('#cart-count'); c.hidden = !n; c.textContent = n > 99 ? '99+' : n;
   }
-  function addToCart(id, v, a, q) {
-    a = (a || []).slice().sort();
-    var key = id + '|' + v + '|' + a.join(',');
-    var found = cart.items.find(function (it) { return it.id + '|' + it.v + '|' + (it.a || []).join(',') === key; });
-    if (found) found.q = Math.min(1000, found.q + q);
-    else cart.items.push({ id: id, v: v, a: a, q: q });
+  function itemKey(it) { return it.id + '|' + (it.v || 0) + '|' + (it.o || []).join(',') + '|' + (it.a || []).slice().sort().join(','); }
+  function addToCart(it) {
+    var key = itemKey(it);
+    var found = cart.items.find(function (x) { return itemKey(x) === key; });
+    if (found) found.q = Math.min(1000, found.q + it.q); else cart.items.push(it);
     saveCart();
+  }
+
+  // ================= Til, e'lon =================
+  function langsHTML() {
+    return LANGS.map(function (l) { return '<button type="button" data-lang="' + l[0] + '" aria-pressed="' + (l[0] === lang) + '">' + l[1] + '</button>'; }).join('');
+  }
+  function paintChrome() {
+    document.documentElement.lang = lang === 'ru' ? 'ru' : lang === 'uzc' ? 'uz-Cyrl' : 'uz';
+    document.querySelectorAll('[data-langs]').forEach(function (el) { el.innerHTML = langsHTML(); });
+    document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = t(el.getAttribute('data-t')); });
+    paintAnn();
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-lang]');
+    if (!b) return;
+    lang = b.getAttribute('data-lang'); store.set('mp_lang', lang);
+    paintChrome(); keepScroll(route);
+  });
+  var annIdx = 0, annTimer;
+  function paintAnn() {
+    var box = $('#ann'), list = announcements;
+    box.hidden = !list.length;
+    clearInterval(annTimer);
+    if (!list.length) return;
+    var span = $('#ann-text');
+    annIdx = annIdx % list.length;
+    span.textContent = L(list[annIdx], 'text');
+    if (list.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      annTimer = setInterval(function () {
+        span.classList.add('fade');
+        setTimeout(function () { annIdx = (annIdx + 1) % list.length; span.textContent = L(list[annIdx], 'text'); span.classList.remove('fade'); }, 350);
+      }, 4500);
+    }
   }
 
   // ================= Yuklash =================
@@ -430,176 +559,228 @@
       .then(function (d) {
         if (!d.ok) throw new Error(d.error || '');
         products = (d.products || []).map(function (p) {
-          p.variants = p.variants || []; p.addons = p.addons || []; p.images = p.images || [];
+          p.variants = p.variants || []; p.options = p.options || []; p.addons = p.addons || []; p.images = p.images || [];
           return p;
         });
-        demo = !!d.demo;
-        loaded = true;
-        // Sotuvdan olingan tovarlarni savatdan tozalash
-        updateCount();
-        renderChips();
-        route();
+        calcs = d.calculators || [];
+        announcements = d.announcements || [];
+        if (!calcById(calcId) && calcs[0]) calcId = calcs[0].id;
+        demo = !!d.demo; loaded = true;
+        updateCount(); paintAnn(); route();
       })
-      .catch(function (e) {
-        loaded = true;
-        loadError = e.message || "Tovarlar yuklanmadi. Internetni tekshirib, sahifani yangilang.";
-        route();
-      });
+      .catch(function (e) { loaded = true; loadError = e.message || ''; route(); });
   }
-
-  // ================= Kategoriyalar =================
-  function categories() {
-    var seen = {}, list = [];
-    products.forEach(function (p) { if (p.category && !seen[p.category]) { seen[p.category] = 1; list.push(p.category); } });
-    return ['Hammasi'].concat(list);
-  }
-  function renderChips() {
-    var box = $('#chips');
-    box.innerHTML = categories().map(function (c) {
-      return '<button class="chip" type="button" data-cat="' + esc(c) + '" aria-pressed="' + (c === category) + '">' + esc(c) + '</button>';
-    }).join('');
-  }
-  $('#chips').addEventListener('click', function (e) {
-    var b = e.target.closest('[data-cat]');
-    if (!b) return;
-    category = b.getAttribute('data-cat');
-    renderChips();
-    if (location.hash !== '#/' && location.hash !== '') location.hash = '#/';
-    else renderHome();
-  });
-  $('#q').addEventListener('input', function (e) {
-    query = e.target.value.trim().toLowerCase();
-    if (location.hash !== '#/' && location.hash !== '') location.hash = '#/';
-    else renderHome();
-  });
 
   // ================= Bosh sahifa =================
   function cardHTML(p) {
-    var img = p.images[0]
-      ? '<img src="' + esc(p.images[0]) + '" alt="" loading="lazy">'
-      : '<div class="ph">' + ICON_PHOTO + '</div>';
-    var badge = '';
-    if (p.old_price && p.old_price > p.price && !p.variants.length) {
-      badge = '<span class="badge sale">−' + Math.round((1 - p.price / p.old_price) * 100) + '%</span>';
-    } else if (p.is_bundle) badge = "<span class=\"badge\">To'plam</span>";
-    var price = p.variants.length ? sum(minPrice(p)) + 'dan' : sum(p.price);
-    var old = p.old_price && p.old_price > p.price && !p.variants.length ? '<s>' + fmt(p.old_price) + '</s>' : '';
+    var img = p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="" loading="lazy">' : '<div class="ph">' + ICON_PHOTO + '</div>';
+    var sale = p.old_price && p.old_price > p.price && !p.variants.length && !p.options.length;
+    var badge = sale ? '<span class="badge sale">−' + Math.round((1 - p.price / p.old_price) * 100) + '%</span>'
+      : p.is_bundle ? '<span class="badge">' + esc(t('bundle')) + '</span>' : '';
+    var price = (p.variants.length > 1 || p.options.some(function (g) { return g.choices.length > 1; }))
+      ? t('from', { p: sum(minPrice(p)) }) : sum(minPrice(p));
     return '<a class="card" href="#/p/' + encodeURIComponent(p.id) + '">' +
       '<div class="shot"><div class="img">' + img + '</div>' + badge +
-      '<button class="add-fab" type="button" data-quick="' + esc(p.id) + '" aria-label="Savatga qo\'shish: ' + esc(p.name) + '">' + ICON_PLUS + '</button></div>' +
-      '<div class="price">' + price + old + '</div>' +
-      '<div class="name">' + esc(p.name) + '</div></a>';
+      '<button class="add-fab" type="button" data-quick="' + esc(p.id) + '" aria-label="' + esc(t('add_cart') + ': ' + L(p, 'name')) + '">' + ICON_PLUS + '</button></div>' +
+      '<div class="price">' + esc(price) + (sale ? '<s>' + fmt(p.old_price) + '</s>' : '') + '</div>' +
+      '<div class="name">' + esc(L(p, 'name')) + '</div></a>';
+  }
+
+  function calcHTML() {
+    var tabs = calcs.length > 1 ? '<div class="fmt-tabs" role="tablist">' + calcs.map(function (c) {
+      return '<button type="button" role="tab" data-calc="' + esc(c.id) + '" aria-pressed="' + (c.id === calcId) + '" aria-selected="' + (c.id === calcId) + '">' +
+        esc(L(c, 'name')) + (cart.calcs[c.id] > 0 ? '<span class="dot" aria-hidden="true"></span>' : '') + '</button>';
+    }).join('') + '</div>' : '';
+    var cells = ''; for (var i = 0; i < 12; i++) cells += '<i></i>';
+    return '<section class="calc-band"><div class="wrap">' +
+      '<div class="bar"><div class="langs" data-langs>' + langsHTML() + '</div></div>' +
+      '<div class="calc-card">' +
+        '<div class="calc-logo"><img src="/dokon/logo.png" alt="Musavvir Print" width="300" height="96"></div>' + tabs +
+        '<div class="screen"><div class="scanline"></div><div class="scr">' +
+          '<div class="scr-top"><span id="c-fmt"></span><span>' + esc(t('each')) + ': <span id="c-unit">0</span></span></div>' +
+          '<div class="scr-main"><div class="l">' + esc(t('total')) + ':</div><div class="n"><span id="c-sum">0</span><i>_</i></div><div class="c">' + esc(t('som')) + '</div></div>' +
+          '<div class="scr-free"><div class="prog" id="c-prog"><div class="t"><span id="c-left"></span><span>' + esc(t('free_short')) + '</span></div><div class="cells" id="c-cells">' + cells + '</div></div>' +
+          '<div class="badge-free" id="c-badge">' + esc(t('free_badge')) + '</div></div>' +
+        '</div></div>' +
+        '<label class="calc-label" for="c-qty">' + esc(t('how_many')) + '</label>' +
+        '<input class="tactile" type="number" id="c-qty" min="0" max="100000" inputmode="numeric" placeholder="0">' +
+        '<button class="retro-btn" type="button" id="c-add"></button>' +
+        '<p class="calc-note" id="c-note"></p>' +
+      '</div></div></section>';
+  }
+
+  function wireCalc() {
+    var inp = $('#c-qty');
+    if (!inp) return;
+    var c = calcById(calcId);
+    if (!c) { $('.calc-card .screen').hidden = true; return; }
+    inp.value = cart.calcs[calcId] > 0 ? cart.calcs[calcId] : '';
+    function paint() {
+      var q = Math.max(0, Math.min(100000, parseInt(inp.value, 10) || 0));
+      var up = tierPrice(c, q);
+      $('#c-fmt').textContent = L(c, 'name').toUpperCase();
+      $('#c-unit').textContent = fmt(up);
+      $('#c-sum').textContent = fmt(q * up);
+      // bepul yetkazish: savatdagi boshqa rasmlar ham hisoblanadi
+      var others = freeCount() - (c.free ? (cart.calcs[calcId] || 0) : 0);
+      var n = others + (c.free ? q : 0);
+      var showProg = n > 0 && n < FREE_FROM, showBadge = n >= FREE_FROM;
+      $('#c-prog').classList.toggle('on', showProg);
+      $('#c-badge').classList.toggle('on', showBadge);
+      $('#c-left').textContent = t('left', { n: Math.max(0, FREE_FROM - n) });
+      var filled = Math.round(Math.min(1, n / FREE_FROM) * 12);
+      document.querySelectorAll('#c-cells i').forEach(function (cell, i) { cell.classList.toggle('f', i < filled); });
+      var inCart = cart.calcs[calcId] > 0;
+      var btn = $('#c-add');
+      btn.textContent = inCart && q !== cart.calcs[calcId] ? t('update_cart') : inCart ? t('in_cart', { n: q }) : t('add_cart');
+      btn.disabled = !q || (inCart && q === cart.calcs[calcId]);
+      $('#c-note').innerHTML = inCart
+        ? esc(t('in_cart', { n: cart.calcs[calcId] })) + ' · <button type="button" id="c-rm">' + esc(t('remove')) + '</button>'
+        : t('other_formats', { a: '<a href="' + LINKS.admin + '" target="_blank" rel="noopener" style="color:var(--pink)">', b: '</a>' });
+      var rm = $('#c-rm');
+      if (rm) rm.onclick = function () { delete cart.calcs[calcId]; saveCart(); inp.value = ''; paint(); paintTabs(); };
+    }
+    inp.addEventListener('input', paint);
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') $('#c-add').click(); });
+    $('#c-add').onclick = function () {
+      var q = Math.max(0, Math.min(100000, parseInt(inp.value, 10) || 0));
+      if (!q) return;
+      var was = cart.calcs[calcId] > 0;
+      cart.calcs[calcId] = q; saveCart(); paint(); paintTabs();
+      toast(was ? t('updated') : t('added'));
+    };
+    paint();
+  }
+  function paintTabs() {
+    document.querySelectorAll('[data-calc]').forEach(function (b) {
+      var id = b.getAttribute('data-calc'), c = calcById(id);
+      b.innerHTML = esc(L(c, 'name')) + (cart.calcs[id] > 0 ? '<span class="dot" aria-hidden="true"></span>' : '');
+    });
+  }
+
+  function productsHTML() {
+    var list = products.filter(function (p) {
+      return !query || (L(p, 'name') + ' ' + p.name + ' ' + L(p, 'description')).toLowerCase().indexOf(query) >= 0;
+    });
+    var html = '';
+    if (!loaded) return '<div class="grid"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>';
+    if (loadError) return '<div class="empty"><b>' + esc(t('load_err')) + '</b>' + esc(t('load_err_t')) + '</div>';
+    if (!list.length) {
+      return query ? '<div class="empty"><b>' + esc(t('not_found', { q: query })) + '</b></div>'
+        : '<div class="empty"><b>' + esc(t('empty_shop')) + '</b></div>';
+    }
+    return html + '<div class="grid">' + list.map(cardHTML).join('') + '</div>';
   }
 
   function renderHome() {
-    setNav('home');
-    document.title = "Musavvir Print — do'kon";
-    var list = products.filter(function (p) {
-      if (category !== 'Hammasi' && p.category !== category) return false;
-      if (query && (p.name + ' ' + p.category + ' ' + p.description).toLowerCase().indexOf(query) < 0) return false;
-      return true;
-    });
-    var showHero = !query && category === 'Hammasi';
-    var html = '<div class="wrap">';
-    if (demo) html += '<div class="demo-note">Bu sinov ko\'rinishi: tovarlar namuna sifatida qo\'yilgan. Admin paneldan haqiqiy tovarlar kiritilgach, ular ko\'rinadi.</div>';
-    if (showHero) {
-      var inCart = cart.prints > 0 ? '<p>Savatda: ' + cart.prints + ' ta rasm</p>' : '<p>RC fotoqog\'ozga, 1 donadan. 300 tadan yetkazish bepul.</p>';
-      html += '<button class="hero" type="button" id="open-calc"><div><h2>10x15 rasm chiqarish — 1 500 so\'mdan</h2>' + inCart +
-        '<span class="go">' + (cart.prints > 0 ? "Sonini o'zgartirish" : 'Narxni hisoblash') + '</span></div>' +
-        '<div class="stack" aria-hidden="true"><span><i></i></span><span><i></i></span><span><i></i></span></div></button>';
-    }
-    if (!loaded) {
-      html += '<div class="section-title"><h3>Tovarlar</h3></div><div class="grid">' +
-        '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>';
+    setChrome('home');
+    document.title = t('title');
+    var html = calcHTML() + '<div class="wrap">';
+    if (demo) html += '<div class="demo-note">' + esc(t('demo')) + '</div>';
+    if (products.length || !loaded) {
+      html += '<div class="section-title"><h2>' + esc(t('products')) + '</h2>' +
+        (products.length ? '<span>' + esc(t('count', { n: products.length })) + '</span>' : '') + '</div>';
+      if (products.length > 8) {
+        html += '<label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>' +
+          '<span class="sr">' + esc(t('search')) + '</span><input id="q" type="search" placeholder="' + esc(t('search')) + '" autocomplete="off" value="' + esc(query) + '"></label>';
+      }
+      html += '<div id="plist">' + productsHTML() + '</div>';
     } else if (loadError) {
-      html += '<div class="empty"><b>Tovarlar yuklanmadi</b>' + esc(loadError) + '</div>';
-    } else if (!list.length) {
-      html += query
-        ? '<div class="empty"><b>«' + esc(query) + '» bo\'yicha hech narsa topilmadi</b>Boshqa so\'z bilan qidirib ko\'ring.</div>'
-        : '<div class="empty"><b>Hozircha bu yerda tovar yo\'q</b>Tez orada qo\'shamiz. Savolingiz bo\'lsa, adminga yozing.</div>';
-    } else {
-      var title = query ? 'Qidiruv natijasi' : category === 'Hammasi' ? 'Albomlar, ramkalar va to\'plamlar' : category;
-      html += '<div class="section-title"><h3>' + esc(title) + '</h3><span>' + list.length + ' ta</span></div>';
-      html += '<div class="grid">' + list.map(cardHTML).join('') + '</div>';
+      html += '<div id="plist">' + productsHTML() + '</div>';
     }
-    html += '<p class="hint" style="text-align:center;margin:28px 0 12px">Polaroid, A5, A4, A3 va boshqa o\'lchamlar — <a href="https://t.me/' + ADMIN + '" target="_blank" rel="noopener">adminga yozing</a>.</p>';
-    html += '</div>';
+    html += '</div>' + footerHTML();
     view.innerHTML = html;
-    var oc = $('#open-calc');
-    if (oc) oc.addEventListener('click', openCalc);
+    wireCalc();
+    var q = $('#q');
+    if (q) q.addEventListener('input', function () { query = q.value.trim().toLowerCase(); $('#plist').innerHTML = productsHTML(); });
+  }
+
+  function footerHTML() {
+    return '<footer class="foot"><div class="wrap"><img src="/dokon/logo.png" alt="Musavvir Print" width="138" height="44"><p>' + esc(t('foot')) + '</p>' +
+      '<div class="socials">' +
+      '<a class="tg" href="' + LINKS.tg + '" target="_blank" rel="noopener">' + ICON.tg + esc(t('tg')) + '</a>' +
+      '<a class="ig" href="' + LINKS.ig + '" target="_blank" rel="noopener">' + ICON.ig + 'Instagram</a>' +
+      '<a class="yt" href="' + LINKS.yt + '" target="_blank" rel="noopener">' + ICON.yt + 'YouTube</a>' +
+      '<a class="ad" href="' + LINKS.admin + '" target="_blank" rel="noopener">' + ICON.ad + esc(t('admin')) + '</a>' +
+      '</div></div></footer>';
   }
 
   view.addEventListener('click', function (e) {
+    var tab = e.target.closest('[data-calc]');
+    if (tab) {
+      calcId = tab.getAttribute('data-calc'); store.set('mp_calc', calcId);
+      document.querySelectorAll('[data-calc]').forEach(function (b) { var on = b === tab; b.setAttribute('aria-pressed', on); b.setAttribute('aria-selected', on); });
+      wireCalc();
+      return;
+    }
     var q = e.target.closest('[data-quick]');
     if (!q) return;
     e.preventDefault();
     var p = byId(q.getAttribute('data-quick'));
     if (!p) return;
-    // Variant yoki qo'shimcha bo'lsa — tanlash uchun tovar sahifasiga
-    if (p.variants.length > 1 || p.addons.length) { location.hash = '#/p/' + encodeURIComponent(p.id); return; }
-    addToCart(p.id, 0, [], 1);
-    toast("Savatga qo'shildi");
+    if (hasChoice(p)) { location.hash = '#/p/' + encodeURIComponent(p.id); return; }
+    addToCart({ id: p.id, v: 0, o: [], a: [], q: 1 });
+    toast(t('added'));
   });
 
   // ================= Tovar sahifasi =================
   function renderProduct(id) {
-    setNav('');
+    setChrome('');
     var p = byId(id);
     if (!p) {
-      view.innerHTML = '<div class="wrap"><button class="back" type="button" onclick="history.back()">‹ Orqaga</button>' +
-        '<div class="empty"><b>Bu tovar topilmadi</b>U sotuvdan olingan bo\'lishi mumkin. <a href="#/">Bosh sahifaga qaytish</a></div></div>';
+      view.innerHTML = '<div class="wrap"><a class="back" href="#/">' + esc(t('back')) + '</a><div class="empty"><b>' + esc(t('not_avail')) + '</b>' + esc(t('not_avail_t')) + '</div></div>';
       return;
     }
-    document.title = p.name + ' — Musavvir Print';
-    var sel = { v: 0, a: [], q: 1 };
+    document.title = L(p, 'name') + ' — Musavvir Print';
+    var sel = { id: p.id, v: 0, o: p.options.map(function () { return 0; }), a: [], q: 1 };
     var imgs = p.images.length ? p.images : [null];
     var slides = imgs.map(function (u, i) {
-      return '<div>' + (u ? '<img src="' + esc(u) + '" alt="' + esc(p.name) + (imgs.length > 1 ? ', ' + (i + 1) + '-rasm' : '') + '"' + (i ? ' loading="lazy"' : '') + '>' : '<div class="ph">' + ICON_PHOTO + '</div>') + '</div>';
+      return '<div>' + (u ? '<img src="' + esc(u) + '" alt="' + esc(L(p, 'name')) + '"' + (i ? ' loading="lazy"' : '') + '>' : '<div class="ph">' + ICON_PHOTO + '</div>') + '</div>';
     }).join('');
     var dots = imgs.length > 1 ? '<div class="dots" aria-hidden="true">' + imgs.map(function (_, i) { return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('') + '</div>' : '';
-
-    var html = '<div class="wrap pp"><button class="back" type="button" id="back">‹ Orqaga</button>' +
+    function group(kind, gi, title, choices, base) {
+      return '<div class="opt-title">' + esc(title) + '</div><div class="pills" role="radiogroup" aria-label="' + esc(title) + '">' +
+        choices.map(function (c, i) {
+          var price = base ? sum(c.price) : (c.price ? '+' + sum(c.price) : '');
+          return '<button type="button" class="pill" role="radio" data-kind="' + kind + '" data-g="' + gi + '" data-i="' + i + '" aria-checked="' + (i === 0) + '">' +
+            esc(L(c, 'name')) + (price ? '<small>' + esc(price) + '</small>' : '') + '</button>';
+        }).join('') + '</div>';
+    }
+    var html = '<div class="wrap pp"><button class="back" type="button" id="back">' + esc(t('back')) + '</button>' +
       '<div class="pp-grid"><div class="gallery"><div class="slides" id="slides">' + slides + '</div>' + dots + '</div><div>' +
-      '<h1>' + esc(p.name) + '</h1><div class="big-price" id="pp-price"></div>';
-    if (p.is_bundle && p.print_qty) html += '<div class="bundle-note">Ichida ' + p.print_qty + ' ta 10x15 rasm bor. Rasmlarni buyurtmadan keyin Telegram orqali yuborasiz.</div>';
-    if (p.variants.length) {
-      html += '<div class="opt-title">Variantni tanlang</div><div class="pills" id="variants" role="radiogroup">' +
-        p.variants.map(function (v, i) {
-          return '<button type="button" class="pill" role="radio" data-v="' + i + '" aria-pressed="' + (i === 0) + '" aria-checked="' + (i === 0) + '">' + esc(v.name) + '<small>' + sum(v.price) + '</small></button>';
-        }).join('') + '</div>';
-    }
+      '<h1>' + esc(L(p, 'name')) + '</h1><div class="big-price" id="pp-price"></div>';
+    if (p.is_bundle && p.print_qty) html += '<div class="bundle-note">' + esc(t('bundle_note', { n: p.print_qty })) + '</div>';
+    if (p.variants.length) html += group('v', 0, t('choose'), p.variants, true);
+    p.options.forEach(function (g, gi) { html += group('o', gi, L(g, 'name'), g.choices, false); });
     if (p.addons.length) {
-      html += '<div class="opt-title">Qo\'shimcha</div><div class="checks">' +
-        p.addons.map(function (a, i) {
-          return '<label class="check"><input type="checkbox" data-a="' + i + '"><span>' + esc(a.name) + '</span><b>+' + sum(a.price) + '</b></label>';
-        }).join('') + '</div>';
+      html += '<div class="opt-title">' + esc(t('extras')) + '</div><div class="checks">' + p.addons.map(function (a, i) {
+        return '<label class="check"><input type="checkbox" data-a="' + i + '"><span>' + esc(L(a, 'name')) + '</span><b>+' + esc(sum(a.price)) + '</b></label>';
+      }).join('') + '</div>';
     }
-    if (p.description) html += '<div class="desc">' + esc(p.description) + '</div>';
+    var d = L(p, 'description');
+    if (d) html += '<div class="desc">' + esc(d) + '</div>';
     html += '</div></div></div>' +
-      '<div class="buybar"><div class="wrap"><div class="stepper"><button type="button" id="minus" aria-label="Kamaytirish">−</button><output id="qty">1</output><button type="button" id="plus" aria-label="Ko\'paytirish">+</button></div>' +
-      '<button class="btn" type="button" id="add">Savatga · <span id="add-sum"></span></button></div></div>';
+      '<div class="buybar"><div class="wrap"><div class="stepper"><button type="button" id="minus" aria-label="−">−</button><output id="qty">1</output><button type="button" id="plus" aria-label="+">+</button></div>' +
+      '<button class="btn" type="button" id="add"></button></div></div>';
     view.innerHTML = html;
     window.scrollTo(0, 0);
 
     function refresh() {
-      var unit = lineUnit(p, sel);
-      var base = p.variants.length ? p.variants[sel.v].price : p.price;
-      var old = !p.variants.length && p.old_price > p.price ? '<s>' + sum(p.old_price) + '</s>' : '';
-      $('#pp-price').innerHTML = sum(base) + old;
+      var info = lineInfo(p, sel);
+      var sale = p.old_price > p.price && !p.variants.length && !p.options.length;
+      $('#pp-price').innerHTML = esc(sum(info.unit)) + (sale ? '<s>' + esc(sum(p.old_price)) + '</s>' : '');
       $('#qty').textContent = sel.q;
-      $('#add-sum').textContent = sum(unit * sel.q);
+      $('#add').textContent = t('to_cart') + ' · ' + sum(info.unit * sel.q);
     }
     refresh();
     $('#back').onclick = function () { if (history.length > 1) history.back(); else location.hash = '#/'; };
-    var vbox = $('#variants');
-    if (vbox) vbox.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-v]');
-      if (!b) return;
-      sel.v = +b.getAttribute('data-v');
-      vbox.querySelectorAll('[data-v]').forEach(function (x) {
-        var on = x === b; x.setAttribute('aria-pressed', on); x.setAttribute('aria-checked', on);
+    view.querySelectorAll('.pill').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var kind = b.getAttribute('data-kind'), g = +b.getAttribute('data-g'), i = +b.getAttribute('data-i');
+        if (kind === 'v') sel.v = i; else sel.o[g] = i;
+        b.parentNode.querySelectorAll('.pill').forEach(function (x) { x.setAttribute('aria-checked', x === b); });
+        refresh();
       });
-      refresh();
     });
     view.querySelectorAll('[data-a]').forEach(function (c) {
       c.addEventListener('change', function () {
@@ -610,11 +791,9 @@
     $('#minus').onclick = function () { sel.q = Math.max(1, sel.q - 1); refresh(); };
     $('#plus').onclick = function () { sel.q = Math.min(1000, sel.q + 1); refresh(); };
     $('#add').onclick = function () {
-      addToCart(p.id, sel.v, sel.a, sel.q);
-      toast("Savatga qo'shildi");
-      var b = $('#add');
-      b.innerHTML = 'Savatga o\'tish';
-      b.onclick = function () { location.hash = '#/savat'; };
+      addToCart({ id: p.id, v: sel.v, o: sel.o.slice(), a: sel.a.slice(), q: sel.q });
+      toast(t('added'));
+      var b = $('#add'); b.textContent = t('go_cart'); b.onclick = function () { location.hash = '#/savat'; };
     };
     var sl = $('#slides');
     if (imgs.length > 1) sl.addEventListener('scroll', function () {
@@ -623,135 +802,65 @@
     }, { passive: true });
   }
 
-  // ================= 10x15 kalkulyator =================
-  function openCalc() {
-    var sheet = $('#sheet'), bg = $('#sheet-bg');
-    var q = cart.prints || 100;
-    sheet.innerHTML =
-      '<div class="grab"></div><h2 id="sheet-title">10x15 rasm chiqarish</h2>' +
-      '<p class="sub">Qancha ko\'p bo\'lsa, donasi shuncha arzon. Rasmlarni buyurtmadan keyin Telegram orqali yuborasiz.</p>' +
-      '<label class="sr" for="calc-q">Rasm soni</label>' +
-      '<div class="qty-big"><button type="button" data-d="-10" aria-label="10 taga kamaytirish">−</button>' +
-      '<input id="calc-q" type="number" inputmode="numeric" min="0" max="100000"><button type="button" data-d="10" aria-label="10 taga ko\'paytirish">+</button></div>' +
-      '<div class="quick">' + [50, 100, 200, 300, 500].map(function (n) { return '<button type="button" data-set="' + n + '">' + n + ' ta</button>'; }).join('') + '</div>' +
-      '<div class="tiers" id="tiers"></div>' +
-      '<div class="calc-total"><span id="calc-unit"></span><b id="calc-sum"></b></div>' +
-      '<p class="hint" id="calc-free" style="margin:-4px 0 12px"></p>' +
-      '<button class="btn" type="button" id="calc-add" style="width:100%"></button>' +
-      (cart.prints > 0 ? '<button class="btn ghost" type="button" id="calc-rm" style="width:100%;margin-top:8px">Savatdan olib tashlash</button>' : '');
-    var inp = $('#calc-q');
-    inp.value = q;
-    function upd() {
-      var n = Math.max(0, Math.min(100000, parseInt(inp.value, 10) || 0));
-      var up = unitPrice(n);
-      $('#tiers').innerHTML = TIERS.map(function (t) {
-        var label = t[1] === Infinity ? t[0] + ' va undan ko\'p' : t[0] + '–' + t[1] + ' ta';
-        var on = n >= t[0] && n <= t[1];
-        return '<div' + (on ? ' class="on"' : '') + '><span>' + label + '</span><span>' + fmt(t[2]) + " so'm</span></div>";
-      }).join('');
-      $('#calc-unit').textContent = n ? n + ' × ' + fmt(up) : 'Sonini kiriting';
-      $('#calc-sum').textContent = sum(n * up);
-      var other = totals().prints - cart.prints;
-      var all = n + other;
-      $('#calc-free').textContent = all >= FREE_FROM ? 'Yetkazish bepul bo\'ladi.' : 'Bepul yetkazish uchun yana ' + (FREE_FROM - all) + ' ta rasm.';
-      var b = $('#calc-add');
-      b.disabled = !n;
-      b.textContent = cart.prints > 0 ? 'Savatni yangilash' : "Savatga qo'shish";
-    }
-    inp.addEventListener('input', upd);
-    sheet.addEventListener('click', function (e) {
-      var d = e.target.closest('[data-d]'), s = e.target.closest('[data-set]');
-      if (d) { inp.value = Math.max(0, (parseInt(inp.value, 10) || 0) + +d.getAttribute('data-d')); upd(); }
-      if (s) { inp.value = s.getAttribute('data-set'); upd(); }
-    });
-    $('#calc-add').onclick = function () {
-      var n = Math.max(0, Math.min(100000, parseInt(inp.value, 10) || 0));
-      if (!n) return;
-      var was = cart.prints;
-      cart.prints = n; saveCart(); closeSheet();
-      toast(was ? 'Rasm soni yangilandi' : "Savatga qo'shildi");
-      route();
-    };
-    var rm = $('#calc-rm');
-    if (rm) rm.onclick = function () { cart.prints = 0; saveCart(); closeSheet(); route(); };
-    upd();
-    bg.hidden = false; sheet.hidden = false;
-    requestAnimationFrame(function () { bg.classList.add('open'); sheet.classList.add('open'); });
-    setTimeout(function () { inp.focus(); inp.select(); }, 260);
-    document.addEventListener('keydown', escClose);
-  }
-  function escClose(e) { if (e.key === 'Escape') closeSheet(); }
-  function closeSheet() {
-    var sheet = $('#sheet'), bg = $('#sheet-bg');
-    sheet.classList.remove('open'); bg.classList.remove('open');
-    document.removeEventListener('keydown', escClose);
-    setTimeout(function () { sheet.hidden = true; bg.hidden = true; }, 250);
-  }
-  $('#sheet-bg').addEventListener('click', closeSheet);
-
   // ================= Savat =================
   function renderCart() {
-    setNav('cart');
-    document.title = 'Savat — Musavvir Print';
-    var lines = cartLines();
-    var html = '<div class="wrap cart"><h1>Savat</h1>';
-    if (!cart.prints && !lines.length) {
-      view.innerHTML = html + '<div class="empty"><b>Savat bo\'sh</b>Rasm sonini hisoblang yoki albom, ramka tanlang.' +
-        '<div style="margin-top:18px"><a class="btn" href="#/" style="max-width:280px;margin:0 auto">Tovarlarni ko\'rish</a></div></div></div>';
+    setChrome('cart');
+    document.title = t('cart') + ' — Musavvir Print';
+    var calcLines = calcs.filter(function (c) { return cart.calcs[c.id] > 0; });
+    var html = '<div class="wrap cart"><h1>' + esc(t('cart')) + '</h1>';
+    if (!calcLines.length && !cart.items.length) {
+      view.innerHTML = html + '<div class="empty"><b>' + esc(t('cart_empty')) + '</b>' + esc(t('cart_empty_t')) +
+        '<div style="margin-top:18px"><a class="btn" href="#/" style="max-width:280px;margin:0 auto">' + esc(t('to_shop')) + '</a></div></div></div>';
       return;
     }
     html += '<div class="lines">';
-    if (cart.prints > 0) {
-      var up = unitPrice(cart.prints);
-      html += '<div class="line"><div class="thumb"><div class="ph" style="background:#fde6ef;color:var(--pink)">' + ICON_PHOTO + '</div></div><div>' +
-        '<h4>10x15 rasm chop etish</h4><div class="meta">' + cart.prints + ' ta × ' + sum(up) + '</div>' +
-        '<div class="row"><button type="button" class="rm" id="edit-prints">Sonini o\'zgartirish</button><span class="sum">' + sum(cart.prints * up) + '</span></div>' +
-        '<button type="button" class="rm" id="rm-prints">Olib tashlash</button></div></div>';
-    }
-    lines.forEach(function (l, i) {
-      var p = l.p, it = l.it;
+    calcLines.forEach(function (c) {
+      var q = cart.calcs[c.id], up = tierPrice(c, q);
+      html += '<div class="line"><div class="thumb print">' + esc(L(c, 'name')) + '</div><div>' +
+        '<h4>' + esc(t('print_line', { f: L(c, 'name') })) + '</h4><div class="meta">' + q + ' × ' + esc(sum(up)) + '</div>' +
+        '<div class="row"><div class="acts"><button type="button" class="rm" data-edit-calc="' + esc(c.id) + '">' + esc(t('change')) + '</button>' +
+        '<button type="button" class="rm" data-rm-calc="' + esc(c.id) + '">' + esc(t('remove')) + '</button></div><span class="sum">' + esc(sum(q * up)) + '</span></div></div></div>';
+    });
+    cart.items.forEach(function (it, i) {
+      var p = byId(it.id);
       if (!p) {
-        html += '<div class="line gone"><div class="thumb"><div class="ph">' + ICON_PHOTO + '</div></div><div><h4>Tovar sotuvdan olingan</h4>' +
-          '<div class="meta">Buyurtma berish uchun uni olib tashlang.</div><button type="button" class="rm" data-rm="' + i + '">Olib tashlash</button></div></div>';
+        html += '<div class="line gone"><div class="thumb"><div class="ph">' + ICON_PHOTO + '</div></div><div><h4>' + esc(t('gone')) + '</h4>' +
+          '<div class="meta">' + esc(t('gone_t')) + '</div><button type="button" class="rm" data-rm="' + i + '">' + esc(t('remove')) + '</button></div></div>';
         return;
       }
-      var meta = [];
-      if (p.variants.length) meta.push((p.variants[it.v] || p.variants[0]).name);
-      (it.a || []).forEach(function (a) { if (p.addons[a]) meta.push('+ ' + p.addons[a].name); });
-      meta.push(sum(l.unit));
+      var info = lineInfo(p, it);
+      var meta = info.parts.concat([sum(info.unit)]).join(' · ');
       var thumb = p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="">' : '<div class="ph">' + ICON_PHOTO + '</div>';
       html += '<div class="line"><a class="thumb" href="#/p/' + encodeURIComponent(p.id) + '">' + thumb + '</a><div>' +
-        '<h4>' + esc(p.name) + '</h4><div class="meta">' + esc(meta.join(' · ')) + '</div>' +
-        '<div class="row"><div class="stepper"><button type="button" data-dec="' + i + '" aria-label="Kamaytirish">−</button><output>' + it.q + '</output>' +
-        '<button type="button" data-inc="' + i + '" aria-label="Ko\'paytirish">+</button></div><span class="sum">' + sum(l.unit * it.q) + '</span></div>' +
-        '<button type="button" class="rm" data-rm="' + i + '">Olib tashlash</button></div></div>';
+        '<h4>' + esc(L(p, 'name')) + '</h4><div class="meta">' + esc(meta) + '</div>' +
+        '<div class="row"><div class="stepper"><button type="button" data-dec="' + i + '" aria-label="−">−</button><output>' + it.q + '</output>' +
+        '<button type="button" data-inc="' + i + '" aria-label="+">+</button></div><span class="sum">' + esc(sum(info.unit * it.q)) + '</span></div>' +
+        '<button type="button" class="rm" data-rm="' + i + '">' + esc(t('remove')) + '</button></div></div>';
     });
     html += '</div>';
 
-    var t = totals();
-    var free = t.prints >= FREE_FROM;
-    html += '<div class="summary"><div class="r total"><span>Jami</span><span>' + sum(t.total) + '</span></div>' +
-      '<div class="meter' + (free ? ' done' : '') + '">' +
-      (free ? 'BTS orqali yetkazish bepul' : 'Bepul yetkazish uchun yana ' + (FREE_FROM - t.prints) + ' ta rasm kerak. Hozir yetkazish pullik.') +
-      (free ? '' : '<div class="bar"><i style="width:' + Math.min(100, t.prints / FREE_FROM * 100) + '%"></i></div>') + '</div></div>';
+    var tt = totals(), free = tt.free >= FREE_FROM;
+    html += '<div class="summary"><div class="total"><span>' + esc(t('total')) + '</span><span>' + esc(sum(tt.total)) + '</span></div>' +
+      '<div class="meter' + (free ? ' done' : '') + '">' + esc(free ? t('free_ok') : t('free_need', { n: FREE_FROM - tt.free })) +
+      (free ? '' : '<div class="bar"><i style="width:' + Math.min(100, tt.free / FREE_FROM * 100) + '%"></i></div>') + '</div></div>';
 
-    var hasGone = lines.some(function (l) { return !l.p; });
-    html += '<form class="checkout" id="checkout" novalidate><h3>Buyurtma berish</h3>' +
-      '<label class="f">Telefon raqam<div class="field"><span class="pre">+998</span><input id="phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="12" placeholder="90 123 45 67" required></div></label>' +
-      '<label class="f" for="address">Manzil yoki lokatsiya</label>' +
-      '<div class="field" style="margin-top:-8px"><textarea id="address" rows="2" maxlength="300" placeholder="Viloyat, shahar/tuman"></textarea>' +
-      '<button type="button" class="loc' + (loc ? ' set' : '') + '" id="loc"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg><span id="loc-label">' + (loc ? 'Olindi' : 'Lokatsiya') + '</span></button></div>' +
-      '<p class="hint" style="margin:-6px 0 0">Eng yaqin BTS filialini o\'zimiz tanlab, sizga qo\'ng\'iroq qilamiz.</p>' +
+    var hasGone = cart.items.some(function (it) { return !byId(it.id); });
+    var needPhotos = calcLines.length || cart.items.some(function (it) { var p = byId(it.id); return p && (p.print_qty || p.options.length); });
+    html += '<form class="checkout" id="checkout" novalidate><h3>' + esc(t('order')) + '</h3>' +
+      '<label class="f">' + esc(t('phone')) + '<div class="field"><span class="pre">+998</span><input id="phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="12" placeholder="90 123 45 67"></div></label>' +
+      '<label class="f" for="address">' + esc(t('addr')) + '</label>' +
+      '<div class="field" style="margin-top:-8px"><textarea id="address" rows="2" maxlength="300" placeholder="' + esc(t('addr_ph')) + '"></textarea>' +
+      '<button type="button" class="loc' + (loc ? ' set' : '') + '" id="loc"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg><span id="loc-label">' + esc(loc ? t('loc_ok') : t('loc')) + '</span></button></div>' +
+      '<p class="hint" style="margin:-6px 0 0">' + esc(t('bts')) + '</p>' +
       '<input class="hp" type="text" id="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
       '<p class="err" id="err" role="alert" hidden></p>' +
-      '<button class="btn" type="submit" id="submit"' + (hasGone ? ' disabled' : '') + '>Buyurtma berish · ' + sum(t.total) + '</button>' +
-      (cart.prints > 0 || lines.some(function (l) { return l.p && l.p.print_qty; }) ? '<p class="hint" style="margin:0;text-align:center">Rasmlaringizni buyurtmadan keyin Telegram orqali yuborasiz.</p>' : '') +
+      '<button class="retro-btn" type="submit" id="submit" style="margin-top:4px"' + (hasGone ? ' disabled' : '') + '>' + esc(t('order')) + '</button>' +
+      (needPhotos ? '<p class="hint" style="margin:0;text-align:center">' + esc(t('send_photos_after')) + '</p>' : '') +
       '</form></div>';
     view.innerHTML = html;
 
     var ph = $('#phone'), ad = $('#address');
-    ph.value = draft.phone || '';
-    ad.value = draft.address || '';
+    ph.value = draft.phone || ''; ad.value = draft.address || '';
     ph.addEventListener('input', function () {
       var d = ph.value.replace(/\D/g, '').replace(/^998/, '').slice(0, 9);
       ph.value = [d.slice(0, 2), d.slice(2, 5), d.slice(5, 7), d.slice(7, 9)].filter(Boolean).join(' ');
@@ -759,18 +868,21 @@
     });
     ad.addEventListener('input', function () { draft.address = ad.value; store.set('mp_checkout', draft); });
     $('#loc').onclick = getLocation;
-
-    view.querySelectorAll('[data-inc],[data-dec],[data-rm]').forEach(function (b) {
+    view.querySelectorAll('[data-inc],[data-dec],[data-rm],[data-rm-calc],[data-edit-calc]').forEach(function (b) {
       b.addEventListener('click', function () {
         var i;
+        if (b.hasAttribute('data-edit-calc')) {
+          calcId = b.getAttribute('data-edit-calc'); store.set('mp_calc', calcId); location.hash = '#/';
+          setTimeout(function () { var q = $('#c-qty'); if (q) { q.scrollIntoView({ block: 'center' }); q.focus(); } }, 60);
+          return;
+        }
+        if (b.hasAttribute('data-rm-calc')) delete cart.calcs[b.getAttribute('data-rm-calc')];
         if (b.hasAttribute('data-inc')) { i = +b.getAttribute('data-inc'); cart.items[i].q = Math.min(1000, cart.items[i].q + 1); }
         if (b.hasAttribute('data-dec')) { i = +b.getAttribute('data-dec'); cart.items[i].q = Math.max(1, cart.items[i].q - 1); }
         if (b.hasAttribute('data-rm')) { i = +b.getAttribute('data-rm'); cart.items.splice(i, 1); }
         saveCart(); keepScroll(renderCart);
       });
     });
-    var ep = $('#edit-prints'); if (ep) ep.onclick = openCalc;
-    var rp = $('#rm-prints'); if (rp) rp.onclick = function () { cart.prints = 0; saveCart(); keepScroll(renderCart); };
     $('#checkout').addEventListener('submit', submitOrder);
   }
   function keepScroll(fn) { var y = window.scrollY; fn(); window.scrollTo(0, y); }
@@ -778,71 +890,94 @@
   function getLocation() {
     var label = $('#loc-label');
     if (!navigator.geolocation) return locFail();
-    label.textContent = 'Kuting…';
+    label.textContent = t('loc_wait');
     navigator.geolocation.getCurrentPosition(function (p) {
       loc = { lat: p.coords.latitude, lon: p.coords.longitude };
-      label.textContent = 'Olindi';
-      $('#loc').classList.add('set');
+      label.textContent = t('loc_ok'); $('#loc').classList.add('set');
     }, locFail, { enableHighAccuracy: true, timeout: 15000 });
   }
-  function locFail() {
-    var label = $('#loc-label');
-    if (label) label.textContent = 'Lokatsiya';
-    showErr("Joylashuvni olib bo'lmadi. Manzilni yozib qoldiring — shu yetarli.");
+  function locFail() { var l = $('#loc-label'); if (l) l.textContent = t('loc'); showErr(t('e_loc')); }
+  function showErr(s) { var e = $('#err'); if (!e) return; e.textContent = s; e.hidden = !s; }
+
+  // Adminga yuboriladigan tayyor matn (mijoz tilida)
+  function buildMessage(orderId, phone, total, free) {
+    var lines = [t('m_hello', { n: orderId ? ' №' + orderId : '' }), ''];
+    calcs.forEach(function (c) {
+      var q = cart.calcs[c.id];
+      if (q > 0) lines.push('• ' + t('print_line', { f: L(c, 'name') }) + ' — ' + q + ' ' + t('pcs') + ': ' + sum(q * tierPrice(c, q)));
+    });
+    cart.items.forEach(function (it) {
+      var p = byId(it.id); if (!p) return;
+      var info = lineInfo(p, it);
+      lines.push('• ' + L(p, 'name') + (info.parts.length ? ' (' + info.parts.join(', ') + ')' : '') + ' — ' + it.q + ' ' + t('pcs') + ': ' + sum(info.unit * it.q));
+    });
+    lines.push('', t('m_total', { s: sum(total) }));
+    if (free) lines.push(t('m_free'));
+    lines.push(t('m_phone', { p: phone }));
+    return lines.join('\n');
   }
-  function showErr(t) { var e = $('#err'); if (!e) return; e.textContent = t; e.hidden = !t; }
 
   function submitOrder(e) {
     e.preventDefault();
     var digits = $('#phone').value.replace(/\D/g, '');
     var address = $('#address').value.trim();
-    if (digits.length !== 9) { showErr("Telefon raqamini to'liq kiriting: 9 ta raqam."); $('#phone').focus(); return; }
-    if (address.length < 3 && !loc) { showErr('Manzilni yozing yoki lokatsiya tugmasini bosing.'); $('#address').focus(); return; }
+    if (digits.length !== 9) { showErr(t('e_phone')); $('#phone').focus(); return; }
+    if (address.length < 3 && !loc) { showErr(t('e_addr')); $('#address').focus(); return; }
     showErr('');
     var btn = $('#submit');
-    btn.disabled = true; btn.textContent = 'Yuborilmoqda…';
-    var t = totals();
+    btn.disabled = true; btn.textContent = t('sending');
     fetch('/api/shop-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         phone: digits, address: address, lat: loc && loc.lat, lon: loc && loc.lon, src: SRC,
         website: $('#website').value,
-        cart: {
-          prints: cart.prints,
-          items: cart.items.map(function (it) { return { id: it.id, v: it.v, a: it.a, q: it.q }; })
-        }
+        cart: { calcs: cart.calcs, items: cart.items.map(function (it) { return { id: it.id, v: it.v, o: it.o, a: it.a, q: it.q }; }) }
       })
-    }).then(function (r) { return r.json().then(function (d) { return { status: r.status, d: d }; }); })
-      .then(function (res) {
-        if (!res.d.ok) throw new Error(res.d.error || "Buyurtma yuborilmadi. Qaytadan urinib ko'ring.");
-        var hadPrints = t.prints > 0;
-        cart = { prints: 0, items: [] }; saveCart();
-        renderDone(res.d, hadPrints);
+    }).then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.ok) throw new Error(d.error || t('e_net'));
+        var needPhotos = Object.keys(cart.calcs).some(function (k) { return cart.calcs[k] > 0; }) ||
+          cart.items.some(function (it) { var p = byId(it.id); return p && (p.print_qty || p.options.length); });
+        var msg = buildMessage(d.id, d.phone || ('+998' + digits), d.total, d.free);
+        if (needPhotos) msg += '\n' + t('m_photos');
+        cart = { calcs: {}, items: [] }; saveCart();
+        renderDone(d, msg, needPhotos);
       })
       .catch(function (err) {
-        btn.disabled = false;
-        btn.textContent = 'Buyurtma berish · ' + sum(t.total);
-        showErr(err.message || "Internet bilan muammo. Qaytadan urinib ko'ring.");
+        btn.disabled = false; btn.textContent = t('order');
+        showErr(err.message || t('e_net'));
       });
   }
 
-  function renderDone(d, hadPrints) {
-    setNav('');
+  function renderDone(d, msg, needPhotos) {
+    setChrome('');
     var num = d.id ? ' №' + d.id : '';
-    var text = 'Assalomu alaykum! Saytda buyurtma berdim' + num + '.' + (hadPrints ? ' Rasmlarimni yuboryapman.' : '');
-    view.innerHTML = '<div class="wrap"><div class="done-box"><div class="tick"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></div>' +
-      '<h1>Buyurtma' + esc(num) + ' qabul qilindi</h1>' +
-      '<p>Jami: <b>' + sum(d.total) + '</b>. ' + (d.free ? 'Yetkazish bepul. ' : '') + 'Tez orada siz bilan bog\'lanamiz' +
-      (hadPrints ? '. Endi chop etiladigan rasmlaringizni Telegram orqali yuboring.' : '.') + '</p>' +
-      '<a class="btn" href="https://t.me/' + ADMIN + '?text=' + encodeURIComponent(text) + '" target="_blank" rel="noopener">' + (hadPrints ? "Rasmlarni Telegramda yuborish" : "Telegramda yozish") + '</a>' +
-      '<a class="btn ghost" href="#/">Bosh sahifaga qaytish</a></div></div>';
+    var tgLink = LINKS.admin + '?text=' + encodeURIComponent(msg);
+    view.innerHTML = '<section class="done-band"><div class="wrap"><div class="done-card">' +
+      '<div class="tick"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></div>' +
+      '<h1>' + esc(t('done', { n: num })) + '</h1><p>' + esc(t('done_t')) + '</p>' +
+      '<p style="margin-top:10px;font-weight:700;color:var(--ink)">' + esc(needPhotos ? t('done_photos') : t('done_msg')) + '</p>' +
+      '<a class="retro-btn" href="' + esc(tgLink) + '" target="_blank" rel="noopener">' + ICON.tg + esc(t('write_tg')) + '</a>' +
+      '<div class="msg-preview"><b>' + esc(t('msg_title')) + '</b>' + esc(msg) + '</div>' +
+      '<div class="alt"><button type="button" id="copy">' + esc(t('copy')) + '</button>' +
+      '<a href="' + LINKS.igdm + '" target="_blank" rel="noopener">' + ICON.ig + esc(t('ig')) + '</a></div>' +
+      '<a class="home" href="#/">' + esc(t('home')) + '</a>' +
+      '</div></div></section>';
     window.scrollTo(0, 0);
+    $('#copy').onclick = function () {
+      var done = function () { toast(t('copied')); };
+      if (navigator.clipboard) navigator.clipboard.writeText(msg).then(done, fallback); else fallback();
+      function fallback() {
+        var ta = document.createElement('textarea'); ta.value = msg; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {} ta.remove();
+      }
+    };
   }
 
   // ================= Yo'naltirish =================
-  function setNav(which) {
-    $('#chips').hidden = which !== 'home';
+  function setChrome(which) {
+    $('#top-white').hidden = which === 'home';
     document.querySelectorAll('[data-nav]').forEach(function (a) {
       var on = a.getAttribute('data-nav') === which;
       a.classList.toggle('on', on);
@@ -852,14 +987,15 @@
   function route() {
     var h = location.hash || '#/';
     var m = h.match(/^#\/p\/(.+)$/);
-    if (h === '#/savat' && !loaded && cart.items.length) { setNav('cart'); view.innerHTML = '<div class="wrap cart"><h1>Savat</h1><div class="skeleton" style="aspect-ratio:3/1"></div></div>'; }
+    if (h === '#/savat' && !loaded) { setChrome('cart'); view.innerHTML = '<div class="wrap cart"><h1>' + esc(t('cart')) + '</h1><div class="skeleton" style="aspect-ratio:3/1"></div></div>'; }
     else if (h === '#/savat') renderCart();
     else if (m && loaded) renderProduct(decodeURIComponent(m[1]));
-    else if (m) view.innerHTML = '<div class="wrap" style="padding-top:20px"><div class="skeleton" style="aspect-ratio:1"></div></div>';
+    else if (m) { setChrome(''); view.innerHTML = '<div class="wrap" style="padding-top:20px"><div class="skeleton" style="aspect-ratio:1"></div></div>'; }
     else renderHome();
   }
   window.addEventListener('hashchange', function () { route(); if (!/^#\/savat/.test(location.hash)) window.scrollTo(0, 0); });
 
+  paintChrome();
   updateCount();
   route();
   load();

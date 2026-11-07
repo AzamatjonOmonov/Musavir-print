@@ -211,9 +211,15 @@
         const FREE_DELIVERY_FROM = 300;
         let hasFiredConfetti = false;
 
-        // 10x15 narxlari (1 dona)
+        // 10x15 narxlari (1 dona). Admin paneldagi narxlar yuklansa — o'shalar ishlatiladi
+        let adminTiers = null;
+        fetch('/api/catalog').then(r => r.json()).then(d => {
+            const c = d && d.ok && (d.calculators || []).find(x => x.id === '10x15');
+            if (c && c.tiers && c.tiers.length) { adminTiers = c.tiers; calculate(); }
+        }).catch(() => {});
         function unitPrice(qty) {
             if (qty <= 0)   return 0;
+            if (adminTiers) { let p = 0; for (const t of adminTiers) if (qty >= t.from) p = t.price; return p; }
             if (qty <= 20)  return 5000;
             if (qty <= 40)  return 4000;
             if (qty < 50)   return 3000;

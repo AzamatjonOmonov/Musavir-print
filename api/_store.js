@@ -155,15 +155,25 @@ const money = (v) => {
 function priceList(arr, max = 20) {
   if (!Array.isArray(arr)) return [];
   return arr
-    .map((x) => ({ name: str(x && x.name, 60), price: money(x && x.price) }))
+    .map((x) => ({ name: str(x && x.name, 60), name_ru: str(x && x.name_ru, 60), price: money(x && x.price) }))
     .filter((x) => x.name)
     .slice(0, max);
+}
+// Tanlov guruhlari: [{ name, name_ru, choices: [{ name, name_ru, price }] }]
+function optionGroups(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr
+    .map((g) => ({ name: str(g && g.name, 40), name_ru: str(g && g.name_ru, 40), choices: priceList(g && g.choices) }))
+    .filter((g) => g.name && g.choices.length)
+    .slice(0, 5);
 }
 function cleanProduct(p) {
   const out = {
     name: str(p.name, 120),
+    name_ru: str(p.name_ru, 120),
     category: str(p.category, 40),
     description: str(p.description, 3000),
+    description_ru: str(p.description_ru, 3000),
     price: money(p.price),
     old_price: p.old_price === '' || p.old_price == null ? null : money(p.old_price) || null,
     // Faqat o'z bazamizga yuklangan rasmlar (begona saytga havola qo'yib bo'lmaydi)
@@ -173,6 +183,7 @@ function cleanProduct(p) {
         .slice(0, 8)
       : [],
     variants: priceList(p.variants),
+    options: optionGroups(p.options),
     addons: priceList(p.addons),
     is_bundle: !!p.is_bundle,
     print_qty: Math.max(0, Math.min(100000, Math.round(Number(p.print_qty) || 0))),
@@ -180,42 +191,167 @@ function cleanProduct(p) {
     sort: Math.max(-9999, Math.min(9999, Math.round(Number(p.sort) || 0))),
   };
   if (!out.name) return { error: 'Tovar nomini yozing' };
-  if (!out.price && !out.variants.length) return { error: 'Narx yoki kamida bitta variant kiriting' };
+  if (!out.price && !out.variants.length && !out.options.length) {
+    return { error: 'Narx, variant yoki tanlov guruhidan kamida bittasini kiriting' };
+  }
   return { product: out };
+}
+
+// Bitta savat qatorining narxi: (variant yoki asosiy narx) + har bir guruhdan tanlangan + qo'shimchalar
+// sel = { v: variant, o: [guruh bo'yicha tanlov], a: [qo'shimchalar] }
+function priceItem(p, sel) {
+  const variants = Array.isArray(p.variants) ? p.variants : [];
+  const groups = Array.isArray(p.options) ? p.options : [];
+  const addons = Array.isArray(p.addons) ? p.addons : [];
+  const idx = (v, n) => Math.min(Math.max(0, Math.floor(Number(v) || 0)), Math.max(0, n - 1));
+  let unit = p.price || 0;
+  const parts = [];
+  if (variants.length) {
+    const v = variants[idx(sel.v, variants.length)];
+    unit = v.price;
+    parts.push(v.name);
+  }
+  const o = Array.isArray(sel.o) ? sel.o : [];
+  groups.forEach((g, i) => {
+    const c = g.choices[idx(o[i], g.choices.length)];
+    unit += c.price;
+    parts.push(c.name);
+  });
+  const chosen = [...new Set(Array.isArray(sel.a) ? sel.a.map((i) => Math.floor(Number(i))) : [])]
+    .filter((i) => i >= 0 && i < addons.length)
+    .map((i) => addons[i]);
+  for (const a of chosen) unit += a.price;
+  let name = p.name + (parts.length ? ` — ${parts.join(', ')}` : '');
+  if (chosen.length) name += ' + ' + chosen.map((a) => a.name).join(', ');
+  return { unit, name };
+}
+
+// ---------- Sozlamalar: narx kalkulyatorlari va e'lonlar ----------
+const DEFAULT_CALCS = [
+  {
+    id: '10x15', name: '10x15', name_ru: '10x15', on: true, free: true,
+    tiers: [
+      { from: 1, price: 5000 }, { from: 21, price: 4000 }, { from: 41, price: 3000 }, { from: 50, price: 2000 },
+      { from: 100, price: 1800 }, { from: 201, price: 1700 }, { from: 301, price: 1600 }, { from: 501, price: 1500 },
+    ],
+  },
+];
+const DEFAULT_ANNOUNCEMENTS = [
+  {
+    text: "🚚 300 ta rasmdan butun O'zbekiston bo'ylab bepul yetkazamiz",
+    text_ru: '🚚 Бесплатная доставка по всему Узбекистану от 300 фото', on: true,
+  },
+];
+
+function cleanCalcs(arr) {
+  if (!Array.isArray(arr)) return { error: "Noto'g'ri ma'lumot" };
+  const seen = new Set();
+  const out = [];
+  for (const c of arr.slice(0, 12)) {
+    const name = str(c && c.name, 30);
+    if (!name) continue;
+    let id = str(c && c.id, 24).toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    if (!id) id = crypto.randomBytes(4).toString('hex');
+    if (seen.has(id)) id += crypto.randomBytes(2).toString('hex');
+    seen.add(id);
+    const tiers = (Array.isArray(c.tiers) ? c.tiers : [])
+      .map((t) => ({ from: Math.max(1, Math.min(1e6, Math.floor(Number(t && t.from) || 0))), price: money(t && t.price) }))
+      .filter((t) => t.from >= 1 && t.price > 0)
+      .sort((a, b) => a.from - b.from)
+      .filter((t, i, a) => i === 0 || t.from !== a[i - 1].from)
+      .slice(0, 20);
+    if (!tiers.length) return { error: `«${name}» uchun kamida bitta narx kiriting` };
+    tiers[0].from = 1;
+    out.push({ id, name, name_ru: str(c.name_ru, 30), on: c.on !== false, free: !!c.free, tiers });
+  }
+  return { value: out };
+}
+function cleanAnnouncements(arr) {
+  if (!Array.isArray(arr)) return { error: "Noto'g'ri ma'lumot" };
+  return {
+    value: arr.slice(0, 3)
+      .map((a) => ({ text: str(a && a.text, 140), text_ru: str(a && a.text_ru, 140), on: !!(a && a.on) }))
+      .filter((a) => a.text),
+  };
+}
+function tierPrice(calc, qty) {
+  if (!calc || qty <= 0) return 0;
+  let price = 0;
+  for (const t of calc.tiers) if (qty >= t.from) price = t.price;
+  return price;
+}
+
+let settingsCache = null;
+let settingsAt = 0;
+async function getSettings({ fresh = false } = {}) {
+  const defaults = { calculators: DEFAULT_CALCS, announcements: DEFAULT_ANNOUNCEMENTS };
+  if (!configured()) return defaults;
+  if (!fresh && settingsCache && Date.now() - settingsAt < 15000) return settingsCache;
+  try {
+    const rows = await rest('settings?select=key,value&key=in.(calculators,announcements)');
+    const map = Object.fromEntries((rows || []).map((r) => [r.key, r.value]));
+    settingsCache = {
+      calculators: Array.isArray(map.calculators) && map.calculators.length ? map.calculators : DEFAULT_CALCS,
+      announcements: Array.isArray(map.announcements) ? map.announcements : DEFAULT_ANNOUNCEMENTS,
+    };
+    settingsAt = Date.now();
+    return settingsCache;
+  } catch {
+    return settingsCache || defaults;
+  }
+}
+async function saveSetting(key, value) {
+  await rest('settings', {
+    method: 'POST', body: { key, value, updated_at: new Date().toISOString() },
+    prefer: 'resolution=merge-duplicates,return=minimal',
+  });
+  settingsCache = null;
+}
+// 10x15 narxi — bot va asosiy sahifa buyurtmalari uchun
+async function printUnitPrice(qty, calcId = '10x15') {
+  const { calculators } = await getSettings();
+  const calc = calculators.find((c) => c.id === calcId) || calculators[0];
+  return tierPrice(calc, qty);
 }
 
 // Sozlanmagan paytda (sinov havolasida) ko'rinadigan namuna tovarlar
 const DEMO_PRODUCTS = [
   {
-    id: 'demo-albom', name: 'Fotoalbom', category: 'Albom', price: 0,
-    description: "Qattiq muqovali fotoalbom. 10x15 rasmlar uchun cho'ntakli varaqlar.\n\nNamuna tovar — admin paneldan o'zingiz kiritasiz.",
-    images: [], variants: [{ name: '100 talik', price: 85000 }, { name: '200 talik', price: 130000 }],
-    addons: [{ name: "Muqovaga ism yozish", price: 20000 }], is_bundle: false, active: true, sort: 1,
+    id: 'demo-fotokniga', name: 'Fotokniga (albom)', name_ru: 'Фотокнига', category: 'Albom', price: 90000,
+    description: "Rasmlaringizni chiroyli qilib sahifalarga terib, kitob ko'rinishida chop etamiz.\n\nRasmlarni buyurtmadan keyin Telegram orqali yuborasiz. Namuna tovar.",
+    description_ru: 'Красиво расставим ваши фото по страницам и напечатаем в виде книги. Фото отправите в Telegram после заказа.',
+    images: [], variants: [],
+    options: [
+      { name: 'Format', name_ru: 'Формат', choices: [{ name: 'A5', name_ru: 'A5', price: 0 }, { name: 'A4', name_ru: 'A4', price: 60000 }] },
+      { name: 'Sahifa soni', name_ru: 'Страниц', choices: [
+        { name: '10 bet', name_ru: '10 стр.', price: 0 }, { name: '20 bet', name_ru: '20 стр.', price: 40000 }, { name: '30 bet', name_ru: '30 стр.', price: 75000 }] },
+      { name: 'Muqova', name_ru: 'Обложка', choices: [{ name: 'Yumshoq', name_ru: 'Мягкая', price: 0 }, { name: 'Qattiq', name_ru: 'Твёрдая', price: 30000 }] },
+    ],
+    addons: [{ name: 'Muqovaga ism yozish', name_ru: 'Имя на обложке', price: 20000 }], is_bundle: false, active: true, sort: 0,
   },
   {
-    id: 'demo-ramka', name: 'Yog\'och ramka', category: 'Ramka', price: 0,
+    id: 'demo-albom', name: 'Fotoalbom', name_ru: 'Фотоальбом', category: 'Albom', price: 0,
+    description: "Qattiq muqovali fotoalbom. 10x15 rasmlar uchun cho'ntakli varaqlar.\n\nNamuna tovar — admin paneldan o'zingiz kiritasiz.",
+    images: [], variants: [{ name: '100 talik', name_ru: 'на 100 фото', price: 85000 }, { name: '200 talik', name_ru: 'на 200 фото', price: 130000 }],
+    options: [], addons: [{ name: 'Muqovaga ism yozish', name_ru: 'Имя на обложке', price: 20000 }], is_bundle: false, active: true, sort: 1,
+  },
+  {
+    id: 'demo-ramka', name: "Yog'och ramka", name_ru: 'Деревянная рамка', category: 'Ramka', price: 0,
     description: "Devorga ilish yoki stolga qo'yish uchun. Namuna tovar.",
     images: [], variants: [{ name: '10x15', price: 25000 }, { name: 'A5', price: 35000 }, { name: 'A4', price: 45000 }],
-    addons: [], is_bundle: false, active: true, sort: 2,
+    options: [], addons: [], is_bundle: false, active: true, sort: 2,
   },
   {
-    id: 'demo-polaroid', name: 'Polaroid rasm', category: 'Polaroid', price: 2500, old_price: null,
-    description: "Oq hoshiyali polaroid uslubidagi rasm, 1 dona. Namuna tovar.",
-    images: [], variants: [], addons: [{ name: 'Laminatsiya', price: 1000 }], is_bundle: false, active: true, sort: 3,
-  },
-  {
-    id: 'demo-tablo', name: 'Laminatsiyali tablo A4', category: 'Laminatsiya', price: 40000,
-    description: "Rasm laminatsiya qilinib, qattiq asosga yopishtiriladi. Namuna tovar.",
-    images: [], variants: [], addons: [], is_bundle: false, active: true, sort: 4,
-  },
-  {
-    id: 'demo-toplam', name: "Oilaviy to'plam: 100 rasm + albom", category: "To'plam", price: 240000, old_price: 265000,
+    id: 'demo-toplam', name: "Oilaviy to'plam: 100 rasm + albom", name_ru: 'Семейный набор: 100 фото + альбом', category: "To'plam",
+    price: 240000, old_price: 265000,
     description: "100 ta 10x15 rasm, 100 talik albom va muqovaga ism yozish.\n\nRasmlarni buyurtmadan keyin Telegram orqali yuborasiz. Namuna tovar.",
-    images: [], variants: [], addons: [{ name: 'Laminatsiyali muqova', price: 15000 }], is_bundle: true, print_qty: 100, active: true, sort: 0,
+    images: [], variants: [], options: [], addons: [{ name: 'Laminatsiyali muqova', name_ru: 'Ламинированная обложка', price: 15000 }],
+    is_bundle: true, print_qty: 100, active: true, sort: 3,
   },
 ];
 
 module.exports = {
   configured, rest, uploadImage, makeToken, checkToken, checkPassword, cleanProduct, DEMO_PRODUCTS,
   makeChallenge, checkChallenge, logEvent, countEvents, sniffImage, SESSION_DAYS,
+  priceItem, getSettings, saveSetting, cleanCalcs, cleanAnnouncements, tierPrice, printUnitPrice,
 };
