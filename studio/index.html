@@ -178,6 +178,10 @@ textarea.txt{resize:vertical;min-height:60px}
 .fontgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
 .fontgrid button{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 2px;font-size:15px;line-height:1.2;white-space:nowrap;overflow:hidden}
 .fontgrid button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.orient.three{grid-template-columns:1fr 1fr 1fr}
+.lay.num{font-size:15px;padding:10px 4px}
+.pgctl{display:flex;gap:6px;align-items:center}
+.a4>.frame.hero::before{content:"★";position:absolute;left:5px;top:3px;color:#fff;font-size:14px;text-shadow:0 0 3px rgba(0,0,0,.6);z-index:1}
 .orient{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .orient button{border:0;background:var(--surface);padding:7px;font-weight:500}
 .orient button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
@@ -299,9 +303,10 @@ textarea.txt{resize:vertical;min-height:60px}
 <section id="m-albom" class="layout" hidden>
   <aside class="panel">
     <div class="field">
-      <span class="lbl">Setka (hamma sahifalar uchun)</span>
+      <span class="lbl">Joylash turi (hamma sahifalar uchun)</span>
+      <div class="orient three" id="laytype" role="group" aria-label="Joylash turi"></div>
       <div class="lays" id="lays"></div>
-      <p class="hint">Bitta sahifaning setkasini alohida o'zgartirish uchun sahifa tepasidagi ro'yxatdan tanlang. Setka o'zgarsa, o'sha rasmlarning qo'lda qilingan tahriri qaytadan avtomatik bo'ladi.</p>
+      <p class="hint" id="layHint"></p>
     </div>
     <div class="field">
       <span class="lbl">Sahifa</span>
@@ -430,6 +435,7 @@ textarea.txt{resize:vertical;min-height:60px}
         <button class="btn" id="rotR" title="O'ngga 90°">↻ 90°</button>
         <button class="btn" id="edReset">Tiklash</button>
       </div>
+      <button class="btn" id="edHero" hidden>★ Katta rasm qilish</button>
       <p class="hint">Rasmni sichqoncha bilan suring. Kattalashtirish uchun g'ildirakdan foydalaning. ← → tugmalari bilan keyingi rasmga o'tasiz.</p>
       <div class="nav">
         <button class="btn" id="edPrev">← Oldingi</button>
@@ -881,7 +887,7 @@ const $ = id => document.getElementById(id);
 const S = {
   mode: "polaroid",
   pol: { photos: [], view: "photos", flagOnly: false, bg: { kind: "img", id: "hearts", src: HEARTS }, customBgs: [], cutline: true },
-  alb: { photos: [], layout: 6, over: {}, cover: true, orient: "p" },
+  alb: { photos: [], layout: "6", over: {}, seed: {}, cover: true, orient: "p" },
   cov: { tpl: "metrika", themeF: "all", f: { ism: "", fam: "", ismlar: "", sarlavha: "", soz: "", sana: "", soat: "", vazn: "", boy: "", joy: "", matn: "", oyat: "" }, st: {}, color: "#c46a8c", tint: false, slots: [], decor: null },
   scale: 1, cancel: false
 };
@@ -1115,7 +1121,7 @@ function cellRects(n) {
 }
 // Aqlli joylash: har sahifa uchun mos setka va rasmlarni kataklarga yo'nalishi bo'yicha moslash
 function smartLayout() {
-  const A = S.alb, n0 = A.layout, ph = A.photos.slice(), out = [], over = {};
+  const A = S.alb, n0 = parseLay(A.layout).n; ph = A.photos.slice(), out = [], over = {};
   const cands = Object.keys(LAYOUTS).map(Number).filter(n => Math.abs(n - n0) <= 2 && (n > 1 || n0 === 1));
   const fit = (items, n) => {
     const rs = cellRects(n), ci = rs.map((r, i) => i).sort((a, b) => rs[a].w / rs[a].h - rs[b].w / rs[b].h);
@@ -1132,14 +1138,82 @@ function smartLayout() {
       const items = ph.slice(i, i + n), r = fit(items, n), score = r.loss + 0.03 * Math.abs(n - n0);
       if (!best || score < best.score) best = { n, score, order: r.order, cnt: items.length };
     }
-    over[k] = best.n; out.push(...best.order); i += best.cnt; k++;
+    over[k] = String(best.n); out.push(...best.order); i += best.cnt; k++;
   }
   A.photos = out; A.over = over;
 }
+// Sahifa turi: "6" oddiy setka, "m6" mozaika, "q6" qatorli
+const MOS_N = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+function parseLay(key) { key = String(key); const t = key[0] === "m" ? "m" : key[0] === "q" ? "q" : "g"; return { t, n: parseInt(key.replace(/\D/g, ""), 10) || 6 }; }
+function layName(key) { const { t, n } = parseLay(key); return t === "m" ? `Mozaika ${n}` : t === "q" ? `Qatorli ${n}` : `${n} ta`; }
+// Mozaika: sahifa rasmlarning o'z shakliga mos kataklarga bo'linadi (tasodifiy daraxtlar ichidan eng yaxshisi)
+const mosCache = new Map();
+function mosaicRects(items, W, H, seed) {
+  const m = items.length; if (m === 1) return [{ x: MARG, y: MARG, w: W, h: H }];
+  const key = items.map(p => p.id + (p.hero ? "*" : "")).join(",") + `|${W}|${H}|${seed}`;
+  if (mosCache.has(key)) return mosCache.get(key);
+  const asp = items.map(p => p.w / p.h), target = W / H;
+  let hero = items.findIndex(p => p.hero); if (hero < 0) hero = items.reduce((b, p, i) => p.w * p.h > items[b].w * items[b].h ? i : b, 0);
+  const rnd = seeded(97 + seed * 7919 + m * 31);
+  const build = list => {
+    if (list.length === 1) return { leaf: list[0], a: asp[list[0]] };
+    const L = list.length, cut = Math.max(1, Math.min(L - 1, Math.round(L / 2 + (rnd() - .5) * L * .7)));
+    const l = build(list.slice(0, cut)), r = build(list.slice(cut)), d = rnd() < .5 ? "H" : "V";
+    return { d, l, r, a: d === "H" ? l.a + r.a : 1 / (1 / l.a + 1 / r.a) };
+  };
+  const place = (n, x, y, w, h, out) => {
+    if (n.leaf != null) { out[n.leaf] = { x, y, w, h }; return; }
+    if (n.d === "H") { const w1 = (w - GAP) * n.l.a / (n.l.a + n.r.a); place(n.l, x, y, w1, h, out); place(n.r, x + w1 + GAP, y, w - w1 - GAP, h, out); }
+    else { const h1 = (h - GAP) * (1 / n.l.a) / (1 / n.l.a + 1 / n.r.a); place(n.l, x, y, w, h1, out); place(n.r, x, y + h1 + GAP, w, h - h1 - GAP, out); }
+  };
+  let best = null;
+  for (let it = 0; it < 900; it++) {
+    const order = items.map((_, i) => i).sort(() => rnd() - .5), tree = build(order), rs = [];
+    place(tree, 0, 0, W, H, rs);
+    const areas = rs.map(r => r.w * r.h), avg = W * H / m, maxOther = Math.max(...areas.filter((_, i) => i !== hero));
+    let cost = Math.abs(Math.log(tree.a / target)) * 4;
+    rs.forEach((r, i) => { cost += lossOf(items[i].w, items[i].h, r.w / r.h) * 1.5 / m; });
+    if (m > 2) cost += Math.max(0, maxOther / areas[hero] - .75) * 1.2;
+    cost += Math.max(0, .3 - Math.min(...areas) / avg) * 4;
+    if (!best || cost < best.cost) best = { cost, rs };
+  }
+  const out = best.rs.map(r => { const x = Math.round(MARG + r.x), y = Math.round(MARG + r.y); return { x, y, w: Math.round(MARG + r.x + r.w) - x, h: Math.round(MARG + r.y + r.h) - y }; });
+  mosCache.set(key, out); return out;
+}
+// Qatorli: har qatorda rasmlar bir xil balandlikda, eni o'z nisbatida
+function rowRects(items, W, H) {
+  const asp = items.map(p => p.w / p.h), m = items.length, total = asp.reduce((a, b) => a + b, 0);
+  let best = null;
+  for (let r = 1; r <= m; r++) {
+    const rows = []; let cur = [], acc = 0, tgt = total / r;
+    asp.forEach((a, i) => { cur.push(i); acc += a; const left = m - i - 1, rowsLeft = r - rows.length - 1; if ((acc >= tgt * .92 && rowsLeft > 0 && left >= rowsLeft) || left < rowsLeft + 1 && rowsLeft > 0 && left === rowsLeft) { rows.push(cur); cur = []; acc = 0; } });
+    if (cur.length) rows.push(cur);
+    const hs = rows.map(row => (W - (row.length - 1) * GAP) / row.reduce((s, i) => s + asp[i], 0)), sum = hs.reduce((a, b) => a + b, 0) + (rows.length - 1) * GAP;
+    const cost = Math.abs(Math.log(sum / H));
+    if (!best || cost < best.cost) best = { cost, rows, hs };
+  }
+  // kesilmasligi uchun: blok sahifaga sig'maydigan bo'lsa kichraytiriladi, kichik bo'lsa o'rtaga qo'yiladi
+  const gaps = (best.rows.length - 1) * GAP, natural = best.hs.reduce((a, b) => a + b, 0), f = Math.min(1, (H - gaps) / natural), out = [];
+  let y = MARG + Math.round((H - natural * f - gaps) / 2);
+  best.rows.forEach((row, ri) => {
+    const h = Math.round(best.hs[ri] * f), rowW = (W - (row.length - 1) * GAP) * f + (row.length - 1) * GAP, sa = row.reduce((s, i) => s + asp[i], 0);
+    let x = MARG + Math.round((W - rowW) / 2);
+    row.forEach(i => { const w = Math.round((W - (row.length - 1) * GAP) * f * asp[i] / sa); out[i] = { x, y, w, h }; x += w + GAP; });
+    y += h + GAP;
+  });
+  return out;
+}
+function pageRects(key, items, k) {
+  const { t, n } = parseLay(key);
+  if (t === "g") return cellRects(n);
+  const W = PW() - 2 * MARG, H = PH() - 2 * MARG;
+  if (!items.length) return [];
+  return t === "m" ? mosaicRects(items, W, H, S.alb.seed[k] || 0) : rowRects(items, W, H);
+}
 function albPages() {
   const A = S.alb, pages = []; let i = 0, k = 0;
-  while (i < A.photos.length) { const n = A.over[k] || A.layout; pages.push({ k, n, start: i, items: A.photos.slice(i, i + n) }); i += n; k++; }
-  pages.forEach(pg => { const rs = cellRects(pg.n); pg.items.forEach((p, j) => ensureFrame(p, rs[j].w, rs[j].h)); });
+  while (i < A.photos.length) { const key = String(A.over[k] || A.layout), n = parseLay(key).n; pages.push({ k, key, n, start: i, items: A.photos.slice(i, i + n) }); i += n; k++; }
+  pages.forEach(pg => { pg.rects = pageRects(pg.key, pg.items, pg.k); pg.items.forEach((p, j) => ensureFrame(p, pg.rects[j].w, pg.rects[j].h)); });
   return pages;
 }
 function layIcon(n) {
@@ -1153,7 +1227,16 @@ function layIcon(n) {
   const h = L.hero / (1 - L.hero) * L.r;
   return `<i style="grid-template-columns:repeat(${L.c},1fr);grid-template-rows:${h}fr repeat(${L.r},1fr)"><b style="grid-column:1/-1"></b>${"<b></b>".repeat(L.c * L.r)}</i>`;
 }
-function renderLays() { $("lays").innerHTML = Object.keys(LAYOUTS).map(n => `<button class="lay" data-lay="${n}" aria-pressed="${+n === S.alb.layout}" aria-label="${n} ta rasm">${layIcon(n)}${n}</button>`).join(""); }
+function renderLays() {
+  const cur = parseLay(S.alb.layout);
+  $("laytype").innerHTML = [["g", "Setka"], ["m", "Mozaika"], ["q", "Qatorli"]].map(([t, n]) => `<button data-laytype="${t}" aria-pressed="${cur.t === t}">${n}</button>`).join("");
+  $("lays").innerHTML = cur.t === "g"
+    ? Object.keys(LAYOUTS).map(n => `<button class="lay" data-lay="${n}" aria-pressed="${+n === cur.n}" aria-label="${n} ta rasm">${layIcon(n)}${n}</button>`).join("")
+    : MOS_N.map(n => `<button class="lay num" data-lay="${cur.t}${n}" aria-pressed="${n === cur.n}" aria-label="${n} ta rasm">${n}</button>`).join("");
+  $("layHint").textContent = cur.t === "m" ? "Sahifa rasmlarning o'z shakliga qarab katta-kichik kataklarga bo'linadi, bitta rasm katta bo'ladi. Kesilish juda kam. Sahifadagi ↻ tugmasi boshqa variant beradi, ★ belgilangan rasm katta bo'ladi."
+    : cur.t === "q" ? "Har qatorda rasmlar bir xil balandlikda, eni rasmning o'z nisbatida. Deyarli hech narsa kesilmaydi."
+    : "Bitta sahifaning setkasini alohida o'zgartirish uchun sahifa tepasidagi ro'yxatdan tanlang. Setka o'zgarsa, o'sha rasmlarning qo'lda qilingan tahriri qaytadan avtomatik bo'ladi.";
+}
 function pct(v, t) { return (v / t * 100).toFixed(4) + "%"; }
 function cellStyle(r) { return `left:${pct(r.x, PW())};top:${pct(r.y, PH())};width:${pct(r.w, PW())};height:${pct(r.h, PH())}`; }
 let coverThumbURL = "";
@@ -1166,16 +1249,18 @@ function renderAlb() {
   $("smart").disabled = !has;
   renderLays();
   $("aDemo").style.aspectRatio = `${PW()}/${PH()}`;
-  $("aDemo").innerHTML = cellRects(A.layout).map(r => `<div class="frame empty" style="${cellStyle(r)}"></div>`).join("");
+  const dl = parseLay(A.layout), demo = dl.t === "g" ? cellRects(dl.n) : pageRects(A.layout, Array.from({ length: dl.n }, (_, i) => ({ id: "d" + i, w: [4, 3, 16, 1, 3, 9][i % 6], h: [3, 4, 9, 1, 2, 16][i % 6] })), -1);
+  $("aDemo").innerHTML = demo.map(r => `<div class="frame empty" style="${cellStyle(r)}"></div>`).join("");
   if (!has) return;
   const pages = albPages(), out = [];
   if (A.cover) out.push(`<div class="pagewrap"><div class="pagehead"><span>Muqova</span><button class="btn sm" data-goto="muqova">Tahrirlash</button></div><div class="a4" data-goto="muqova" style="cursor:pointer"><img class="coverimg" id="albCoverImg" alt="Muqova" src="${coverThumbURL}"></div></div>`);
   for (const pg of pages) {
-    const rs = cellRects(pg.n);
-    const opts = Object.keys(LAYOUTS).map(n => `<option value="${n}"${+n === pg.n ? " selected" : ""}>${n} ta</option>`).join("");
-    out.push(`<div class="pagewrap"><div class="pagehead"><span>Sahifa ${pg.k + 1 + (A.cover ? 1 : 0)}</span><label>Setka <select data-pagelay="${pg.k}" aria-label="Sahifa setkasi">${opts}</select></label></div>
-      <div class="a4" style="aspect-ratio:${PW()}/${PH()}">${pg.items.map((p, j) => `<div class="frame${needsCheck(p) ? " flag" : ""}" draggable="true" data-cell="${pg.start + j}" data-open="alb:${p.id}" style="${cellStyle(rs[j])}">${frameHTML(p)}</div>`).join("")}
-      ${rs.slice(pg.items.length).map(r => `<div class="frame empty" style="${cellStyle(r)}"></div>`).join("")}</div></div>`);
+    const rs = pg.rects, isM = parseLay(pg.key).t === "m";
+    const og = (lbl, keys) => `<optgroup label="${lbl}">${keys.map(k => `<option value="${k}"${k === pg.key ? " selected" : ""}>${layName(k)}</option>`).join("")}</optgroup>`;
+    const opts = og("Setka", Object.keys(LAYOUTS)) + og("Mozaika", MOS_N.map(n => "m" + n)) + og("Qatorli", MOS_N.map(n => "q" + n));
+    out.push(`<div class="pagewrap"><div class="pagehead"><span>Sahifa ${pg.k + 1 + (A.cover ? 1 : 0)}</span><span class="pgctl">${isM ? `<button class="btn sm" data-reseed="${pg.k}" title="Boshqa variant">↻</button>` : ""}<select data-pagelay="${pg.k}" aria-label="Sahifa setkasi">${opts}</select></span></div>
+      <div class="a4" style="aspect-ratio:${PW()}/${PH()}">${pg.items.map((p, j) => `<div class="frame${needsCheck(p) ? " flag" : ""}${p.hero && isM ? " hero" : ""}" draggable="true" data-cell="${pg.start + j}" data-open="alb:${p.id}" style="${cellStyle(rs[j])}">${frameHTML(p)}</div>`).join("")}
+      ${(parseLay(pg.key).t === "g" ? rs.slice(pg.items.length) : []).map(r => `<div class="frame empty" style="${cellStyle(r)}"></div>`).join("")}</div></div>`);
   }
   $("pages").innerHTML = out.join("");
   $("aFlagN").textContent = A.photos.filter(needsCheck).length;
@@ -1465,7 +1550,7 @@ async function renderCoverPreview() {
   try {
     const cv = $("coverCanvas"), ctx = cv.getContext("2d"); cv.__fast = true;
     ctx.setTransform(cv.width / A4W, 0, 0, cv.height / A4H, 0, 0);
-    await drawCover(ctx, thumbBmp, true);
+      await drawCover(ctx, thumbBmp, true);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
   } finally { coverBusy = false; if (coverAgain) { coverAgain = false; renderCoverPreview(); } }
 }
@@ -1592,6 +1677,7 @@ function drawEditor() {
   $("fbBlur").setAttribute("aria-pressed", p.fitBg === "blur"); $("fbWhite").setAttribute("aria-pressed", p.fitBg === "white");
   const z = $("edZoom"); z.min = p.mode === "fit" ? 0.5 : 1; z.value = p.zoom; $("edZoomO").textContent = Math.round(p.zoom * 100) + "%";
   $("edAngle").value = p.angle; $("edAngleO").textContent = (p.angle > 0 ? "+" : "") + p.angle.toFixed(1) + "°";
+  $("edHero").hidden = !ED.hero; if (ED.hero) $("edHero").textContent = p.hero ? "★ Katta rasm (bekor qilish)" : "★ Katta rasm qilish";
   $("edPrev").disabled = i <= 0;
   $("edNext").textContent = i >= list.length - 1 ? "Yopish" : "Keyingi →";
 }
@@ -1625,6 +1711,7 @@ function edKeys(e) {
   $("edPrev").onclick = () => stepEditor(-1);
   $("edNext").onclick = () => stepEditor(1);
   $("edDone").onclick = closeEditor;
+  $("edHero").onclick = () => { const p = ED.p, pages = albPages(), pg = pages.find(x => x.items.includes(p)); if (pg) pg.items.forEach(q => { if (q !== p) q.hero = false; }); p.hero = !p.hero; closeEditor(); };
   $("editor").addEventListener("pointerdown", e => { if (e.target === $("editor")) closeEditor(); });
 })();
 function openFor(key) {
@@ -1636,7 +1723,8 @@ function openFor(key) {
       after: (q, closed) => { if (S.pol.view === "photos" && !S.pol.flagOnly) refreshPolCard(q); if (closed && (S.pol.flagOnly || S.pol.view === "sheets")) renderPol(); } });
   } else if (kind === "alb") {
     const p = S.alb.photos.find(x => x.id === +v); if (!p) return;
-    openEditor(p, { kind: "cell", list: () => S.alb.photos, after: (q, closed) => { if (closed) renderAlb(); } });
+    const pg = albPages().find(x => x.items.includes(p));
+    openEditor(p, { kind: "cell", hero: !!pg && parseLay(pg.key).t === "m", list: () => S.alb.photos, after: (q, closed) => { if (closed) renderAlb(); } });
   } else if (kind === "albflag") {
     const fl = S.alb.photos.filter(needsCheck); if (!fl.length) return;
     openEditor(fl[0], { kind: "cell", list: () => S.alb.photos.filter(x => needsCheck(x) || x === ED.p), after: (q, closed) => { if (closed) renderAlb(); } });
@@ -1681,7 +1769,7 @@ async function renderAlbPage(cv, ctx, pg, k = 1) {
   ctx.setTransform(k, 0, 0, k, 0, 0); ctx.filter = "none";
   if (pg === "cover") { await drawCoverFull(ctx); return toJpeg(cv, 300 * k); }
   ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, PW(), PH());
-  const rs = cellRects(pg.n);
+  const rs = pg.rects;
   for (let j = 0; j < pg.items.length; j++) { const p = pg.items[j]; await withFull(p, bmp => drawPhoto(ctx, p, bmp, rs[j].x, rs[j].y)); }
   return toJpeg(cv, 300 * k);
 }
@@ -1839,7 +1927,7 @@ document.addEventListener("drop", e => {
 document.addEventListener("dragend", () => { dragCell = null; document.querySelectorAll(".dragover").forEach(x => x.classList.remove("dragover")); });
 
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-theme],[data-orient],[data-style],[data-sfont],[data-sreset],[data-scale],[data-open],[data-inc],[data-dec],[data-del],[data-bg],[data-delbg],#bgAdd,[data-pick],[data-clear],[data-lay],[data-goto],[data-tpl],[data-color],[data-font],[data-slotpick],[data-slotdel]");
+  const t = e.target.closest("[data-laytype],[data-reseed],[data-theme],[data-orient],[data-style],[data-sfont],[data-sreset],[data-scale],[data-open],[data-inc],[data-dec],[data-del],[data-bg],[data-delbg],#bgAdd,[data-pick],[data-clear],[data-lay],[data-goto],[data-tpl],[data-color],[data-font],[data-slotpick],[data-slotdel]");
   if (!t) return;
   const P = S.pol, byId = id => P.photos.find(p => p.id === +id);
   if (t.dataset.delbg) { e.preventDefault(); e.stopPropagation(); const id = t.dataset.delbg; bgStore("readwrite", s => s.delete(id)); P.customBgs = P.customBgs.filter(c => c.id !== id); if (P.bg.id === id) selectBg("hearts"); else renderBgs(); return; }
@@ -1850,14 +1938,16 @@ document.addEventListener("click", e => {
     if (t.dataset.confirm !== "1") { t.dataset.confirm = "1"; t.textContent = "Ha, tozalansin"; setTimeout(() => { t.dataset.confirm = ""; t.textContent = "Hammasini tozalash"; }, 3000); return; }
     t.dataset.confirm = ""; t.textContent = "Hammasini tozalash";
     if (t.dataset.clear === "polaroid") { P.photos.forEach(p => URL.revokeObjectURL(p.thumb)); P.photos = []; }
-    else { S.alb.photos.forEach(p => URL.revokeObjectURL(p.thumb)); S.alb.photos = []; S.alb.over = {}; }
+    else { S.alb.photos.forEach(p => URL.revokeObjectURL(p.thumb)); S.alb.photos = []; S.alb.over = {}; S.alb.seed = {}; }
     showErrors(t.dataset.clear, []); renderAll(); return;
   }
   if (t.dataset.open) { openFor(t.dataset.open); return; }
   if (t.dataset.inc) { const p = byId(t.dataset.inc); p.copies = Math.min(99, p.copies + 1); refreshPolCard(p); renderBar(); return; }
   if (t.dataset.dec) { const p = byId(t.dataset.dec); p.copies = Math.max(1, p.copies - 1); refreshPolCard(p); renderBar(); return; }
   if (t.dataset.del) { const id = +t.dataset.del.split(":")[1], p = byId(id); if (p) { URL.revokeObjectURL(p.thumb); P.photos = P.photos.filter(x => x !== p); } renderAll(); return; }
-  if (t.dataset.lay) { S.alb.layout = +t.dataset.lay; S.alb.over = {}; ls.set("lay", S.alb.layout); renderAll(); return; }
+  if (t.dataset.lay) { S.alb.layout = t.dataset.lay; S.alb.over = {}; ls.set("lay", S.alb.layout); renderAll(); return; }
+  if (t.dataset.laytype) { const n = parseLay(S.alb.layout).n, ty = t.dataset.laytype; S.alb.layout = ty === "g" ? String(LAYOUTS[n] ? n : 6) : ty + n; S.alb.over = {}; ls.set("lay", S.alb.layout); renderAll(); return; }
+  if (t.dataset.reseed) { const k = +t.dataset.reseed; S.alb.seed[k] = (S.alb.seed[k] || 0) + 1; renderAll(); return; }
   if (t.dataset.goto) { setMode(t.dataset.goto); return; }
   if (t.dataset.scale) { if (t.disabled) return; S.scale = +t.dataset.scale; ls.set("scale", S.scale); renderBar(); if (S.scale === 3) toast("3x: fayllar juda katta bo'ladi (sahifa ~30-40 MB). Faqat Chrome'da ishlaydi, PDF yasalmaydi."); return; }
   if (t.dataset.tpl) { S.cov.tpl = t.dataset.tpl; openStyle = null; syncSlots(); saveCov(); renderAll(); return; }
@@ -1872,7 +1962,7 @@ document.addEventListener("click", e => {
   if (t.dataset.preset) return;
 });
 document.addEventListener("change", e => {
-  if (e.target.dataset && e.target.dataset.pagelay != null) { S.alb.over[+e.target.dataset.pagelay] = +e.target.value; renderAll(); }
+  if (e.target.dataset && e.target.dataset.pagelay != null) { S.alb.over[+e.target.dataset.pagelay] = e.target.value; renderAll(); }
   if (e.target.dataset && e.target.dataset.preset) { const k = e.target.dataset.preset; if (e.target.value) { S.cov.f[k] = e.target.value; covChanged(true); } }
 });
 document.addEventListener("input", e => {
@@ -1887,7 +1977,7 @@ document.addEventListener("input", e => {
   if (t.classList.contains("cardSize")) { document.documentElement.style.setProperty("--card-w", t.value + "px"); document.querySelectorAll(".cardSize").forEach(x => x.value = t.value); ls.set("card", t.value); }
 });
 $("tint").onchange = e => { S.cov.tint = e.target.checked; covChanged(false); };
-$("smart").onclick = () => { smartLayout(); renderAll(); toast("Rasmlar yo'nalishi bo'yicha joylandi. Sahifa setkalarini qo'lda ham o'zgartirsa bo'ladi."); };
+$("smart").onclick = () => { if (parseLay(S.alb.layout).t !== "g") { toast("Mozaika va qatorli joylash rasmlarga o'zi moslashadi. Aqlli joylash oddiy setka uchun."); return; } smartLayout(); renderAll(); toast("Rasmlar yo'nalishi bo'yicha joylandi. Sahifa setkalarini qo'lda ham o'zgartirsa bo'ladi."); };
 $("fromAlb").onclick = () => { const tp = TPL[S.cov.tpl], used = new Set(S.cov.slots.filter(Boolean)); let j = 0; for (let k = 0; k < tp.slots.length; k++) { if (S.cov.slots[k]) continue; while (j < S.alb.photos.length && used.has(S.alb.photos[j])) j++; const src = S.alb.photos[j++]; if (!src) break; setSlot(k, Object.assign({}, src, { id: ++uid, fw: 0, tb: null })); } renderAll(); };
 $("decorAdd").onclick = () => $("decorFile").click();
 $("decorFile").onchange = async e => { const f = e.target.files[0]; e.target.value = ""; if (!f) return; try { const bmp = await createImageBitmap(f); S.cov.decor = { bmp, scale: 1, dy: 0 }; covChanged(true); } catch (err) { toast("Bezak rasmi ochilmadi. PNG yuklang."); } };
@@ -1928,7 +2018,7 @@ window.addEventListener("hashchange", () => { const m = location.hash.slice(1); 
 $("order").value = ls.get("order", "");
 const cw = ls.get("card", null); if (cw) { document.querySelectorAll(".cardSize").forEach(x => x.value = cw); document.documentElement.style.setProperty("--card-w", cw + "px"); }
 S.pol.cutline = ls.get("cut", true); $("cutline").checked = S.pol.cutline;
-S.alb.layout = ls.get("lay", 6); if (!LAYOUTS[S.alb.layout]) S.alb.layout = 6;
+S.alb.layout = String(ls.get("lay", "6")); { const L0 = parseLay(S.alb.layout); if (L0.t === "g" ? !LAYOUTS[L0.n] : !MOS_N.includes(L0.n)) S.alb.layout = "6"; }
 S.alb.cover = ls.get("albCover", true);
 S.scale = [1, 2, 3].includes(ls.get("scale", 1)) ? ls.get("scale", 1) : 1;
 const cv0 = ls.get("cov2", null); if (cv0) { Object.assign(S.cov, { tpl: TPL[cv0.tpl] ? cv0.tpl : "metrika", color: cv0.color || S.cov.color, tint: !!cv0.tint, st: cv0.st || {}, themeF: cv0.themeF || "all" }); Object.assign(S.cov.f, cv0.f || {}); if (/[\u0600-\u06FF]/.test(S.cov.f.oyat)) S.cov.f.oyat = ""; }
