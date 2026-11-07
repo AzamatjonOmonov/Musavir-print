@@ -1179,7 +1179,7 @@ function renderAlb() {
   }
   $("pages").innerHTML = out.join("");
   $("aFlagN").textContent = A.photos.filter(needsCheck).length;
-  if (A.cover) refreshCoverThumb();
+  if (A.cover && (coverDirty || !coverThumbURL)) refreshCoverThumb();
 }
 
 // ================= MUQOVA =================
@@ -1382,8 +1382,8 @@ function drawPhoto(ctx, p, bmp, fx, fy, shape) {
   const place = g => { ctx.save(); ctx.translate(fx + g.cx, fy + g.cy); ctx.rotate(g.t); ctx.drawImage(bmp, -g.DW / 2, -g.DH / 2, g.DW, g.DH); ctx.restore(); };
   if (p.mode === "fit" && p.fitBg === "blur") {
     const b = geom(p, { mode: "fill", zoom: 1.15, angle: 0, ox: 0, oy: 0 }), sc = ctx.getTransform().a, r = 0.035 * p.fw;
-    if ("filter" in ctx) { ctx.filter = `blur(${r * sc}px)`; place(b); ctx.filter = "none"; }
-    else {
+    if ("filter" in ctx && !ctx.canvas.__fast) { ctx.filter = `blur(${r * sc}px)`; place(b); ctx.filter = "none"; }
+    else { // tez usul: kichraytirib-kattalashtirib xiralash (ko'rinishlar uchun)
       const t = document.createElement("canvas"); t.width = Math.ceil(p.fw / 24); t.height = Math.ceil(p.fh / 24);
       const tc = t.getContext("2d"); tc.scale(t.width / p.fw, t.height / p.fh); tc.translate(b.cx, b.cy); tc.rotate(b.t); tc.drawImage(bmp, -b.DW / 2, -b.DH / 2, b.DW, b.DH);
       ctx.drawImage(t, fx, fy, p.fw, p.fh);
@@ -1428,7 +1428,7 @@ function drawText(ctx, key, raw, o) {
   return { s, next };
 }
 // Muqovani chizish. ctx A4 (2480×3508) koordinatalarida; getImg(p) rasmni beradi.
-async function drawCover(ctx, getImg, preview, tplId) {
+async function drawCover(ctx, getImg, preview, tplId, noPhotos) {
   await fontsReady();
   const C = S.cov, tp = TPL[tplId || C.tpl];
   ctx.save();
@@ -1438,7 +1438,7 @@ async function drawCover(ctx, getImg, preview, tplId) {
     async photo(k) {
       const sl = tp.slots[k], p0 = C.slots[k];
       // boshqa shablon miniatyurasi uchun nusxa: asl rasm tahriri buzilmaydi
-      const p = p0 && tplId && tplId !== C.tpl ? Object.assign({}, p0, { fw: 0 }) : p0;
+      const p = noPhotos ? null : p0;
       if (p) { ensureFrame(p, sl.w, sl.h); drawPhoto(ctx, p, await getImg(p0), sl.x, sl.y, sl.shape); }
       else if (preview && !(C.decor && tp.decorBox && k === 0 && tp.slots.length === 1)) {
         ctx.save(); shapePath(ctx, sl.x, sl.y, sl.w, sl.h, sl.shape); ctx.fillStyle = "#e9e6eb"; ctx.fill();
@@ -1447,7 +1447,7 @@ async function drawCover(ctx, getImg, preview, tplId) {
       }
     },
     decor() {
-      const d = C.decor; if (!d || !d.bmp) return;
+      const d = C.decor; if (!d || !d.bmp || noPhotos) return;
       const box = tp.decorBox || { x: 0, y: 0, w: A4W, h: A4H }, s = Math.min(box.w / d.bmp.width, box.h / d.bmp.height) * d.scale;
       const w = d.bmp.width * s, h = d.bmp.height * s;
       ctx.drawImage(d.bmp, box.x + (box.w - w) / 2, box.y + (box.h - h) / 2 + d.dy * A4H, w, h);
@@ -1459,29 +1459,31 @@ async function drawCover(ctx, getImg, preview, tplId) {
 }
 let coverBusy = false, coverAgain = false;
 async function renderCoverPreview() {
+  coverDirty = true;
   if (coverBusy) { coverAgain = true; return; }
   coverBusy = true;
   try {
-    const cv = $("coverCanvas"), ctx = cv.getContext("2d");
+    const cv = $("coverCanvas"), ctx = cv.getContext("2d"); cv.__fast = true;
     ctx.setTransform(cv.width / A4W, 0, 0, cv.height / A4H, 0, 0);
     await drawCover(ctx, thumbBmp, true);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
   } finally { coverBusy = false; if (coverAgain) { coverAgain = false; renderCoverPreview(); } }
 }
 async function refreshCoverThumb() {
-  const cv = document.createElement("canvas"); cv.width = 496; cv.height = 702;
+  coverDirty = false;
+  const cv = document.createElement("canvas"); cv.width = 496; cv.height = 702; cv.__fast = true;
   const ctx = cv.getContext("2d"); ctx.setTransform(496 / A4W, 0, 0, 702 / A4H, 0, 0);
   await drawCover(ctx, thumbBmp, true);
   coverThumbURL = cv.toDataURL("image/jpeg", 0.85);
   const im = $("albCoverImg"); if (im) im.src = coverThumbURL;
 }
-let tplThumbJob = 0;
+let tplThumbJob = 0, coverDirty = true;
 async function renderTplThumbs() {
   const job = ++tplThumbJob;
   for (const id of TPL_IDS) {
     const cv = document.querySelector(`canvas[data-tplthumb="${id}"]`); if (!cv) continue;
-    const ctx = cv.getContext("2d"); ctx.setTransform(cv.width / A4W, 0, 0, cv.height / A4H, 0, 0);
-    await drawCover(ctx, thumbBmp, true, id);
+    cv.__fast = true; const ctx = cv.getContext("2d"); ctx.setTransform(cv.width / A4W, 0, 0, cv.height / A4H, 0, 0);
+    await drawCover(ctx, thumbBmp, true, id, true); // miniatyuralar rasmsiz: faqat joylashuv va matn
     if (job !== tplThumbJob) return;
   }
 }
@@ -1519,11 +1521,10 @@ function renderCovPanel() {
 function setSlot(k, p) { S.cov.slots[k] = p; const sl = TPL[S.cov.tpl].slots[k]; if (p && sl) ensureFrame(p, sl.w, sl.h); }
 function syncSlots() { const sl = TPL[S.cov.tpl].slots; S.cov.slots.forEach((p, k) => { if (p && sl[k]) ensureFrame(p, sl[k].w, sl[k].h); }); }
 function saveCov() { const C = S.cov; ls.set("cov2", { tpl: C.tpl, f: C.f, st: C.st, color: C.color, tint: C.tint, themeF: C.themeF }); }
-let covTimer = 0, thumbTimer = 0;
+let covTimer = 0;
 function covChanged(panel) {
-  saveCov(); if (panel) renderCovPanel();
-  clearTimeout(covTimer); covTimer = setTimeout(renderCoverPreview, 50);
-  clearTimeout(thumbTimer); thumbTimer = setTimeout(renderTplThumbs, 500);
+  saveCov(); coverDirty = true; if (panel) renderCovPanel();
+  clearTimeout(covTimer); covTimer = setTimeout(renderCoverPreview, 120);
 }
 
 // ================= Umumiy chizish =================
