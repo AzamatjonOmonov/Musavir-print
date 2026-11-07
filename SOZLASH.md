@@ -24,7 +24,7 @@ Vercel → Musavir-print loyihasi → **Settings → Environment Variables**:
 |---|---|
 | `SUPABASE_URL` | Project URL |
 | `SUPABASE_SECRET_KEY` | Secret key |
-| `ADMIN_PASSWORD` | Admin panel uchun parol (kamida 10 belgi) |
+| `ADMIN_PASSWORD` | Admin panel uchun parol — kamida 10 belgi, yaxshisi 4–5 so'zli ibora (masalan: `oq-albom-yashil-choy-2026`) |
 
 Environment: **Production** va **Preview** ikkalasini belgilang. Keyin **Deployments → Redeploy**.
 
@@ -41,3 +41,20 @@ Do'kon **namuna tovarlar** bilan ochiladi (sariq yozuv chiqadi). Undan berilgan 
 - Tovar: variant narxi (yoki asosiy narx) + belgilangan qo'shimchalar.
 - Narx har doim serverda bazadan qayta hisoblanadi — mijoz o'zgartira olmaydi.
 - Bepul yetkazish: 10x15 rasmlar + to'plamlar ichidagi rasmlar jami 300 tadan.
+
+## Himoya
+
+Admin panelga kirish **2 bosqichli**: parol → buyurtmalar guruhiga keladigan 6 xonali kod (5 daqiqa amal qiladi, bir marta ishlatiladi).
+
+- Bir IP dan 6 marta xato parol yoki kod → 15 daqiqaga blok va guruhga ogohlantirish. Hamma IP lardan jami 20 ta xato → hamma uchun 15 daqiqaga blok.
+- Har kirishda guruhga «✅ Admin panelga kirildi» xabari keladi. Siz kirmagan bo'lsangiz — darhol parolni almashtiring.
+- Kirish 7 kun saqlanadi. **Parolni almashtirsangiz, hamma qurilmalardan chiqib ketadi** (telefon yo'qolsa shunday qiling).
+- Faqat rasm fayllari yuklanadi (fayl ichidan tekshiriladi), tovar rasmi faqat o'z bazamizdan bo'lishi mumkin.
+- Admin sahifasi boshqa saytga joylab bo'lmaydi, qidiruv tizimlariga chiqmaydi.
+
+Eng muhimi — akkauntlar. Ularda ikki bosqichli kirish (2FA) yoqilgan bo'lsin:
+- [ ] Telegram — yoqilgan
+- [ ] Google pochta (azamatjonomonov1421@gmail.com) — myaccount.google.com → Security → 2-Step Verification
+- [ ] GitHub — Settings → Password and authentication → Two-factor authentication
+- [ ] Vercel — Account Settings → Authentication (GitHub yoki Google bilan kirilsa, o'shaning 2FA si himoya qiladi)
+- [ ] Supabase — Account → Security → Multi-factor authentication

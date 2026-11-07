@@ -32,9 +32,20 @@ create table if not exists orders (
   status      text not null default 'yangi'       -- yangi / ishlanmoqda / yuborildi / bekor
 );
 
+-- Admin panelga kirish urinishlari (parol taxmin qilishdan himoya)
+create table if not exists admin_events (
+  id          bigint generated always as identity primary key,
+  created_at  timestamptz not null default now(),
+  ip          text not null default '',
+  kind        text not null,               -- fail / code_sent / code_fail / code_used / login
+  ref         text not null default ''
+);
+create index if not exists admin_events_lookup on admin_events (kind, created_at);
+
 -- Jadvallarga faqat sayt serveri (secret key) kira oladi.
-alter table products enable row level security;
-alter table orders   enable row level security;
+alter table products     enable row level security;
+alter table orders       enable row level security;
+alter table admin_events enable row level security;
 
 -- Tovar rasmlari uchun ochiq papka
 insert into storage.buckets (id, name, public)

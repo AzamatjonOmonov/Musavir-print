@@ -146,9 +146,16 @@
   <form id="login-form">
     <div class="logo">musavir</div>
     <p>Do'kon boshqaruvi</p>
-    <input class="i" type="password" id="pw" placeholder="Parol" autocomplete="current-password" aria-label="Parol" required>
+    <div id="step-pw">
+      <input class="i" type="password" id="pw" placeholder="Parol" autocomplete="current-password" aria-label="Parol">
+    </div>
+    <div id="step-code" hidden>
+      <p style="margin-bottom:10px">Telegramdagi buyurtmalar guruhiga 6 xonali kod yubordik. 5 daqiqa amal qiladi.</p>
+      <input class="i" type="text" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" aria-label="Telegramdagi kod" style="text-align:center;font-size:24px;letter-spacing:.3em">
+    </div>
     <p class="err" id="login-err" role="alert" hidden></p>
     <button class="btn" type="submit" id="login-btn">Kirish</button>
+    <button class="out" type="button" id="back-pw" hidden style="justify-self:center">Parolni qaytadan kiritish</button>
   </form>
 </section>
 
@@ -272,7 +279,7 @@
       .then(function (r) {
         return r.json().catch(function () { return { ok: false, error: 'Server javob bermadi (' + r.status + ')' }; })
           .then(function (d) {
-            if (r.status === 401 && action !== 'login') { logout(); throw new Error('Qaytadan kiring'); }
+            if (r.status === 401 && action !== 'login' && action !== 'verify') { logout(); throw new Error('Qaytadan kiring'); }
             if (r.status === 503) $('#no-db').hidden = false;
             if (!d.ok) throw new Error(d.error || 'Xatolik');
             return d;
@@ -284,16 +291,37 @@
   function showLogin() { $('#login').hidden = false; $('#app').hidden = true; setTimeout(function () { $('#pw').focus(); }, 50); }
   function showApp() { $('#login').hidden = true; $('#app').hidden = false; loadProducts(); }
   function logout() { token = null; ls.set('mp_admin', null); showLogin(); }
+  var challenge = null;
+  function codeStep(on) {
+    $('#step-pw').hidden = on; $('#step-code').hidden = !on; $('#back-pw').hidden = !on;
+    $('#login-btn').textContent = on ? 'Tasdiqlash' : 'Kirish';
+    setTimeout(function () { (on ? $('#code') : $('#pw')).focus(); }, 30);
+  }
+  $('#back-pw').onclick = function () { challenge = null; $('#code').value = ''; $('#login-err').hidden = true; codeStep(false); };
+  $('#code').addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '').slice(0, 6);
+    if (this.value.length === 6) $('#login-form').requestSubmit();
+  });
   $('#login-form').addEventListener('submit', function (e) {
     e.preventDefault();
     var b = $('#login-btn'), err = $('#login-err');
+    if (b.disabled) return;
+    var req = challenge
+      ? api('verify', { challenge: challenge, code: $('#code').value })
+      : api('login', { password: $('#pw').value });
     b.disabled = true; err.hidden = true;
-    api('login', { password: $('#pw').value }).then(function (d) {
-      token = d.token; ls.set('mp_admin', token); $('#pw').value = '';
+    req.then(function (d) {
+      if (d.step === 'code') { challenge = d.challenge; $('#pw').value = ''; codeStep(true); return; }
+      token = d.token; ls.set('mp_admin', token); challenge = null; $('#code').value = '';
+      codeStep(false);
       $('#no-db').hidden = d.configured !== false;
       showApp();
-    }).catch(function (x) { err.textContent = x.message; err.hidden = false; })
-      .then(function () { b.disabled = false; });
+    }).catch(function (x) {
+      err.textContent = x.message; err.hidden = false;
+      // kod eskirgan / ko'p xato bo'lsa — parol bosqichiga qaytamiz
+      if (challenge && /qaytadan kiriting/.test(x.message)) { challenge = null; $('#code').value = ''; codeStep(false); }
+      else if (challenge) { $('#code').value = ''; $('#code').focus(); }
+    }).then(function () { b.disabled = false; });
   });
   $('#logout').onclick = logout;
 

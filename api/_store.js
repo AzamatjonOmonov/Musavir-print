@@ -50,27 +50,100 @@ async function uploadImage(buffer, contentType) {
   return `${SB_URL}/storage/v1/object/public/${BUCKET}/${name}`;
 }
 
-// ---------- Admin kirish tokeni ----------
-function sign(payload) {
-  return crypto.createHmac('sha256', 'admin:' + ADMIN_PASSWORD).update(payload).digest('hex').slice(0, 40);
+// ---------- Admin kirish: imzolar ----------
+// Imzo kaliti parol + server sirlaridan olinadi: parol almashsa, hamma kirishlar
+// bekor bo'ladi; serverdagi sir esa o'g'irlangan tokendan parolni topishga yo'l qo'ymaydi.
+function signKey() {
+  return crypto.createHash('sha256')
+    .update(`admin-sign:${ADMIN_PASSWORD}:${SB_KEY}:${process.env.BOT_TOKEN || ''}`)
+    .digest();
 }
-function makeToken(days = 30) {
-  const exp = Math.floor(Date.now() / 1000) + days * 86400;
-  return `${exp}.${sign(String(exp))}`;
+function sign(payload) {
+  return crypto.createHmac('sha256', signKey()).update(payload).digest('hex').slice(0, 48);
+}
+function same(a, b) {
+  const x = Buffer.from(String(a));
+  const y = Buffer.from(String(b));
+  return x.length === y.length && crypto.timingSafeEqual(x, y);
+}
+
+const SESSION_DAYS = 7;
+function makeToken() {
+  const exp = Math.floor(Date.now() / 1000) + SESSION_DAYS * 86400;
+  return `${exp}.${sign('s:' + exp)}`;
 }
 function checkToken(token) {
   if (!ADMIN_PASSWORD || !token) return false;
   const [exp, sig] = String(token).split('.');
-  if (!exp || !sig || Number(exp) < Date.now() / 1000) return false;
-  const a = Buffer.from(sig);
-  const b = Buffer.from(sign(exp));
-  return a.length === b.length && crypto.timingSafeEqual(a, b);
+  if (!/^\d+$/.test(exp || '') || !sig || Number(exp) < Date.now() / 1000) return false;
+  return same(sig, sign('s:' + exp));
 }
 function checkPassword(pw) {
   if (!ADMIN_PASSWORD) return false;
   const a = crypto.createHash('sha256').update(String(pw || '')).digest();
   const b = crypto.createHash('sha256').update(ADMIN_PASSWORD).digest();
   return crypto.timingSafeEqual(a, b);
+}
+
+// Telegram'ga yuboriladigan 6 xonali kod. Kodning o'zi hech qayerda saqlanmaydi:
+// "challenge" ichida faqat uning imzosi bor.
+const CODE_TTL = 5 * 60;
+function makeChallenge() {
+  const code = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
+  const nonce = crypto.randomBytes(9).toString('hex');
+  const exp = Math.floor(Date.now() / 1000) + CODE_TTL;
+  return { code, nonce, challenge: `${exp}.${nonce}.${sign(`c:${exp}:${nonce}:${code}`)}` };
+}
+// { ok, nonce } yoki { error: 'expired' | 'bad' }
+function checkChallenge(challenge, code) {
+  const [exp, nonce, sig] = String(challenge || '').split('.');
+  if (!/^\d+$/.test(exp || '') || !/^[0-9a-f]{18}$/.test(nonce || '') || !sig) return { error: 'bad' };
+  if (Number(exp) < Date.now() / 1000) return { error: 'expired', nonce };
+  const c = String(code || '').replace(/\D/g, '');
+  if (c.length !== 6) return { error: 'bad', nonce };
+  return same(sig, sign(`c:${exp}:${nonce}:${c}`)) ? { ok: true, nonce } : { error: 'bad', nonce };
+}
+
+// ---------- Kirish urinishlari jurnali ----------
+// Bazada saqlanadi (server qayta ishga tushsa ham yo'qolmaydi).
+// Baza ulanmagan sinov rejimida — vaqtincha xotirada.
+const memEvents = [];
+async function logEvent(ip, kind, ref = '') {
+  if (!configured()) {
+    memEvents.push({ t: Date.now(), ip, kind, ref });
+    if (memEvents.length > 5000) memEvents.splice(0, 2500);
+    return;
+  }
+  try {
+    await rest('admin_events', { method: 'POST', body: { ip: String(ip).slice(0, 64), kind, ref: String(ref).slice(0, 64) } });
+  } catch {
+    // jurnal yozilmasa ham kirishni to'xtatmaymiz
+  }
+}
+async function countEvents({ kind, ip, ref, minutes }) {
+  const since = Date.now() - minutes * 60 * 1000;
+  if (!configured()) {
+    return memEvents.filter((e) => e.t >= since && e.kind === kind &&
+      (ip == null || e.ip === ip) && (ref == null || e.ref === ref)).length;
+  }
+  let q = `admin_events?select=id&kind=eq.${encodeURIComponent(kind)}` +
+    `&created_at=gte.${encodeURIComponent(new Date(since).toISOString())}&limit=200`;
+  if (ip != null) q += `&ip=eq.${encodeURIComponent(ip)}`;
+  if (ref != null) q += `&ref=eq.${encodeURIComponent(ref)}`;
+  try {
+    const rows = await rest(q);
+    return Array.isArray(rows) ? rows.length : 0;
+  } catch {
+    return 0;
+  }
+}
+
+// Yuklangan fayl haqiqatan rasm ekanini ichidan tekshirish
+function sniffImage(buf) {
+  if (buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
+  if (buf.length > 8 && buf.slice(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return 'image/png';
+  if (buf.length > 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') return 'image/webp';
+  return '';
 }
 
 // ---------- Tovar ma'lumotini tozalash ----------
@@ -93,8 +166,11 @@ function cleanProduct(p) {
     description: str(p.description, 3000),
     price: money(p.price),
     old_price: p.old_price === '' || p.old_price == null ? null : money(p.old_price) || null,
+    // Faqat o'z bazamizga yuklangan rasmlar (begona saytga havola qo'yib bo'lmaydi)
     images: Array.isArray(p.images)
-      ? p.images.map((u) => str(u, 500)).filter((u) => /^https:\/\//.test(u)).slice(0, 8)
+      ? p.images.map((u) => str(u, 500))
+        .filter((u) => SB_URL && u.startsWith(`${SB_URL}/storage/v1/object/public/${BUCKET}/`) && !/[\s"'<>]/.test(u))
+        .slice(0, 8)
       : [],
     variants: priceList(p.variants),
     addons: priceList(p.addons),
@@ -141,4 +217,5 @@ const DEMO_PRODUCTS = [
 
 module.exports = {
   configured, rest, uploadImage, makeToken, checkToken, checkPassword, cleanProduct, DEMO_PRODUCTS,
+  makeChallenge, checkChallenge, logEvent, countEvents, sniffImage, SESSION_DAYS,
 };
