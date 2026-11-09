@@ -301,9 +301,38 @@ function cleanCalcs(arr) {
   }
   return { value: out };
 }
+// Bosh sahifa slaydlari (5 tagacha). Matnda *so'z* — Times kursiv bilan yoziladi
+const DEFAULT_SLIDES = [
+  { img: '/dokon/hero/slide1.webp', bg: '', title: 'Esdaliklaringiz *telefonda* qolib ketmasin...', title_ru: 'Пусть ваши воспоминания не останутся в *телефоне*...', btn: 'Buyurtma beriş', btn_ru: 'Заказать', link: 'calc', url: '', on: true },
+  { img: '/dokon/hero/slide2.webp', bg: '', title: 'Biz sizga sifatli qilib çiqarib beramiz...', title_ru: 'Напечатаем ваши фото *качественно*...', btn: 'Buyurtma beriş', btn_ru: 'Заказать', link: 'calc', url: '', on: true },
+  { img: '/dokon/hero/slide3.webp', bg: '/dokon/hero/map.webp', title: '*Özbekiston* böylab yetkazib beramiz...', title_ru: 'Доставляем по всему *Узбекистану*...', btn: 'Buyurtma beriş', btn_ru: 'Заказать', link: 'calc', url: '', on: true },
+];
+const SLIDE_LINKS = ['calc', 'products', 'telegram', 'url'];
+const slideImg = (u) => typeof u === 'string' && (/^\/dokon\/hero\/[\w-]+\.(webp|png|jpg)$/.test(u) || ownUrl(u, BUCKET));
+function cleanSlides(arr) {
+  if (!Array.isArray(arr)) return { error: "Noto'g'ri ma'lumot" };
+  const out = [];
+  for (const x of arr.slice(0, 5)) {
+    if (!x || !slideImg(x.img)) return { error: 'Har bir slaydga surat yuklang' };
+    const title = str(x.title, 120);
+    if (!title) return { error: 'Har bir slaydga matn yozing' };
+    const link = SLIDE_LINKS.includes(x.link) ? x.link : 'calc';
+    let url = '';
+    if (link === 'url') {
+      url = str(x.url, 300);
+      if (!/^https:\/\/[^\s"'<>]+$/.test(url) && !/^#\/[\w/-]*$/.test(url)) return { error: 'Havola https:// bilan boshlansin' };
+    }
+    out.push({
+      img: x.img, bg: slideImg(x.bg) ? x.bg : '', title, title_ru: str(x.title_ru, 120),
+      btn: str(x.btn, 30) || 'Buyurtma beriş', btn_ru: str(x.btn_ru, 30), link, url, on: x.on !== false,
+    });
+  }
+  return { value: out };
+}
+
 const DEFAULT_SITE = {
   clients: '250+',
-  speed: 'Buyurtmangizni kechiktirmay chop etib, jo\'natamiz',
+  speed: 'Buyurtmangizni keçiktirmay çop etib, jönatamiz',
   speed_ru: 'Печатаем и отправляем без задержек',
   hero_image: '',
 };
@@ -336,16 +365,17 @@ function tierPrice(calc, qty) {
 let settingsCache = null;
 let settingsAt = 0;
 async function getSettings({ fresh = false } = {}) {
-  const defaults = { calculators: DEFAULT_CALCS, announcements: DEFAULT_ANNOUNCEMENTS, site: DEFAULT_SITE };
+  const defaults = { calculators: DEFAULT_CALCS, announcements: DEFAULT_ANNOUNCEMENTS, site: DEFAULT_SITE, slides: DEFAULT_SLIDES };
   if (!configured()) return defaults;
   if (!fresh && settingsCache && Date.now() - settingsAt < 15000) return settingsCache;
   try {
-    const rows = await rest('settings?select=key,value&key=in.(calculators,announcements,site)');
+    const rows = await rest('settings?select=key,value&key=in.(calculators,announcements,site,slides)');
     const map = Object.fromEntries((rows || []).map((r) => [r.key, r.value]));
     settingsCache = {
       calculators: Array.isArray(map.calculators) && map.calculators.length ? map.calculators : DEFAULT_CALCS,
       announcements: Array.isArray(map.announcements) ? map.announcements : DEFAULT_ANNOUNCEMENTS,
       site: { ...DEFAULT_SITE, ...(map.site && typeof map.site === 'object' ? map.site : {}) },
+      slides: Array.isArray(map.slides) ? map.slides : DEFAULT_SLIDES,
     };
     settingsAt = Date.now();
     return settingsCache;
@@ -371,33 +401,33 @@ async function printUnitPrice(qty, calcId = '10x15') {
 const DEMO_PRODUCTS = [
   {
     id: 'demo-fotokniga', name: 'Fotokniga (albom)', name_ru: 'Фотокнига', category: 'Albom', price: 90000,
-    description: "Rasmlaringizni chiroyli qilib sahifalarga terib, kitob ko'rinishida chop etamiz.\n\nRasmlarni buyurtmadan keyin Telegram orqali yuborasiz. Namuna tovar.",
+    description: "Rasmlaringizni çiroyli qilib sahifalarga terib, kitob körinişida çop etamiz.\n\nRasmlarni buyurtmadan keyin Telegram orqali yuborasiz. Namuna tovar.",
     description_ru: 'Красиво расставим ваши фото по страницам и напечатаем в виде книги. Фото отправите в Telegram после заказа.',
     images: [], variants: [],
     options: [
       { name: 'Format', name_ru: 'Формат', choices: [{ name: 'A5', name_ru: 'A5', price: 0 }, { name: 'A4', name_ru: 'A4', price: 60000 }] },
       { name: 'Sahifa soni', name_ru: 'Страниц', choices: [
         { name: '10 bet', name_ru: '10 стр.', price: 0 }, { name: '20 bet', name_ru: '20 стр.', price: 40000 }, { name: '30 bet', name_ru: '30 стр.', price: 75000 }] },
-      { name: 'Muqova', name_ru: 'Обложка', choices: [{ name: 'Yumshoq', name_ru: 'Мягкая', price: 0 }, { name: 'Qattiq', name_ru: 'Твёрдая', price: 30000 }] },
+      { name: 'Muqova', name_ru: 'Обложка', choices: [{ name: 'Yumşoq', name_ru: 'Мягкая', price: 0 }, { name: 'Qattiq', name_ru: 'Твёрдая', price: 30000 }] },
     ],
-    addons: [{ name: 'Muqovaga ism yozish', name_ru: 'Имя на обложке', price: 20000 }], is_bundle: false, active: true, sort: 0,
+    addons: [{ name: 'Muqovaga ism yoziş', name_ru: 'Имя на обложке', price: 20000 }], is_bundle: false, active: true, sort: 0,
   },
   {
     id: 'demo-albom', name: 'Fotoalbom', name_ru: 'Фотоальбом', category: 'Albom', price: 0,
-    description: "Qattiq muqovali fotoalbom. 10x15 rasmlar uchun cho'ntakli varaqlar.\n\nNamuna tovar — admin paneldan o'zingiz kiritasiz.",
+    description: "Qattiq muqovali fotoalbom. 10x15 rasmlar uçun çöntakli varaqlar.\n\nNamuna tovar — admin paneldan özingiz kiritasiz.",
     images: [], variants: [{ name: '100 talik', name_ru: 'на 100 фото', price: 85000 }, { name: '200 talik', name_ru: 'на 200 фото', price: 130000 }],
-    options: [], addons: [{ name: 'Muqovaga ism yozish', name_ru: 'Имя на обложке', price: 20000 }], is_bundle: false, active: true, sort: 1,
+    options: [], addons: [{ name: 'Muqovaga ism yoziş', name_ru: 'Имя на обложке', price: 20000 }], is_bundle: false, active: true, sort: 1,
   },
   {
-    id: 'demo-ramka', name: "Yog'och ramka", name_ru: 'Деревянная рамка', category: 'Ramka', price: 0,
-    description: "Devorga ilish yoki stolga qo'yish uchun. Namuna tovar.",
+    id: 'demo-ramka', name: "Yoğoç ramka", name_ru: 'Деревянная рамка', category: 'Ramka', price: 0,
+    description: "Devorga iliş yoki stolga qöyiş uçun. Namuna tovar.",
     images: [], variants: [{ name: '10x15', price: 25000 }, { name: 'A5', price: 35000 }, { name: 'A4', price: 45000 }],
     options: [], addons: [], is_bundle: false, active: true, sort: 2,
   },
   {
-    id: 'demo-toplam', name: "Oilaviy to'plam: 100 rasm + albom", name_ru: 'Семейный набор: 100 фото + альбом', category: "To'plam",
+    id: 'demo-toplam', name: "Oilaviy töplam: 100 rasm + albom", name_ru: 'Семейный набор: 100 фото + альбом', category: "To'plam",
     price: 240000, old_price: 265000,
-    description: "100 ta 10x15 rasm, 100 talik albom va muqovaga ism yozish.\n\nRasmlarni buyurtmadan keyin Telegram orqali yuborasiz. Namuna tovar.",
+    description: "100 ta 10x15 rasm, 100 talik albom va muqovaga ism yoziş.\n\nRasmlarni buyurtmadan keyin Telegram orqali yuborasiz. Namuna tovar.",
     images: [], variants: [], options: [], addons: [{ name: 'Laminatsiyali muqova', name_ru: 'Ламинированная обложка', price: 15000 }],
     is_bundle: true, print_qty: 100, active: true, sort: 3,
   },
@@ -407,5 +437,5 @@ module.exports = {
   configured, rest, uploadImage, makeToken, checkToken, checkPassword, cleanProduct, DEMO_PRODUCTS,
   makeChallenge, checkChallenge, logEvent, countEvents, sniffImage, SESSION_DAYS,
   priceItem, getSettings, saveSetting, cleanCalcs, cleanAnnouncements, tierPrice, printUnitPrice,
-  cleanSite, cleanReview, signVideoUpload,
+  cleanSite, cleanReview, signVideoUpload, cleanSlides,
 };

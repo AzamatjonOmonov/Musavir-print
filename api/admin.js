@@ -3,7 +3,7 @@
 const {
   configured, rest, uploadImage, makeToken, checkToken, checkPassword, cleanProduct,
   makeChallenge, checkChallenge, logEvent, countEvents, sniffImage,
-  getSettings, saveSetting, cleanCalcs, cleanAnnouncements, cleanSite, cleanReview, signVideoUpload,
+  getSettings, saveSetting, cleanCalcs, cleanAnnouncements, cleanSite, cleanReview, signVideoUpload, cleanSlides,
 } = require('./_store');
 const { ADMIN_CHAT_ID, tg, esc } = require('./_lib');
 
@@ -213,6 +213,11 @@ module.exports = async (req, res) => {
           if (c.error) return fail(400, c.error);
           if (!c.value.length) return fail(400, 'Kamida bitta narx formati qolsin');
           await saveSetting('calculators', c.value);
+        }
+        if (b.slides !== undefined) {
+          const c = cleanSlides(b.slides);
+          if (c.error) return fail(400, c.error);
+          await saveSetting('slides', c.value);
         }
         if (b.site !== undefined) {
           await saveSetting('site', cleanSite(b.site).value);

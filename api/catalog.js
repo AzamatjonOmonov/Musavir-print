@@ -6,11 +6,12 @@ const FIELDS = 'id,name,name_ru,category,description,description_ru,price,old_pr
 
 module.exports = async (req, res) => {
   if (req.method !== 'GET') return res.status(405).json({ ok: false });
-  const { calculators, announcements, site } = await getSettings();
+  const { calculators, announcements, site, slides } = await getSettings();
   const settings = {
     calculators: calculators.filter((c) => c.on !== false),
     announcements: announcements.filter((a) => a.on),
     site,
+    slides: slides.filter((x) => x.on !== false),
   };
   if (!configured()) {
     res.setHeader('Cache-Control', 'no-store');

@@ -8,20 +8,31 @@
 <meta property="og:title" content="Musavvir Print — do'kon">
 <meta property="og:description" content="Rasm chop etish, fotokniga, albomlar, ramkalar va tayyor to'plamlar.">
 <meta property="og:image" content="/dokon/logo.png">
-<meta name="theme-color" content="#e4005e">
+<meta name="theme-color" content="#ff0066">
 <link rel="icon" href="/dokon/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link rel="preload" href="/dokon/fonts/gsf-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/dokon/hero/slide1.webp" as="image">
 <style>
+  /* Shriftlar: Google Sans Flex (lotin), Onest (kirill), Tinos Bold Italic (= Times New Roman) */
+  @font-face { font-family: 'Brand'; font-style: normal; font-weight: 100 1000; font-display: swap; src: url(/dokon/fonts/gsf-latin.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+  @font-face { font-family: 'Brand'; font-style: normal; font-weight: 100 1000; font-display: swap; src: url(/dokon/fonts/gsf-latin-ext.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+  @font-face { font-family: 'Brand'; font-style: normal; font-weight: 100 900; font-display: swap; src: url(/dokon/fonts/onest-cyrillic.woff2) format('woff2'); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: 'Brand'; font-style: normal; font-weight: 100 900; font-display: swap; src: url(/dokon/fonts/onest-cyrillic-ext.woff2) format('woff2'); unicode-range: U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F; }
+  @font-face { font-family: 'BrandSerif'; font-style: italic; font-weight: 700; font-display: swap; src: url(/dokon/fonts/tinos-latin-bi.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+  @font-face { font-family: 'BrandSerif'; font-style: italic; font-weight: 700; font-display: swap; src: url(/dokon/fonts/tinos-latin-ext-bi.woff2) format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+  @font-face { font-family: 'BrandSerif'; font-style: italic; font-weight: 700; font-display: swap; src: url(/dokon/fonts/tinos-cyrillic-bi.woff2) format('woff2'); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+  @font-face { font-family: 'BrandSerif'; font-style: italic; font-weight: 700; font-display: swap; src: url(/dokon/fonts/tinos-cyrillic-ext-bi.woff2) format('woff2'); unicode-range: U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F; }
   :root {
     --bg: #f2f1f4;
     --surface: #ffffff;
     --ink: #2c2c2c;
     --muted: #77727a;
     --line: #e4e1e6;
-    --pink: #e5005c;
-    --pink-bg: #e4005e;
+    --pink: #ff0066;
+    --pink-bg: #ff0066;
     --wine: #610027;
     --paper: #e3dfd5;
     --gray: #a3a3a3;
@@ -37,7 +48,7 @@
   html, body { overflow-x: clip; }
   body {
     margin: 0; background: var(--bg); color: var(--ink);
-    font: 15px/1.45 'Space Grotesk', system-ui, sans-serif;
+    font: 15px/1.45 'Brand', system-ui, sans-serif;
     padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
   }
   button, input, textarea, select { font: inherit; color: inherit; }
@@ -129,53 +140,8 @@
   .calc-note { text-align: center; font-size: 14px; font-weight: 700; color: rgba(44,44,44,.72); margin: 16px 0 0; line-height: 1.4; }
   .calc-note button { border: 0; background: none; padding: 0; color: var(--pink); text-decoration: underline; text-underline-offset: 3px; font-weight: 700; }
 
-  /* ---------- Bosh blok ---------- */
-  .hero { background: var(--pink-bg); color: #fff; padding: 12px 0 0; overflow: hidden; }
-  .hero .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-  .hero .bar img { height: 40px; width: auto; }
-  .hero-grid { display: grid; gap: 18px; align-items: center; padding-bottom: 64px; }
-  @media (min-width: 860px) { .hero-grid { grid-template-columns: 1.1fr .9fr; padding-bottom: 96px; } .news { margin-top: -60px; } }
-  .hero h1 { margin: 0; font-size: clamp(34px, 9.5vw, 60px); line-height: 1.02; letter-spacing: -.02em; font-weight: 700; text-wrap: balance; }
-  .hero .clients { display: inline-flex; align-items: center; gap: 10px; margin-top: 18px; font-weight: 500; font-size: 15px; }
-  .hero .clients b { font-size: 26px; font-weight: 700; line-height: 1; }
-  .hero .clients .faces { display: flex; }
-  .hero .clients .faces i { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--pink-bg); margin-left: -8px; background: var(--paper); }
-  .hero .clients .faces i:first-child { margin-left: 0; background: #f6b7cf; } .hero .clients .faces i:nth-child(2) { background: #ffd9a8; }
-  .hero .cta { margin-top: 24px; max-width: 420px; background: #fff; color: var(--wine); border-color: var(--wine); font-size: 18px; letter-spacing: .08em; }
-  .hero .cta small { display: block; font-size: 12px; letter-spacing: .02em; text-transform: none; font-weight: 500; color: var(--pink); }
-  .hero .cta span { text-align: left; }
-  /* Telefon → rasmlar */
-  .art { position: relative; height: 270px; max-width: 360px; width: 100%; margin: 0 auto; }
-  @media (max-width: 859px) { .art { height: 230px; transform: scale(.88); transform-origin: top center; margin-bottom: -20px; } }
-  .art .phone { position: absolute; left: 4%; top: 18px; width: 128px; height: 240px; border-radius: 26px; background: #2c2c2c; padding: 9px; transform: rotate(-8deg); box-shadow: 6px 6px 0 var(--wine); }
-  .art .phone::before { content: ''; position: absolute; top: 12px; left: 50%; width: 34px; height: 6px; margin-left: -17px; border-radius: 3px; background: #444; z-index: 2; }
-  .art .phone .scr2 { height: 100%; border-radius: 18px; background: #3a3a3a; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 26px 6px 6px; align-content: start; }
-  .art .phone .scr2 i { aspect-ratio: 1; border-radius: 3px; background: #5a5a5a; }
-  .art .phone .scr2 i:nth-child(3n) { background: #6b5a62; }
-  .art .pol { position: absolute; width: 112px; background: #fff; padding: 7px 7px 26px; border-radius: 3px; box-shadow: 0 6px 16px rgba(60,0,25,.35); }
-  .art .pol i { display: block; aspect-ratio: 1; border-radius: 1px; }
-  .art .pol.p1 { left: 36%; top: 6px; transform: rotate(7deg); } .art .pol.p1 i { background: linear-gradient(160deg, #ffd9a8, #e98aa7 70%); }
-  .art .pol.p2 { left: 58%; top: 78px; transform: rotate(-6deg); } .art .pol.p2 i { background: linear-gradient(200deg, #c9dcc0, #8fb0a0); }
-  .art .pol.p3 { left: 30%; top: 140px; transform: rotate(-14deg); } .art .pol.p3 i { background: linear-gradient(180deg, #f6e3b4, #e6b8a2); }
-  @media (prefers-reduced-motion: no-preference) {
-    .art .pol { animation: fly .9s cubic-bezier(.2,.8,.2,1) both; }
-    .art .pol.p2 { animation-delay: .15s; } .art .pol.p3 { animation-delay: .3s; }
-    @keyframes fly { from { opacity: 0; translate: -60px 40px; scale: .6; } }
-  }
-  .art .photo { position: absolute; inset: 10px 8% 10px; background: #fff; padding: 10px 10px 34px; border-radius: 4px; transform: rotate(3deg); box-shadow: 6px 6px 0 var(--wine); }
-  .art .photo img { width: 100%; height: 100%; object-fit: cover; }
-
-  /* Yangilik lentasi */
-  .news { position: relative; z-index: 2; margin-top: -34px; transform: skewY(-3deg); background: var(--wine); color: #fff; box-shadow: 0 6px 0 rgba(0,0,0,.12); }
-  .news > .wrap { transform: skewY(3deg); }
-  .news .wrap { display: flex; align-items: center; gap: 14px; padding-top: 12px; padding-bottom: 12px; }
-  .news svg { flex: none; width: 74px; height: auto; }
-  .news .tag { display: inline-block; background: #fff; color: var(--wine); font-weight: 700; font-size: 12px; letter-spacing: .08em; padding: 2px 8px; border-radius: 5px; margin-bottom: 4px; }
-  .news p { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25; }
-  .news small { display: block; font-weight: 400; opacity: .85; font-size: 13px; margin-top: 2px; }
-
   /* Afzalliklar */
-  .perks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 34px; }
+  .perks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
   @media (min-width: 860px) { .perks { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
   .perk { background: var(--surface); border-radius: 16px; padding: 16px 14px; }
   .perk .ic { width: 44px; height: 44px; border-radius: 12px; background: #fde6ef; color: var(--pink); display: grid; place-items: center; margin-bottom: 10px; }
@@ -216,6 +182,67 @@
   .after-add { display: grid; gap: 10px; margin-top: 14px; }
   .after-add a { height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; text-decoration: none; border: 2px solid var(--gray); background: #fff; }
   .after-add a.go { background: var(--nokia-dark); color: var(--nokia); border-color: var(--nokia-dark); }
+
+  /* ---------- Slayder (Figma: 6941×3687) ---------- */
+  .slider-wrap { padding: 12px 0 0; }
+  @media (min-width: 700px) { .slider-wrap { padding-top: 20px; } }
+  .slider { position: relative; container-type: inline-size; }
+  .slides-h { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 28px; overscroll-behavior-x: contain; }
+  .slides-h::-webkit-scrollbar { display: none; }
+  .slide { flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always; position: relative; overflow: hidden; background: linear-gradient(#fff 0 21.44%, var(--pink) 21.44%); color: #fff; aspect-ratio: 6941 / 3687; }
+  .slide .bg { position: absolute; left: 46%; top: 24.25%; width: 52.5%; height: 47.5%; object-fit: contain; pointer-events: none; }
+  .slide .person { position: absolute; left: 38.3%; top: 4.5%; width: 61.7%; height: 95.5%; object-fit: contain; object-position: 72% 100%; pointer-events: none; }
+  .slide .q { position: absolute; width: 11.11%; height: auto; pointer-events: none; }
+  .slide .q1 { left: 2.96%; top: 32.7%; }
+  .slide .q2 { left: 28.31%; top: 57.23%; transform: rotate(180deg); }
+  .slide h2 { position: absolute; left: 8.84%; top: 38.6%; width: 34%; margin: 0; font-weight: 600; font-size: 4.61cqw; line-height: .85; letter-spacing: -.03em; text-wrap: balance; }
+  .slide h2.long { font-size: 4.05cqw; }
+  .slide h2 em { font-family: 'BrandSerif', 'Times New Roman', serif; font-style: italic; font-weight: 700; font-size: 1.0625em; letter-spacing: -.01em; line-height: 1; }
+  .slide .go { position: absolute; left: 9.23%; top: 77.42%; min-width: 18.17%; height: 9.21%; padding: 0 2.2%; border-radius: 999px; background: #fff; color: #2e2e2e; font-weight: 600; font-size: 1.88cqw; letter-spacing: -.03em; display: flex; align-items: center; justify-content: center; text-decoration: none; white-space: nowrap; box-shadow: 0 6px 18px rgba(80,0,30,.18); }
+  .slide-head { position: absolute; z-index: 3; left: 0; right: 0; top: 0; height: 21.44%; display: flex; align-items: center; justify-content: space-between; padding: 0 7.02% 0 9.16%; pointer-events: none; }
+  .slide-head img { width: 16%; height: auto; }
+  .burger { pointer-events: auto; width: 4.55%; min-width: 30px; aspect-ratio: 315 / 222; border: 0; background: none; padding: 0; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
+  .burger i { display: block; height: 18.9%; border-radius: 99px; background: var(--pink); }
+  .dots-h { position: absolute; z-index: 3; left: 0; right: 0; bottom: 3.2%; display: flex; justify-content: center; gap: 8px; }
+  .dots-h button { width: 9px; height: 9px; border-radius: 50%; border: 0; padding: 0; background: rgba(255,255,255,.55); cursor: pointer; transition: width .25s; }
+  .dots-h button[aria-current="true"] { width: 26px; border-radius: 5px; background: #fff; }
+  /* Telefon: tik karta */
+  @container (max-width: 699px) {
+    .slides-h { border-radius: 24px; }
+    .slide { aspect-ratio: 4 / 5.1; background: linear-gradient(#fff 0 15%, var(--pink) 15%); }
+    .slide-head { height: 15%; padding: 0 6%; }
+    .slide-head img { width: 38%; }
+    .burger { width: 10%; min-width: 0; }
+    .slide h2 { left: 7%; top: 21%; width: 82%; font-size: 10.4cqw; line-height: .88; }
+    .slide h2.long { font-size: 8.4cqw; width: 86%; }
+    .slide .q { width: 19%; }
+    .slide .q1 { left: 2%; top: 17.5%; }
+    .slide .q2 { left: auto; right: 3%; top: 17.5%; }
+    .slide .person { left: 22%; top: 38%; width: 82%; height: 62%; object-position: 70% 100%; }
+    .slide .bg { left: 18%; top: 44%; width: 82%; height: 34%; }
+    .slide .go { left: 7%; top: auto; bottom: 8%; height: 10%; min-width: 0; padding: 0 6.5%; font-size: 4.3cqw; }
+    .dots-h { bottom: 2.6%; }
+  }
+  .clients-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 16px 0 0; font-size: 15px; color: #4b464e; }
+  .clients-row b { font-size: 22px; color: var(--ink); }
+  .clients-row .faces { display: flex; }
+  .clients-row .faces i { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--bg); margin-left: -7px; background: var(--paper); }
+  .clients-row .faces i:first-child { margin-left: 0; background: #f6b7cf; } .clients-row .faces i:nth-child(2) { background: #ffd9a8; }
+
+  /* ---------- Menyu ---------- */
+  .drawer-bg { position: fixed; inset: 0; z-index: 70; background: rgba(30,10,20,.45); opacity: 0; transition: opacity .2s; }
+  .drawer { position: fixed; z-index: 71; top: 0; right: 0; bottom: 0; width: min(340px, 86vw); background: var(--surface); transform: translateX(100%); transition: transform .25s ease-out; display: flex; flex-direction: column; padding: 18px 20px calc(20px + env(safe-area-inset-bottom)); overflow-y: auto; }
+  .drawer.open { transform: none; } .drawer-bg.open { opacity: 1; }
+  .drawer .dh { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .drawer .dh img { height: 34px; width: auto; }
+  .drawer .x { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--bg); font-size: 24px; line-height: 1; }
+  .drawer nav a { display: flex; align-items: center; justify-content: space-between; padding: 14px 4px; border-bottom: 1px solid var(--line); text-decoration: none; font-size: 17px; font-weight: 500; }
+  .drawer nav a .count2 { background: var(--pink); color: #fff; border-radius: 10px; font-size: 12px; font-weight: 700; padding: 1px 8px; }
+  .drawer .lbl { margin: 22px 0 8px; font-size: 13px; color: var(--muted); }
+  .drawer .langs { background: var(--bg); align-self: flex-start; }
+  .drawer .langs button { color: var(--muted); padding: 7px 14px; font-size: 14px; }
+  .drawer .langs button[aria-pressed="true"] { background: var(--surface); color: var(--pink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .drawer .socials { justify-content: flex-start; }
 
   /* ---------- Tovarlar ---------- */
   .section-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 28px 0 12px; }
@@ -402,8 +429,8 @@
     var AP = "['ʻʼ`’‘]";
     var map = { a: 'а', b: 'б', d: 'д', f: 'ф', g: 'г', h: 'ҳ', i: 'и', j: 'ж', k: 'к', l: 'л', m: 'м', n: 'н', o: 'о',
       p: 'п', q: 'қ', r: 'р', s: 'с', t: 'т', u: 'у', v: 'в', x: 'х', y: 'й', z: 'з', c: 'с', w: 'в' };
-    var re = new RegExp('(o' + AP + '|g' + AP + '|sh|ch|yo(?!' + AP + ')|yu|ya|ye|' + AP + '|[a-z])', 'gi');
-    var vowels = /[aeiouаеиоуэёюяў]/i;
+    var re = new RegExp('(o' + AP + '|g' + AP + '|sh|ch|yo(?!' + AP + ')|yu|ya|ye|' + AP + '|[a-zöğşç])', 'gi');
+    var vowels = /[aeiouöаеиоуэёюяў]/i;
     var out = '', prev = '';
     var i = 0;
     while (i < str.length) {
@@ -411,8 +438,10 @@
       var m = re.exec(str);
       if (!m || m.index !== i) { out += str[i]; prev = str[i]; i++; continue; }
       var tok = m[0], low = tok.toLowerCase().replace(new RegExp(AP, 'g'), "'"), res;
-      if (low === "o'") res = 'ў';
-      else if (low === "g'") res = 'ғ';
+      if (low === "o'" || low === 'ö') res = 'ў';
+      else if (low === "g'" || low === 'ğ') res = 'ғ';
+      else if (low === 'ş') res = 'ш';
+      else if (low === 'ç') res = 'ч';
       else if (low === "'") res = 'ъ';
       else if (low === 'sh') res = 'ш';
       else if (low === 'ch') res = 'ч';
@@ -420,7 +449,7 @@
       else if (low === 'yu') res = 'ю';
       else if (low === 'ya') res = 'я';
       else if (low === 'ye') res = 'е';
-      else if (low === 'e') res = (!prev || !/[a-zа-яёўқғҳ]/i.test(prev) || vowels.test(prev)) ? 'э' : 'е';
+      else if (low === 'e') res = (!prev || !/[a-zöğşçа-яёўқғҳ]/i.test(prev) || vowels.test(prev)) ? 'э' : 'е';
       else res = map[low] || tok;
       if (tok[0] !== tok[0].toLowerCase()) {
         var allUp = tok.length > 1 && tok.replace(new RegExp(AP, 'g'), '') === tok.replace(new RegExp(AP, 'g'), '').toUpperCase();
@@ -434,50 +463,51 @@
 
   var T = {
     uz: {
-      title: "Musavvir Print — do'kon",
-      nav_home: 'Bosh sahifa', nav_cart: 'Savat', nav_admin: 'Adminga yozish',
-      each: 'Donasi', total: 'Jami', som: "so'm", left: 'Yana {n} ta', free_short: 'bepul 🚚',
-      free_badge: 'Tabriklaymiz! Yetkazib berish bepul 🚚', how_many: 'Nechta rasm?',
-      add_cart: "Savatga qo'shish", update_cart: 'Savatni yangilash', in_cart: 'Savatda: {n} ta',
-      remove: 'Olib tashlash', added: "Savatga qo'shildi", updated: 'Savat yangilandi',
-      other_formats: "Polaroid va boshqa o'lchamlar — {a}adminga yozing{b}.",
-      products: 'Fotokniga, albom va boshqalar', count: '{n} ta', search: 'Qidirish…',
-      demo: "Bu sinov ko'rinishi: tovarlar namuna sifatida qo'yilgan. Admin paneldan haqiqiy tovarlar kiritilgach, ular ko'rinadi.",
-      not_found: "«{q}» bo'yicha hech narsa topilmadi", empty_shop: "Hozircha tovar yo'q", load_err: 'Tovarlar yuklanmadi',
-      load_err_t: 'Internetni tekshirib, sahifani yangilang.',
-      from: '{p}dan', bundle: "To'plam", back: '‹ Orqaga', not_avail: 'Bu tovar topilmadi', not_avail_t: "U sotuvdan olingan bo'lishi mumkin.",
-      choose: 'Tanlang', extras: "Qo'shimcha", to_cart: 'Savatga', go_cart: "Savatga o'tish",
-      bundle_note: 'Ichida {n} ta 10x15 rasm bor. Rasmlarni buyurtmadan keyin Telegram orqali yuborasiz.',
-      cart: 'Savat', cart_empty: "Savat bo'sh", cart_empty_t: 'Rasm sonini hisoblang yoki fotokniga, albom tanlang.', to_shop: "Bosh sahifaga o'tish",
-      print_line: '{f} rasm chop etish', change: "O'zgartirish", gone: 'Tovar sotuvdan olingan', gone_t: 'Buyurtma berish uchun uni olib tashlang.',
-      free_ok: 'BTS orqali yetkazish bepul', free_need: 'Bepul yetkazish uchun yana {n} ta rasm kerak. Hozir yetkazish pullik.',
-      order: 'Buyurtma berish', phone: 'Telefon raqam', addr: 'Manzil yoki lokatsiya', addr_ph: 'Viloyat, shahar/tuman',
-      loc: 'Lokatsiya', loc_wait: 'Kuting…', loc_ok: 'Olindi', bts: "Eng yaqin BTS filialini o'zimiz tanlab, sizga qo'ng'iroq qilamiz.",
+      title: "Musavvir Print — dökon",
+      nav_home: 'Boş sahifa', nav_cart: 'Savat', nav_admin: 'Adminga yoziş',
+      each: 'Donasi', total: 'Jami', som: "söm", left: 'Yana {n} ta', free_short: 'bepul 🚚',
+      free_badge: 'Tabriklaymiz! Yetkazib beriş bepul 🚚', how_many: 'Neçta rasm?',
+      add_cart: "Savatga qöşiş", update_cart: 'Savatni yangilaş', in_cart: 'Savatda: {n} ta',
+      remove: 'Olib taşlaş', added: "Savatga qöşildi", updated: 'Savat yangilandi',
+      other_formats: "Polaroid va boşqa ölçamlar — {a}adminga yozing{b}.",
+      products: 'Fotokniga, albom va boşqalar', count: '{n} ta', search: 'Qidiriş…',
+      demo: "Bu sinov körinişi: tovarlar namuna sifatida qöyilgan. Admin paneldan haqiqiy tovarlar kiritilgaç, ular körinadi.",
+      not_found: "«{q}» böyiça heç narsa topilmadi", empty_shop: "Hozirça tovar yöq", load_err: 'Tovarlar yuklanmadi',
+      load_err_t: 'Internetni tekşirib, sahifani yangilang.',
+      from: '{p}dan', bundle: "Töplam", back: '‹ Orqaga', not_avail: 'Bu tovar topilmadi', not_avail_t: "U sotuvdan olingan bölişi mumkin.",
+      choose: 'Tanlang', extras: "Qöşimça", to_cart: 'Savatga', go_cart: "Savatga ötiş",
+      bundle_note: 'Içida {n} ta 10x15 rasm bor. Rasmlarni buyurtmadan keyin Telegram orqali yuborasiz.',
+      cart: 'Savat', cart_empty: "Savat böş", cart_empty_t: 'Rasm sonini hisoblang yoki fotokniga, albom tanlang.', to_shop: "Boş sahifaga ötiş",
+      print_line: '{f} rasm çop etiş', change: "Özgartiriş", gone: 'Tovar sotuvdan olingan', gone_t: 'Buyurtma beriş uçun uni olib taşlang.',
+      free_ok: 'BTS orqali yetkaziş bepul', free_need: 'Bepul yetkaziş uçun yana {n} ta rasm kerak. Hozir yetkaziş pullik.',
+      order: 'Buyurtma beriş', phone: 'Telefon raqam', addr: 'Manzil yoki lokatsiya', addr_ph: 'Viloyat, şahar/tuman',
+      loc: 'Lokatsiya', loc_wait: 'Kuting…', loc_ok: 'Olindi', bts: "Eng yaqin BTS filialini özimiz tanlab, sizga qönğiroq qilamiz.",
       send_photos_after: 'Rasmlaringizni buyurtmadan keyin Telegram orqali yuborasiz.',
-      e_phone: "Telefon raqamini to'liq kiriting: 9 ta raqam.", e_addr: 'Manzilni yozing yoki lokatsiya tugmasini bosing.',
-      e_loc: "Joylashuvni olib bo'lmadi. Manzilni yozib qoldiring — shu yetarli.", e_net: "Internet bilan muammo. Qaytadan urinib ko'ring.",
+      e_phone: "Telefon raqamini töliq kiriting: 9 ta raqam.", e_addr: 'Manzilni yozing yoki lokatsiya tugmasini bosing.',
+      e_loc: "Joylaşuvni olib bölmadi. Manzilni yozib qoldiring — şu yetarli.", e_net: "Internet bilan muammo. Qaytadan urinib köring.",
       sending: 'Yuborilmoqda…',
-      done: 'Buyurtmangiz{n} qabul qilindi', done_t: "Tez orada siz bilan bog'lanamiz.",
-      done_photos: "Endi rasmlaringizni adminga Telegramda yuboring — xabar tayyor, faqat «Yuborish»ni bosing.",
-      done_msg: "Endi adminga Telegramda yozing — xabar tayyor, faqat «Yuborish»ni bosing.",
-      msg_title: 'Adminga boradigan xabar', write_tg: 'Telegramda adminga yozish', copy: 'Matnni nusxalash', copied: 'Nusxalandi',
-      ig: 'Instagram', home: "Bosh sahifaga qaytish",
+      done: 'Buyurtmangiz{n} qabul qilindi', done_t: "Tez orada siz bilan boğlanamiz.",
+      done_photos: "Endi rasmlaringizni adminga Telegramda yuboring — xabar tayyor, faqat «Yuboriş»ni bosing.",
+      done_msg: "Endi adminga Telegramda yozing — xabar tayyor, faqat «Yuboriş»ni bosing.",
+      msg_title: 'Adminga boradigan xabar', write_tg: 'Telegramda adminga yoziş', copy: 'Matnni nusxalaş', copied: 'Nusxalandi',
+      ig: 'Instagram', home: "Boş sahifaga qaytiş",
       m_hello: 'Assalomu alaykum! Saytda buyurtma berdim{n}.', m_total: 'Jami: {s}', m_phone: 'Telefon: {p}',
-      m_photos: 'Rasmlarimni yuboryapman.', m_free: 'Yetkazish: bepul', pcs: 'ta',
-      foot: 'Esdalik rasmlaringizni sifatli chop etamiz', tg: 'Telegram kanal', yt: 'YouTube', admin: 'Adminga yozish',
+      m_photos: 'Rasmlarimni yuboryapman.', m_free: 'Yetkaziş: bepul', pcs: 'ta',
+      foot: 'Esdalik rasmlaringizni sifatli çop etamiz', tg: 'Telegram kanal', yt: 'YouTube', admin: 'Adminga yoziş',
       slogan: 'Esdaliklaringiz telefonda qolib ketmasin', clients: 'mamnun mijoz',
-      calc_cta: 'Rasm narxini hisoblash', calc_cta_sub: '10x15 — {p} so\'mdan',
-      news_tag: 'YANGI', news: "Butun O'zbekiston bo'ylab yetkazib beramiz", news_sub: "BTS orqali — sizga eng yaqin filialgacha",
-      perks: 'Nega aynan biz', p1: "Butun O'zbekiston bo'ylab", p1t: "BTS orqali har bir viloyatga yetkazamiz",
-      p2: 'RC fotoqog\'oz', p2t: 'Rangi yorqin, sifatli va uzoq saqlanadi', p3: 'Tez tayyorlaymiz',
-      p4: 'Qulay narx', p4t: '10x15 rasm {p} so\'mdan. Ko\'p olsangiz — arzonroq',
-      how: 'Qanday buyurtma beriladi', s1: 'Hisoblang va buyurtma bering', s1t: 'Rasm sonini kiriting, xohlasangiz albom yoki ramka qo\'shing',
-      s2: 'Rasmlarni Telegramda yuboring', s2t: 'Buyurtmadan keyin adminga tayyor xabar ochiladi',
-      s3: 'BTS filialidan oling', s3t: 'Eng yaqin filialni o\'zimiz tanlab, qo\'ng\'iroq qilamiz',
-      reviews: 'Mijozlarimiz fikri', reviews_sub: '{n} mijozlarimizdan ba\'zi fikrlar', on_ig: 'Instagramda ko\'rish', close: 'Yopish',
-      rv_demo: 'Namuna joy — fikr videolari va skrinshotlarni admin paneldan yuklaysiz',
-      calc_title: 'Rasm narxini hisoblash', go_cart2: "Savatga o'tish", add_more: "Albom, ramka qo'shish",
-      play: 'Videoni ochish', open_img: 'Kattalashtirish'
+      calc_cta: 'Rasm narxini hisoblaş', calc_cta_sub: '10x15 — {p} sömdan',
+      news_tag: 'YANGI', news: "Butun Özbekiston böylab yetkazib beramiz", news_sub: "BTS orqali — sizga eng yaqin filialgaça",
+      perks: 'Nega aynan biz', p1: "Butun Özbekiston böylab", p1t: "BTS orqali har bir viloyatga yetkazamiz",
+      p2: 'RC fotoqoğoz', p2t: 'Rangi yorqin, sifatli va uzoq saqlanadi', p3: 'Tez tayyorlaymiz',
+      p4: 'Qulay narx', p4t: '10x15 rasm {p} sömdan. Köp olsangiz — arzonroq',
+      how: 'Qanday buyurtma beriladi', s1: 'Hisoblang va buyurtma bering', s1t: 'Rasm sonini kiriting, xohlasangiz albom yoki ramka qöşing',
+      s2: 'Rasmlarni Telegramda yuboring', s2t: 'Buyurtmadan keyin adminga tayyor xabar oçiladi',
+      s3: 'BTS filialidan oling', s3t: 'Eng yaqin filialni özimiz tanlab, qönğiroq qilamiz',
+      reviews: 'Mijozlarimiz fikri', reviews_sub: '{n} mijozlarimizdan ba\'zi fikrlar', on_ig: 'Instagramda köriş', close: 'Yopiş',
+      rv_demo: 'Namuna joy — fikr videolari va skrinşotlarni admin paneldan yuklaysiz',
+      calc_title: 'Rasm narxini hisoblaş', go_cart2: "Savatga ötiş", add_more: "Albom, ramka qöşiş",
+      play: 'Videoni oçiş', open_img: 'Kattalaştiriş',
+      menu: 'Menyu', lang_lbl: 'Til', follow: 'Bizni kuzating', slide_n: '{n}-slayd'
     },
     ru: {
       title: 'Musavvir Print — магазин',
@@ -523,10 +553,11 @@
       reviews: 'Отзывы клиентов', reviews_sub: 'Немного отзывов от {n} наших клиентов', on_ig: 'Смотреть в Instagram', close: 'Закрыть',
       rv_demo: 'Место для примера — видео и скриншоты отзывов загрузите в админ-панели',
       calc_title: 'Расчёт печати фото', go_cart2: 'Перейти в корзину', add_more: 'Добавить альбом, рамку',
-      play: 'Открыть видео', open_img: 'Увеличить'
+      play: 'Открыть видео', open_img: 'Увеличить',
+      menu: 'Меню', lang_lbl: 'Язык', follow: 'Мы в соцсетях', slide_n: 'Слайд {n}'
     }
   };
-  var LANGS = [['uz', "Oʻz"], ['uzc', 'Ўз'], ['ru', 'Ру']];
+  var LANGS = [['uz', 'Öz'], ['uzc', 'Ўз'], ['ru', 'Ру']];
   var store = {
     get: function (k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
     set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -579,6 +610,7 @@
 
   // ================= Holat =================
   var products = [], calcs = [], announcements = [], reviews = [];
+  var slides = [];
   var site = { clients: '250+', speed: "Buyurtmangizni kechiktirmay chop etib, jo'natamiz", speed_ru: 'Печатаем и отправляем без задержек', hero_image: '' };
   var demo = false, loaded = false, loadError = '';
   var query = '';
@@ -681,6 +713,7 @@
         calcs = d.calculators || [];
         reviews = d.reviews || [];
         if (d.site) site = d.site;
+        slides = d.slides || [];
         announcements = d.announcements || [];
         if (!calcById(calcId) && calcs[0]) calcId = calcs[0].id;
         demo = !!d.demo; loaded = true;
@@ -792,7 +825,6 @@
     return html + '<div class="grid">' + list.map(cardHTML).join('') + '</div>';
   }
 
-  var UZ_MAP = '<svg viewBox="0 0 200 130" aria-hidden="true"><path fill="#fff" fill-opacity=".95" d="M174.5,51.3L174.9,51.0L175.5,50.7L176.6,51.3L177.6,51.9L177.8,52.3L177.8,52.6L175.5,53.9L174.1,54.6L173.4,54.7L173.3,54.9L172.8,56.3L171.9,56.6L170.8,57.1L170.0,57.8L168.7,59.4L165.6,61.8L165.5,62.3L165.8,62.7L166.8,63.0L168.2,63.7L169.0,64.3L171.0,63.5L171.5,63.7L172.0,64.4L172.6,66.6L173.5,67.2L174.7,67.6L175.4,67.8L176.4,68.3L177.7,68.5L178.6,68.3L179.7,68.8L179.9,68.6L180.0,65.4L180.9,65.9L181.5,65.9L181.9,65.5L182.2,65.0L182.3,63.9L182.1,62.9L182.5,62.4L182.8,62.3L183.1,62.4L183.2,62.7L183.3,63.6L183.9,64.0L184.4,64.3L184.7,65.1L185.1,65.8L185.4,67.6L186.3,67.8L187.4,68.1L188.1,67.8L188.7,68.0L188.9,68.8L188.8,69.6L188.9,70.3L189.2,70.4L190.2,70.0L191.0,70.0L191.7,70.4L192.7,70.9L194.0,72.5L194.4,72.7L196.4,72.8L196.9,73.1L197.6,73.1L198.3,72.8L200.0,73.3L200.0,73.6L199.7,74.0L195.8,76.1L195.5,76.7L194.7,77.6L193.8,78.0L193.4,78.0L191.4,77.2L191.2,77.4L191.1,77.7L191.1,78.1L191.5,79.0L191.3,79.6L190.9,80.0L189.7,79.6L189.5,79.4L189.5,79.1L189.0,79.1L188.3,79.4L186.9,80.9L186.4,81.7L186.2,82.2L185.6,82.4L184.9,82.5L184.1,83.3L183.2,83.8L182.9,83.4L182.7,82.9L182.4,82.8L181.9,82.9L181.2,82.9L180.4,82.4L179.5,81.9L178.6,81.7L176.2,82.0L175.0,82.2L174.6,82.5L173.9,82.5L171.1,83.1L170.5,82.9L170.0,82.0L169.7,81.1L168.9,80.8L168.1,80.6L167.8,80.2L167.7,79.8L167.9,79.4L167.9,79.1L169.8,77.5L171.6,75.9L171.8,75.8L171.9,75.5L172.2,75.0L172.2,74.7L170.9,74.1L170.8,73.8L171.1,73.5L171.1,73.1L170.2,72.0L168.6,70.3L168.1,70.1L167.8,70.2L167.1,71.9L166.9,72.3L165.1,73.4L163.5,74.2L160.8,75.6L160.1,76.0L159.6,75.9L159.1,75.6L157.6,74.3L156.6,73.8L155.9,74.3L155.4,74.9L155.4,76.3L154.8,77.0L154.2,77.4L155.3,81.1L155.2,81.6L154.4,81.7L155.0,83.1L154.4,83.3L153.1,82.9L151.2,82.7L147.7,83.3L147.5,83.6L147.4,83.9L147.6,84.2L149.3,84.2L151.0,84.0L151.4,84.3L151.5,84.8L151.3,85.1L150.7,85.1L149.5,85.4L149.4,85.7L149.3,86.0L149.7,86.8L150.2,87.3L150.3,87.6L150.1,87.9L149.8,88.0L149.4,87.6L149.2,87.7L149.1,88.0L149.0,88.4L148.7,88.7L148.1,88.5L147.6,88.7L147.3,90.2L147.0,91.8L146.0,93.0L145.5,93.4L144.8,93.5L143.7,93.3L143.0,93.2L141.1,92.9L139.1,92.5L136.9,92.0L134.8,93.0L134.2,93.6L133.8,94.2L133.5,94.5L132.6,97.9L132.7,98.3L133.2,98.6L135.7,99.3L136.1,99.6L136.3,100.0L136.4,101.6L136.6,101.8L137.4,102.0L138.7,102.0L139.7,101.8L140.7,101.9L141.3,102.3L141.7,102.8L141.9,103.4L140.7,106.8L140.8,108.1L141.1,109.8L141.8,111.2L143.1,112.6L144.0,113.5L144.2,113.9L144.3,114.6L144.1,115.4L143.6,116.7L142.9,117.8L142.2,118.3L141.2,119.8L140.3,121.5L138.5,123.9L138.0,125.2L137.8,128.9L137.3,130.0L137.3,129.6L136.6,129.2L135.6,129.3L134.8,129.0L134.5,128.6L133.6,128.7L132.2,129.5L130.8,129.1L129.3,127.5L126.5,126.9L122.9,127.3L122.8,125.6L122.8,123.4L123.0,120.5L124.1,118.2L124.1,117.8L123.9,117.4L123.5,117.0L121.4,116.4L120.7,116.1L119.9,115.4L118.9,114.6L117.9,114.1L116.5,113.4L115.2,113.0L114.4,113.3L113.7,113.7L113.0,113.7L112.3,113.5L109.8,111.8L106.1,108.8L103.1,106.8L101.2,105.8L100.8,105.5L99.7,104.5L97.1,102.0L95.4,102.4L93.0,100.8L90.7,99.2L90.3,98.8L87.8,95.8L85.3,93.9L82.5,91.9L80.8,90.6L77.8,88.4L76.4,87.0L75.9,86.6L75.4,85.6L74.6,81.0L73.7,78.9L72.4,77.8L71.3,75.6L70.4,72.3L69.7,70.2L69.1,69.2L67.9,68.1L66.1,66.9L64.4,66.4L63.7,66.4L63.4,66.5L63.1,66.8L62.4,67.6L61.4,67.7L60.7,67.7L60.0,67.4L57.8,67.1L57.0,66.8L55.7,66.8L52.9,67.3L52.2,67.2L49.3,65.3L48.0,64.5L47.7,64.0L47.7,63.3L48.1,62.2L48.5,61.5L48.3,60.6L47.8,59.8L47.8,58.9L48.2,58.4L49.0,58.5L49.3,58.2L49.1,57.7L48.7,57.4L48.2,56.6L46.5,55.9L46.2,55.6L46.3,55.2L46.6,54.9L46.7,54.1L46.7,53.1L46.9,52.6L47.0,52.2L46.7,51.9L46.2,51.5L45.3,50.6L44.1,50.5L40.5,50.5L39.4,50.1L38.5,49.6L37.6,47.7L37.1,47.2L36.7,47.0L35.7,47.0L34.4,46.8L33.8,46.4L32.1,44.6L30.5,43.1L29.8,44.6L29.2,44.9L27.7,44.7L26.6,44.5L26.0,44.8L25.4,45.4L25.5,45.8L26.0,46.2L27.0,47.0L28.5,48.9L29.2,49.9L29.2,50.2L29.1,50.5L28.9,50.6L28.6,50.6L28.2,50.6L28.0,50.3L27.9,49.8L27.4,49.0L26.9,48.5L26.3,48.2L25.5,48.0L24.5,47.6L23.9,47.6L23.4,48.0L22.9,48.6L22.7,50.0L21.9,51.6L21.4,52.2L19.9,52.6L16.4,52.7L15.3,53.2L14.6,53.8L13.3,55.8L12.3,56.5L11.5,57.4L11.7,60.3L12.2,63.7L12.8,64.6L13.3,64.9L13.3,65.2L13.0,65.5L12.7,65.9L12.2,66.6L11.5,66.5L10.3,66.4L9.3,66.2L5.9,66.0L3.1,65.8L0.0,65.7L0.0,62.1L0.0,58.5L0.0,55.0L0.0,51.4L0.0,47.9L0.0,44.3L0.0,40.7L0.0,37.2L0.0,33.6L0.0,30.1L0.0,26.5L0.0,22.9L0.0,19.4L0.0,15.8L0.0,12.3L0.0,8.7L1.5,8.2L3.3,7.7L5.1,7.2L7.1,6.5L9.5,5.8L11.5,5.2L13.9,4.5L15.8,3.9L17.5,3.4L19.7,2.7L23.2,1.8L25.0,1.3L27.0,0.7L28.8,0.2L30.1,0.0L31.4,0.7L33.0,1.8L34.6,2.8L36.2,3.8L37.8,4.8L39.4,5.8L41.1,6.9L42.7,7.9L44.3,8.9L45.9,9.9L47.5,10.9L49.1,12.0L50.7,13.0L52.3,14.0L53.9,15.0L55.5,16.1L57.1,17.1L58.7,18.0L59.3,18.7L59.7,20.3L60.4,21.5L61.7,22.8L63.1,24.2L64.7,26.0L65.8,27.3L67.0,28.6L68.9,30.7L70.1,32.0L71.1,32.0L73.0,31.7L75.6,31.3L77.6,31.0L80.1,30.6L82.4,30.2L84.3,29.9L87.1,30.1L89.8,30.4L91.8,30.5L93.7,30.7L96.0,30.9L97.2,31.0L98.7,31.1L99.3,30.8L100.6,30.1L101.7,29.5L103.0,28.9L104.1,28.5L105.2,29.6L106.1,30.7L107.2,32.0L108.3,33.2L109.5,33.9L111.0,34.8L111.8,36.5L113.0,38.6L113.7,40.1L114.5,41.6L115.7,41.0L116.9,40.3L118.0,39.8L117.9,41.6L117.7,43.2L117.6,45.8L117.4,47.8L117.0,50.3L117.0,52.1L117.0,53.8L116.9,55.1L119.1,55.1L120.7,55.2L122.6,55.2L122.8,56.9L123.1,59.2L123.5,61.2L123.9,63.0L124.4,65.3L124.6,66.5L125.1,67.9L125.6,68.2L126.3,68.5L128.9,68.3L131.1,68.1L132.8,68.0L134.6,67.9L137.1,67.8L137.9,68.1L138.6,67.9L139.4,67.6L140.0,68.6L140.4,69.2L140.8,69.7L141.5,70.2L141.2,71.3L140.8,72.8L140.7,73.6L141.4,74.5L142.0,75.0L143.5,76.0L145.0,76.6L145.9,76.7L146.8,76.5L147.1,75.9L147.1,75.1L146.6,74.3L146.7,73.3L146.9,72.6L147.8,71.3L148.7,70.0L150.1,68.8L151.6,67.5L152.3,66.6L152.5,65.0L153.6,64.1L154.7,63.5L156.1,63.0L156.5,62.3L158.4,60.9L159.5,60.2L161.0,59.8L163.0,59.0L164.5,57.9L166.1,56.0L167.3,54.7L168.3,53.9L169.2,53.9L169.8,54.5L170.3,54.6L170.6,54.3L171.2,53.5L171.8,52.5L172.4,52.1L173.5,51.9L174.5,51.3ZM171.1,71.6L171.0,71.3L170.7,70.6L170.1,70.3L169.9,70.4L170.1,70.9L170.7,71.7L171.1,71.6ZM177.5,87.8L176.9,88.0L175.8,88.0L175.2,87.8L175.6,86.6L175.6,86.3L175.6,86.3L175.3,86.1L174.8,85.6L174.7,84.8L174.8,84.1L175.2,83.8L175.4,83.9L176.0,84.9L176.6,85.3L177.8,85.4L177.2,86.5L177.6,87.6L177.5,87.8ZM184.2,87.0L183.9,87.6L183.3,87.4L182.9,87.0L183.1,86.7L183.7,86.5L184.0,86.3L184.3,86.3L184.2,87.0Z"/><circle cx="150" cy="79" r="5" fill="#e5005c" stroke="#fff" stroke-width="2"/></svg>';
   var PI = {
     truck: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z"/><circle cx="6.5" cy="17.5" r="1.8" fill="#fff"/><circle cx="17" cy="17.5" r="1.8" fill="#fff"/></svg>',
     paper: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1.5"/><rect x="7" y="6" width="10" height="9"/><path d="m7 15 3-3 2 2 2-2 3 3"/></svg>',
@@ -804,20 +836,110 @@
     if (!c || !c.tiers.length) return '1 500';
     return fmt(Math.min.apply(null, c.tiers.map(function (x) { return x.price; })));
   }
-  function heroHTML() {
-    var art = site.hero_image
-      ? '<div class="art"><div class="photo"><img src="' + esc(site.hero_image) + '" alt=""></div></div>'
-      : '<div class="art" aria-hidden="true"><div class="phone"><div class="scr2">' + '<i></i>'.repeat(8) + '</div></div>' +
-        '<div class="pol p1"><i></i></div><div class="pol p2"><i></i></div><div class="pol p3"><i></i></div></div>';
-    return '<section class="hero"><div class="wrap">' +
-      '<div class="bar"><img src="/dokon/logo-white.png" alt="Musavvir Print" width="125" height="40"><div class="langs" data-langs>' + langsHTML() + '</div></div>' +
-      '<div class="hero-grid"><div>' +
-        '<h1>' + esc(t('slogan')) + '</h1>' +
-        '<div class="clients"><span class="faces" aria-hidden="true"><i></i><i></i><i></i></span><span><b>' + esc(site.clients || '250+') + '</b> ' + esc(t('clients')) + '</span></div>' +
-        '<a class="retro-btn cta" href="#/hisoblash"><span>' + esc(t('calc_cta')) + '<small>' + esc(t('calc_cta_sub', { p: lowestPrint() })) + '</small></span></a>' +
-      '</div>' + art + '</div></div></section>' +
-      '<div class="news"><div class="wrap">' + UZ_MAP + '<div><span class="tag">' + esc(t('news_tag')) + '</span><p>' + esc(t('news')) + '<small>' + esc(t('news_sub')) + '</small></p></div></div></div>';
+  // Matndagi *so'z* → Times kursiv
+  function richTitle(txt) {
+    return esc(txt).replace(/\*([^*]+)\*/g, '<em>$1</em>');
   }
+  function slideHref(x) {
+    if (x.link === 'products') return '#/';
+    if (x.link === 'telegram') return LINKS.admin;
+    if (x.link === 'url' && x.url) return x.url;
+    return '#/hisoblash';
+  }
+  function heroHTML() {
+    var list = slides;
+    if (!list.length) return '';
+    var Q = '<img class="q q1" src="/dokon/hero/quote.png" alt="" aria-hidden="true"><img class="q q2" src="/dokon/hero/quote.png" alt="" aria-hidden="true">';
+    var items = list.map(function (x, i) {
+      var title = lang === 'ru' ? (x.title_ru || x.title) : lang === 'uzc' ? toCyr(x.title) : x.title;
+      var btn = lang === 'ru' ? (x.btn_ru || x.btn) : lang === 'uzc' ? toCyr(x.btn) : x.btn;
+      var href = slideHref(x), ext = /^https?:/.test(href);
+      return '<div class="slide" role="group" aria-roledescription="slide" aria-label="' + esc(t('slide_n', { n: i + 1 })) + '">' +
+                (x.bg ? '<img class="bg" src="' + esc(x.bg) + '" alt="" aria-hidden="true"' + (i ? ' loading="lazy"' : '') + '>' : '') +
+        '<img class="person" src="' + esc(x.img) + '" alt=""' + (i ? ' loading="lazy"' : ' fetchpriority="high"') + '>' + Q +
+        '<h2' + (title.replace(/\*/g, '').length > 42 ? ' class="long"' : '') + '>' + richTitle(title) + '</h2>' +
+        '<a class="go" href="' + esc(href) + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + (x.link === 'products' ? ' data-to-products' : '') + '>' + esc(btn) + '</a>' +
+      '</div>';
+    }).join('');
+    var dots = list.length > 1 ? '<div class="dots-h">' + list.map(function (_, i) {
+      return '<button type="button" data-dot="' + i + '" aria-label="' + esc(t('slide_n', { n: i + 1 })) + '"' + (i ? '' : ' aria-current="true"') + '></button>';
+    }).join('') + '</div>' : '';
+    return '<section class="slider-wrap"><div class="wrap"><div class="slider" aria-roledescription="carousel">' +
+      '<div class="slide-head"><img src="/dokon/hero/logo-musavvir.png" alt="Musavvir Print" width="800" height="226">' +
+      '<button type="button" class="burger" data-menu aria-label="' + esc(t('menu')) + '"><i></i><i></i><i></i></button></div>' +
+      '<div class="slides-h" id="slides-h">' + items + '</div>' + dots + '</div>' +
+      '<div class="clients-row"><span class="faces" aria-hidden="true"><i></i><i></i><i></i></span><span><b>' + esc(site.clients || '250+') + '</b> ' + esc(t('clients')) + '</span></div>' +
+      '</div></section>';
+  }
+  var slideTimer;
+  function wireSlider() {
+    clearInterval(slideTimer);
+    var track = $('#slides-h');
+    if (!track) return;
+    var n = track.children.length;
+    function current() { return Math.round(track.scrollLeft / track.clientWidth); }
+    function paintDots() {
+      var c = current();
+      document.querySelectorAll('[data-dot]').forEach(function (d, i) { if (i === c) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
+    }
+    function go(i) { track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' }); }
+    track.addEventListener('scroll', function () { requestAnimationFrame(paintDots); }, { passive: true });
+    var pausedUntil = 0;
+    function pause() { pausedUntil = Date.now() + 8000; }
+    document.querySelectorAll('[data-dot]').forEach(function (d) {
+      d.addEventListener('click', function () { pause(); go(+d.getAttribute('data-dot')); });
+    });
+    ['pointerdown', 'touchstart', 'wheel', 'focusin'].forEach(function (ev) { track.addEventListener(ev, pause, { passive: true }); });
+    if (n < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    slideTimer = setInterval(function () {
+      if (!document.body.contains(track)) { clearInterval(slideTimer); return; }
+      if (Date.now() < pausedUntil || document.hidden || $('.drawer.open') || $('.lightbox')) return;
+      go((current() + 1) % n);
+    }, 5000);
+  }
+
+  // ---- Menyu
+  function openMenu() {
+    var bg = document.createElement('div'); bg.className = 'drawer-bg';
+    var dr = document.createElement('aside'); dr.className = 'drawer'; dr.setAttribute('role', 'dialog'); dr.setAttribute('aria-modal', 'true'); dr.setAttribute('aria-label', t('menu'));
+    var n = cart.items.reduce(function (a, it) { return a + it.q; }, 0) + Object.keys(cart.calcs).filter(function (k) { return cart.calcs[k] > 0; }).length;
+    dr.innerHTML = '<div class="dh"><img src="/dokon/hero/logo-musavvir.png" alt="Musavvir Print"><button type="button" class="x" aria-label="' + esc(t('close')) + '">×</button></div>' +
+      '<nav><a href="#/hisoblash">' + esc(t('calc_title')) + '</a>' +
+      '<a href="#/" data-to-products>' + esc(t('products')) + '</a>' +
+      (reviews.length ? '<a href="#/" data-to-reviews>' + esc(t('reviews')) + '</a>' : '') +
+      '<a href="#/savat">' + esc(t('cart')) + (n ? '<span class="count2">' + n + '</span>' : '') + '</a></nav>' +
+      '<div class="lbl">' + esc(t('lang_lbl')) + '</div><div class="langs" data-langs>' + langsHTML() + '</div>' +
+      '<div class="lbl">' + esc(t('follow')) + '</div><div class="socials">' +
+      '<a class="tg" href="' + LINKS.tg + '" target="_blank" rel="noopener">' + ICON.tg + 'Telegram</a>' +
+      '<a class="ig" href="' + LINKS.ig + '" target="_blank" rel="noopener">' + ICON.ig + 'Instagram</a>' +
+      '<a class="yt" href="' + LINKS.yt + '" target="_blank" rel="noopener">' + ICON.yt + 'YouTube</a>' +
+      '<a class="ad" href="' + LINKS.admin + '" target="_blank" rel="noopener">' + ICON.ad + esc(t('admin')) + '</a></div>';
+    document.body.appendChild(bg); document.body.appendChild(dr);
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(function () { bg.classList.add('open'); dr.classList.add('open'); });
+    function close() {
+      bg.classList.remove('open'); dr.classList.remove('open'); document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKey);
+      setTimeout(function () { bg.remove(); dr.remove(); }, 250);
+    }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    document.addEventListener('keydown', onKey);
+    bg.addEventListener('click', close);
+    dr.addEventListener('click', function (e) {
+      if (e.target.closest('.x')) return close();
+      if (e.target.closest('[data-lang]')) return;
+      var a = e.target.closest('a'); if (!a) return;
+      var toP = a.hasAttribute('data-to-products'), toR = a.hasAttribute('data-to-reviews');
+      if (toP) pendingProducts = true;
+      if (toR) pendingReviews = true;
+      close();
+      if ((toP || toR) && (location.hash === '#/' || location.hash === '')) { e.preventDefault(); renderHome(); }
+    });
+    dr.querySelector('.x').focus();
+  }
+  var pendingReviews = false;
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-menu]')) openMenu(); });
+
   function perksHTML() {
     var speed = lang === 'ru' ? (site.speed_ru || site.speed) : lang === 'uzc' ? toCyr(site.speed) : site.speed;
     var items = [[PI.truck, t('p1'), t('p1t')], [PI.paper, t('p2'), t('p2t')], [PI.bolt, t('p3'), speed], [PI.tag, t('p4'), t('p4t', { p: lowestPrint() })]];
@@ -912,9 +1034,11 @@
     html += stepsHTML() + reviewsHTML() + '</div>' + footerHTML();
     view.innerHTML = html;
     wireReviews();
+    wireSlider();
     var q = $('#q');
     if (q) q.addEventListener('input', function () { query = q.value.trim().toLowerCase(); $('#plist').innerHTML = productsHTML(); });
     if (pendingProducts) { pendingProducts = false; setTimeout(function () { var el = $('#products'); if (el) el.scrollIntoView(); }, 0); }
+    if (pendingReviews) { pendingReviews = false; setTimeout(function () { var el = $('.reviews'); if (el) el.scrollIntoView(); }, 0); }
   }
   var pendingProducts = false;
 
