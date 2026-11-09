@@ -39,7 +39,7 @@
     #app > header .hrow { flex-wrap: wrap; height: auto; padding-top: 8px; padding-bottom: 8px; row-gap: 8px; }
     #app > header .out { margin-left: auto; }
     .tabs { order: 3; width: 100%; margin-left: 0; }
-    .tabs button { flex: 1; padding: 7px 4px; font-size: 14px; }
+    .tabs button { flex: 1; padding: 7px 2px; font-size: 13px; }
   }
   .tabs button[aria-selected="true"] { background: var(--surface); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
   .out { border: 0; background: none; color: var(--muted); padding: 8px 0 8px 4px; font-size: 14px; }
@@ -157,6 +157,14 @@
   .annrow { display: grid; grid-template-columns: 1fr auto 40px; gap: 6px 8px; align-items: center; }
   .annrow .ru { grid-column: 1 / 2; }
   .stack-list { display: grid; gap: 12px; }
+  .rrow { display: grid; grid-template-columns: 84px 1fr; gap: 12px; background: var(--surface); border-radius: 14px; padding: 10px; }
+  .rrow.off { opacity: .55; }
+  .rrow .m { width: 84px; aspect-ratio: 9/16; border-radius: 8px; overflow: hidden; background: #1d1d1d; position: relative; }
+  .rrow .m img, .rrow .m video { width: 100%; height: 100%; object-fit: cover; }
+  .rrow .m span { position: absolute; left: 4px; bottom: 4px; background: rgba(0,0,0,.6); color: #fff; font-size: 11px; padding: 1px 5px; border-radius: 4px; }
+  .rrow .fields { display: grid; gap: 8px; align-content: start; }
+  .rrow .fields input { padding: 8px 10px; font-size: 14px; }
+  .rrow .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .settings-save { position: sticky; bottom: 0; background: var(--bg); padding: 12px 0 16px; display: flex; gap: 12px; align-items: center; justify-content: flex-end; }
   .settings-save .err { flex: 1; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -190,6 +198,7 @@
       <div class="tabs" role="tablist">
         <button role="tab" id="tab-products" aria-selected="true">Tovarlar</button>
         <button role="tab" id="tab-orders" aria-selected="false">Buyurtmalar</button>
+        <button role="tab" id="tab-reviews" aria-selected="false">Fikrlar</button>
         <button role="tab" id="tab-settings" aria-selected="false">Sozlamalar</button>
       </div>
       <button class="out" id="logout" type="button">Chiqish</button>
@@ -211,8 +220,28 @@
       <div class="orders" id="olist"></div>
     </section>
 
+    <section id="reviews-view" hidden>
+      <div class="toolbar"><h1>Mijozlar fikri</h1>
+        <label class="btn" style="cursor:pointer">+ Fikr qo'shish<input type="file" id="rv-file" accept="video/mp4,video/quicktime,video/webm,image/*" hidden></label></div>
+      <p class="muted" style="margin:-4px 0 12px;font-size:14px">Video (50 MB gacha) yoki skrinshot. Saytning pastida aylanib turadi.</p>
+      <div id="rv-progress" class="notice" hidden></div>
+      <div class="stack-list" id="rlist"><p class="muted">Yuklanmoqda…</p></div>
+    </section>
+
     <section id="settings-view" hidden>
       <div class="toolbar"><h1>Sozlamalar</h1></div>
+      <div class="box" style="margin-bottom:14px">
+        <h3>Bosh sahifa</h3>
+        <label class="f">Mijozlar soni <small>slogan ostida chiqadi, masalan: 250+</small><input class="i" id="st-clients" maxlength="12" style="max-width:160px"></label>
+        <label class="f">«Tez tayyorlaymiz» matni<input class="i" id="st-speed" maxlength="90"></label>
+        <label class="f">Ruscha <small>ixtiyoriy</small><input class="i" id="st-speed-ru" maxlength="90"></label>
+        <div class="f">Bosh sahifa surati <small style="font-weight:400;color:var(--muted)">ixtiyoriy — bo'lmasa telefon va rasmlar chizmasi turadi</small>
+          <div style="display:flex;gap:12px;align-items:center;margin-top:6px">
+            <div id="st-hero-prev" style="width:80px;height:96px;border-radius:8px;background:var(--paper);overflow:hidden;display:grid;place-items:center;color:#b5ad9c"></div>
+            <div style="display:grid;gap:8px"><label class="btn light" style="cursor:pointer;height:38px">Surat tanlash<input type="file" id="st-hero-file" accept="image/*" hidden></label>
+            <button type="button" class="mini" id="st-hero-rm">Olib tashlash</button></div>
+          </div></div>
+      </div>
       <div class="box">
         <h3>Rasm chiqarish narxlari</h3>
         <p class="sub">Do'kondagi kalkulyator, Telegram bot va asosiy sahifa shu narxlardan foydalanadi. Har bir pog'ona: shu sondan boshlab 1 dona narxi.</p>
@@ -380,6 +409,9 @@
     $('#tab-products').setAttribute('aria-selected', which === 'products');
     $('#tab-orders').setAttribute('aria-selected', which === 'orders');
     $('#tab-settings').setAttribute('aria-selected', which === 'settings');
+    $('#tab-reviews').setAttribute('aria-selected', which === 'reviews');
+    $('#reviews-view').hidden = which !== 'reviews';
+    if (which === 'reviews') loadReviews();
     $('#products-view').hidden = which !== 'products';
     $('#orders-view').hidden = which !== 'orders';
     $('#settings-view').hidden = which !== 'settings';
@@ -389,6 +421,7 @@
   $('#tab-products').onclick = function () { tab('products'); };
   $('#tab-orders').onclick = function () { tab('orders'); };
   $('#tab-settings').onclick = function () { tab('settings'); };
+  $('#tab-reviews').onclick = function () { tab('reviews'); };
 
   // ===== Tovarlar ro'yxati =====
   function loadProducts() {
@@ -733,7 +766,17 @@
       return { text: el.querySelector('[data-a="text"]').value.trim(), text_ru: el.querySelector('[data-a="text_ru"]').value.trim(), on: el.querySelector('[data-a="on"]').checked };
     }).filter(function (a) { return a.text; });
   }
+  var heroImage = '';
+  function paintHero() {
+    $('#st-hero-prev').innerHTML = heroImage ? '<img src="' + esc(heroImage) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : PH;
+    $('#st-hero-rm').hidden = !heroImage;
+  }
   function paintSettings(st) {
+    var site = st.site || {};
+    $('#st-clients').value = site.clients || '';
+    $('#st-speed').value = site.speed || '';
+    $('#st-speed-ru').value = site.speed_ru || '';
+    heroImage = site.hero_image || ''; paintHero();
     var cs = st.calculators || [];
     $('#calcs').innerHTML = cs.map(function (c, i) { return calcHTML(c, i, cs.length); }).join('');
     $('#anns').innerHTML = (st.announcements || []).map(annHTML).join('');
@@ -782,12 +825,153 @@
     var bad = calcsList.find(function (c) { return !c.name || !c.tiers.length; });
     if (bad) { err.textContent = 'Har bir formatga nom va kamida bitta narx kiriting'; return; }
     err.textContent = ''; b.disabled = true; b.textContent = 'Saqlanmoqda…';
-    api('settings.save', { calculators: calcsList, announcements: readAnns() })
+    api('settings.save', {
+      calculators: calcsList, announcements: readAnns(),
+      site: { clients: $('#st-clients').value.trim(), speed: $('#st-speed').value.trim(), speed_ru: $('#st-speed-ru').value.trim(), hero_image: heroImage }
+    })
       .then(function (d) { paintSettings(d); toast('Saqlandi. Saytda ~20 soniyada yangilanadi'); })
       .catch(function (x) { err.textContent = x.message; })
       .then(function () { b.disabled = false; b.textContent = 'Saqlash'; });
   };
   window.addEventListener('beforeunload', function (e) { if (setDirty || dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+  $('#st-hero-file').addEventListener('change', function () {
+    var f = this.files[0]; this.value = '';
+    if (!f) return;
+    $('#st-hero-prev').textContent = '…';
+    shrink(f).then(function (b64) { return api('upload', { data: b64, type: 'image/jpeg' }); })
+      .then(function (d) { heroImage = d.url; setDirty = true; paintHero(); toast("Surat yuklandi — «Saqlash»ni bosing"); })
+      .catch(function (x) { paintHero(); toast(x.message); });
+  });
+  $('#st-hero-rm').onclick = function () { heroImage = ''; setDirty = true; paintHero(); };
+
+  // ===== Mijozlar fikri =====
+  var reviewsList = [];
+  function loadReviews() {
+    api('reviews.list').then(function (d) { reviewsList = d.reviews || []; renderReviews(); })
+      .catch(function (e) { $('#rlist').innerHTML = '<div class="empty"><b>Yuklanmadi</b>' + esc(e.message) + '</div>'; });
+  }
+  function renderReviews() {
+    var box = $('#rlist');
+    if (!reviewsList.length) {
+      box.innerHTML = '<div class="empty"><b>Hali fikr yo\'q</b>«+ Fikr qo\'shish» tugmasini bosib, mijoz videosi yoki skrinshotini yuklang.</div>';
+      return;
+    }
+    box.innerHTML = reviewsList.map(function (r, i) {
+      var m = r.kind === 'video'
+        ? '<video src="' + esc(r.url) + '"' + (r.poster ? ' poster="' + esc(r.poster) + '"' : '') + ' muted playsinline preload="metadata"></video><span>video</span>'
+        : '<img src="' + esc(r.url) + '" alt=""><span>skrinshot</span>';
+      return '<div class="rrow' + (r.active ? '' : ' off') + '" data-r="' + r.id + '"><div class="m">' + m + '</div><div class="fields">' +
+        '<input class="i" data-f="author" maxlength="60" placeholder="Ism, shahar — masalan: Dilnoza, Toshkent" value="' + esc(r.author) + '">' +
+        '<input class="i" data-f="note" maxlength="120" placeholder="Izoh — masalan: 100 ta rasm + albom" value="' + esc(r.note) + '">' +
+        '<input class="i" data-f="note_ru" maxlength="120" placeholder="Izoh ruscha (ixtiyoriy)" value="' + esc(r.note_ru) + '">' +
+        '<input class="i" data-f="link" maxlength="300" placeholder="Instagram havolasi (ixtiyoriy)" value="' + esc(r.link) + '">' +
+        '<div class="acts"><label class="switch"><input type="checkbox" data-f="active"' + (r.active ? ' checked' : '') + ' aria-label="Saytda ko\'rinsin"> Saytda</label>' +
+        '<button type="button" class="mini" data-rmv="-1"' + (i === 0 ? ' disabled' : '') + ' aria-label="Yuqoriga">↑</button>' +
+        '<button type="button" class="mini" data-rmv="1"' + (i === reviewsList.length - 1 ? ' disabled' : '') + ' aria-label="Pastga">↓</button>' +
+        '<button type="button" class="mini" data-rsave>Saqlash</button>' +
+        '<button type="button" class="mini" data-rdel style="color:#b00035">O\'chirish</button></div></div></div>';
+    }).join('');
+  }
+  function readReview(row) {
+    var r = reviewsList.find(function (x) { return x.id === row.getAttribute('data-r'); });
+    var out = Object.assign({}, r);
+    row.querySelectorAll('[data-f]').forEach(function (el) { out[el.getAttribute('data-f')] = el.type === 'checkbox' ? el.checked : el.value.trim(); });
+    return out;
+  }
+  function saveReview(rv, quiet) {
+    return api('reviews.save', { id: rv.id, review: rv }).then(function (d) {
+      reviewsList = reviewsList.map(function (x) { return x.id === d.review.id ? d.review : x; });
+      if (!quiet) toast('Saqlandi');
+      return d.review;
+    });
+  }
+  $('#rlist').addEventListener('click', function (e) {
+    var row = e.target.closest('.rrow'); if (!row) return;
+    var b;
+    if ((b = e.target.closest('[data-rsave]'))) {
+      saveReview(readReview(row)).then(renderReviews).catch(function (x) { toast(x.message); });
+    } else if ((b = e.target.closest('[data-rdel]'))) {
+      if (!confirm("Bu fikr saytdan o'chirilsinmi?")) return;
+      api('reviews.delete', { id: row.getAttribute('data-r') }).then(function () {
+        reviewsList = reviewsList.filter(function (x) { return x.id !== row.getAttribute('data-r'); });
+        renderReviews(); toast("O'chirildi");
+      }).catch(function (x) { toast(x.message); });
+    } else if ((b = e.target.closest('[data-rmv]'))) {
+      var i = reviewsList.findIndex(function (x) { return x.id === row.getAttribute('data-r'); });
+      var j = i + +b.getAttribute('data-rmv');
+      var item = reviewsList.splice(i, 1)[0]; reviewsList.splice(j, 0, item);
+      renderReviews();
+      Promise.all(reviewsList.map(function (x, k) { x.sort = k; return saveReview(x, true); }))
+        .then(function () { toast('Tartib saqlandi'); }).catch(function (x) { toast(x.message); });
+    }
+  });
+  $('#rlist').addEventListener('change', function (e) {
+    if (!e.target.matches('[data-f="active"]')) return;
+    var row = e.target.closest('.rrow');
+    saveReview(readReview(row)).then(renderReviews).catch(function (x) { toast(x.message); });
+  });
+
+  // Videodan birinchi kadrni olish (muqova uchun). Ishlamasa — muqovasiz qoladi.
+  function videoPoster(file) {
+    return new Promise(function (resolve) {
+      var url = URL.createObjectURL(file), v = document.createElement('video'), done = false;
+      function finish(x) { if (done) return; done = true; URL.revokeObjectURL(url); resolve(x); }
+      v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = url;
+      v.addEventListener('loadeddata', function () { try { v.currentTime = Math.min(0.5, (v.duration || 1) / 3); } catch (e) { finish(null); } });
+      v.addEventListener('seeked', function () {
+        try {
+          var k = Math.min(1, 720 / Math.max(v.videoWidth, v.videoHeight));
+          var c = document.createElement('canvas'); c.width = Math.round(v.videoWidth * k); c.height = Math.round(v.videoHeight * k);
+          c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+          var d = c.toDataURL('image/jpeg', 0.8); finish(d.slice(d.indexOf(',') + 1));
+        } catch (e) { finish(null); }
+      });
+      v.addEventListener('error', function () { finish(null); });
+      setTimeout(function () { finish(null); }, 8000);
+    });
+  }
+  function uploadVideo(file, onProgress) {
+    return api('reviews.sign', { type: file.type }).then(function (d) {
+      return new Promise(function (resolve, reject) {
+        var x = new XMLHttpRequest();
+        x.open('PUT', d.upload);
+        x.setRequestHeader('Content-Type', file.type);
+        x.setRequestHeader('x-upsert', 'false');
+        x.upload.onprogress = function (e) { if (e.lengthComputable) onProgress(Math.round(e.loaded / e.total * 100)); };
+        x.onload = function () { x.status < 300 ? resolve(d.url) : reject(new Error('Video yuklanmadi (' + x.status + ')')); };
+        x.onerror = function () { reject(new Error("Video yuklanmadi — internetni tekshiring")); };
+        x.send(file);
+      });
+    });
+  }
+  $('#rv-file').addEventListener('change', function () {
+    var f = this.files[0]; this.value = '';
+    if (!f) return;
+    var prog = $('#rv-progress');
+    var isVideo = /^video\//.test(f.type);
+    if (isVideo && !/^video\/(mp4|quicktime|webm)$/.test(f.type)) { toast('Faqat MP4, MOV yoki WEBM video'); return; }
+    if (isVideo && f.size > 50 * 1024 * 1024) { toast("Video 50 MB dan katta. Qisqartirib yoki siqib qayta saqlang"); return; }
+    if (!isVideo && !/^image\//.test(f.type)) { toast('Video yoki rasm tanlang'); return; }
+    prog.hidden = false; prog.textContent = 'Yuklanmoqda…';
+    var job = isVideo
+      ? videoPoster(f).then(function (pb64) {
+          var posterP = pb64 ? api('upload', { data: pb64, type: 'image/jpeg' }).then(function (d) { return d.url; }).catch(function () { return ''; }) : Promise.resolve('');
+          return posterP.then(function (poster) {
+            return uploadVideo(f, function (pc) { prog.textContent = 'Video yuklanmoqda: ' + pc + '%'; })
+              .then(function (url) { return { kind: 'video', url: url, poster: poster }; });
+          });
+        })
+      : shrink(f).then(function (b64) { return api('upload', { data: b64, type: 'image/jpeg' }); }).then(function (d) { return { kind: 'image', url: d.url }; });
+    job.then(function (rv) {
+      rv.active = true; rv.sort = -1;
+      return api('reviews.save', { review: rv });
+    }).then(function (d) {
+      reviewsList.unshift(d.review); renderReviews();
+      prog.hidden = true; toast("Fikr qo'shildi — ism va izohni yozib, «Saqlash»ni bosing");
+      var first = $('#rlist [data-f="author"]'); if (first) first.focus();
+    }).catch(function (x) { prog.hidden = true; toast(x.message); });
+  });
 
   if (token) showApp(); else showLogin();
 })();

@@ -30,6 +30,11 @@ Environment: **Production** va **Preview** ikkalasini belgilang. Keyin **Deploym
 
 `BOT_TOKEN` va `ADMIN_CHAT_ID` allaqachon bor — Preview uchun ham belgilanganini tekshiring, aks holda sinov havolasida buyurtma Telegramga bormaydi.
 
+## Mijozlar fikri (video)
+
+Videolar to'g'ridan-to'g'ri Supabase'ga yuklanadi (50 MB gacha). `schema.sql` ni qayta ishga tushirsangiz
+`reviews` papkasi ham yaratiladi. Skrinshotlar avtomatik kichraytirilib yuklanadi.
+
 ## Baza ulanmaguncha
 
 Do'kon **namuna tovarlar** bilan ochiladi (sariq yozuv chiqadi). Undan berilgan buyurtma Telegram guruhga

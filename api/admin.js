@@ -3,7 +3,7 @@
 const {
   configured, rest, uploadImage, makeToken, checkToken, checkPassword, cleanProduct,
   makeChallenge, checkChallenge, logEvent, countEvents, sniffImage,
-  getSettings, saveSetting, cleanCalcs, cleanAnnouncements,
+  getSettings, saveSetting, cleanCalcs, cleanAnnouncements, cleanSite, cleanReview, signVideoUpload,
 } = require('./_store');
 const { ADMIN_CHAT_ID, tg, esc } = require('./_lib');
 
@@ -172,6 +172,36 @@ module.exports = async (req, res) => {
         return res.status(200).json({ ok: true, order: row });
       }
 
+      case 'reviews.list': {
+        const reviews = await rest('reviews?select=*&order=sort.asc,created_at.desc&limit=200');
+        return res.status(200).json({ ok: true, reviews });
+      }
+
+      case 'reviews.sign': {
+        const r = await signVideoUpload(String(b.type || ''));
+        if (r.error) return fail(400, r.error);
+        return res.status(200).json({ ok: true, ...r });
+      }
+
+      case 'reviews.save': {
+        const c = cleanReview(b.review || {});
+        if (c.error) return fail(400, c.error);
+        let row;
+        if (b.id) {
+          if (!UUID.test(b.id)) return fail(400, "Noto'g'ri fikr");
+          [row] = await rest(`reviews?id=eq.${b.id}`, { method: 'PATCH', body: c.review, prefer: 'return=representation' });
+        } else {
+          [row] = await rest('reviews', { method: 'POST', body: c.review, prefer: 'return=representation' });
+        }
+        return res.status(200).json({ ok: true, review: row });
+      }
+
+      case 'reviews.delete': {
+        if (!UUID.test(b.id || '')) return fail(400, "Noto'g'ri fikr");
+        await rest(`reviews?id=eq.${b.id}`, { method: 'DELETE' });
+        return res.status(200).json({ ok: true });
+      }
+
       case 'settings.get': {
         const st = await getSettings({ fresh: true });
         return res.status(200).json({ ok: true, ...st });
@@ -183,6 +213,9 @@ module.exports = async (req, res) => {
           if (c.error) return fail(400, c.error);
           if (!c.value.length) return fail(400, 'Kamida bitta narx formati qolsin');
           await saveSetting('calculators', c.value);
+        }
+        if (b.site !== undefined) {
+          await saveSetting('site', cleanSite(b.site).value);
         }
         if (b.announcements !== undefined) {
           const a = cleanAnnouncements(b.announcements);

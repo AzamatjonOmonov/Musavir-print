@@ -34,6 +34,7 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   [hidden] { display: none !important; }
   html { scroll-behavior: smooth; }
+  html, body { overflow-x: clip; }
   body {
     margin: 0; background: var(--bg); color: var(--ink);
     font: 15px/1.45 'Space Grotesk', system-ui, sans-serif;
@@ -127,6 +128,94 @@
   .retro-btn:disabled { opacity: .6; }
   .calc-note { text-align: center; font-size: 14px; font-weight: 700; color: rgba(44,44,44,.72); margin: 16px 0 0; line-height: 1.4; }
   .calc-note button { border: 0; background: none; padding: 0; color: var(--pink); text-decoration: underline; text-underline-offset: 3px; font-weight: 700; }
+
+  /* ---------- Bosh blok ---------- */
+  .hero { background: var(--pink-bg); color: #fff; padding: 12px 0 0; overflow: hidden; }
+  .hero .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .hero .bar img { height: 40px; width: auto; }
+  .hero-grid { display: grid; gap: 18px; align-items: center; padding-bottom: 64px; }
+  @media (min-width: 860px) { .hero-grid { grid-template-columns: 1.1fr .9fr; padding-bottom: 96px; } .news { margin-top: -60px; } }
+  .hero h1 { margin: 0; font-size: clamp(34px, 9.5vw, 60px); line-height: 1.02; letter-spacing: -.02em; font-weight: 700; text-wrap: balance; }
+  .hero .clients { display: inline-flex; align-items: center; gap: 10px; margin-top: 18px; font-weight: 500; font-size: 15px; }
+  .hero .clients b { font-size: 26px; font-weight: 700; line-height: 1; }
+  .hero .clients .faces { display: flex; }
+  .hero .clients .faces i { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--pink-bg); margin-left: -8px; background: var(--paper); }
+  .hero .clients .faces i:first-child { margin-left: 0; background: #f6b7cf; } .hero .clients .faces i:nth-child(2) { background: #ffd9a8; }
+  .hero .cta { margin-top: 24px; max-width: 420px; background: #fff; color: var(--wine); border-color: var(--wine); font-size: 18px; letter-spacing: .08em; }
+  .hero .cta small { display: block; font-size: 12px; letter-spacing: .02em; text-transform: none; font-weight: 500; color: var(--pink); }
+  .hero .cta span { text-align: left; }
+  /* Telefon → rasmlar */
+  .art { position: relative; height: 270px; max-width: 360px; width: 100%; margin: 0 auto; }
+  @media (max-width: 859px) { .art { height: 230px; transform: scale(.88); transform-origin: top center; margin-bottom: -20px; } }
+  .art .phone { position: absolute; left: 4%; top: 18px; width: 128px; height: 240px; border-radius: 26px; background: #2c2c2c; padding: 9px; transform: rotate(-8deg); box-shadow: 6px 6px 0 var(--wine); }
+  .art .phone::before { content: ''; position: absolute; top: 12px; left: 50%; width: 34px; height: 6px; margin-left: -17px; border-radius: 3px; background: #444; z-index: 2; }
+  .art .phone .scr2 { height: 100%; border-radius: 18px; background: #3a3a3a; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 26px 6px 6px; align-content: start; }
+  .art .phone .scr2 i { aspect-ratio: 1; border-radius: 3px; background: #5a5a5a; }
+  .art .phone .scr2 i:nth-child(3n) { background: #6b5a62; }
+  .art .pol { position: absolute; width: 112px; background: #fff; padding: 7px 7px 26px; border-radius: 3px; box-shadow: 0 6px 16px rgba(60,0,25,.35); }
+  .art .pol i { display: block; aspect-ratio: 1; border-radius: 1px; }
+  .art .pol.p1 { left: 36%; top: 6px; transform: rotate(7deg); } .art .pol.p1 i { background: linear-gradient(160deg, #ffd9a8, #e98aa7 70%); }
+  .art .pol.p2 { left: 58%; top: 78px; transform: rotate(-6deg); } .art .pol.p2 i { background: linear-gradient(200deg, #c9dcc0, #8fb0a0); }
+  .art .pol.p3 { left: 30%; top: 140px; transform: rotate(-14deg); } .art .pol.p3 i { background: linear-gradient(180deg, #f6e3b4, #e6b8a2); }
+  @media (prefers-reduced-motion: no-preference) {
+    .art .pol { animation: fly .9s cubic-bezier(.2,.8,.2,1) both; }
+    .art .pol.p2 { animation-delay: .15s; } .art .pol.p3 { animation-delay: .3s; }
+    @keyframes fly { from { opacity: 0; translate: -60px 40px; scale: .6; } }
+  }
+  .art .photo { position: absolute; inset: 10px 8% 10px; background: #fff; padding: 10px 10px 34px; border-radius: 4px; transform: rotate(3deg); box-shadow: 6px 6px 0 var(--wine); }
+  .art .photo img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* Yangilik lentasi */
+  .news { position: relative; z-index: 2; margin-top: -34px; transform: skewY(-3deg); background: var(--wine); color: #fff; box-shadow: 0 6px 0 rgba(0,0,0,.12); }
+  .news > .wrap { transform: skewY(3deg); }
+  .news .wrap { display: flex; align-items: center; gap: 14px; padding-top: 12px; padding-bottom: 12px; }
+  .news svg { flex: none; width: 74px; height: auto; }
+  .news .tag { display: inline-block; background: #fff; color: var(--wine); font-weight: 700; font-size: 12px; letter-spacing: .08em; padding: 2px 8px; border-radius: 5px; margin-bottom: 4px; }
+  .news p { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25; }
+  .news small { display: block; font-weight: 400; opacity: .85; font-size: 13px; margin-top: 2px; }
+
+  /* Afzalliklar */
+  .perks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 34px; }
+  @media (min-width: 860px) { .perks { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+  .perk { background: var(--surface); border-radius: 16px; padding: 16px 14px; }
+  .perk .ic { width: 44px; height: 44px; border-radius: 12px; background: #fde6ef; color: var(--pink); display: grid; place-items: center; margin-bottom: 10px; }
+  .perk h3 { margin: 0 0 4px; font-size: 16px; line-height: 1.2; }
+  .perk p { margin: 0; font-size: 13.5px; color: #5d5861; line-height: 1.4; }
+
+  /* Qanday ishlaydi */
+  .steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; counter-reset: st; }
+  @media (min-width: 860px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+  .steps li { counter-increment: st; display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; background: var(--surface); border-radius: 16px; padding: 14px; }
+  .steps li::before { content: counter(st); width: 44px; height: 44px; border-radius: 50%; background: var(--nokia-dark); color: var(--nokia); display: grid; place-items: center; font: 700 26px/1 'VT323', monospace; }
+  .steps b { display: block; font-size: 15px; }
+  .steps span { font-size: 13.5px; color: #5d5861; }
+
+  /* Mijozlar fikri */
+  .reviews { margin-top: 8px; }
+  .rv-track { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin: 0 -16px; padding: 0 16px 6px; scroll-padding: 0 16px; }
+  .rv-track::-webkit-scrollbar { display: none; }
+  .rv { flex: 0 0 min(58%, 230px); scroll-snap-align: start; border: 0; padding: 0; background: none; text-align: left; }
+  .rv .media { position: relative; aspect-ratio: 9 / 16; border-radius: 16px; overflow: hidden; background: #1d1d1d; }
+  .rv .media video, .rv .media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rv .media.shot { background: var(--surface); }
+  .rv .media.shot img { object-fit: cover; object-position: top; }
+  .rv .play { position: absolute; right: 10px; bottom: 10px; width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; display: grid; place-items: center; }
+  .rv .who { margin: 8px 2px 0; font-size: 14px; font-weight: 700; }
+  .rv .note { margin: 0 2px; font-size: 13px; color: var(--muted); }
+  .rv.ph .media { background: repeating-linear-gradient(135deg, #ece9ee 0 12px, #f5f3f6 12px 24px); display: grid; place-items: center; color: var(--muted); font-size: 13px; text-align: center; padding: 12px; }
+  .lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(15,10,14,.92); display: grid; place-items: center; padding: 56px 12px 24px; }
+  .lightbox video, .lightbox img { max-width: 100%; max-height: calc(100vh - 140px); border-radius: 12px; background: #000; }
+  .lightbox .x { position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.15); color: #fff; font-size: 26px; }
+  .lightbox .meta { color: #fff; text-align: center; margin-top: 10px; font-size: 14px; }
+  .lightbox .meta a { color: #fff; display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; border: 1.5px solid rgba(255,255,255,.4); border-radius: 10px; padding: 8px 12px; text-decoration: none; }
+  .center-sub { margin: -6px 0 14px; color: var(--muted); font-size: 14px; }
+
+  /* Kalkulyator sahifasi */
+  .calc-band .bar { justify-content: space-between; align-items: center; }
+  .calc-band .back-w { border: 0; background: none; color: #fff; font-weight: 700; padding: 8px 0; font-size: 15px; }
+  .after-add { display: grid; gap: 10px; margin-top: 14px; }
+  .after-add a { height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; text-decoration: none; border: 2px solid var(--gray); background: #fff; }
+  .after-add a.go { background: var(--nokia-dark); color: var(--nokia); border-color: var(--nokia-dark); }
 
   /* ---------- Tovarlar ---------- */
   .section-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 28px 0 12px; }
@@ -375,7 +464,20 @@
       ig: 'Instagram', home: "Bosh sahifaga qaytish",
       m_hello: 'Assalomu alaykum! Saytda buyurtma berdim{n}.', m_total: 'Jami: {s}', m_phone: 'Telefon: {p}',
       m_photos: 'Rasmlarimni yuboryapman.', m_free: 'Yetkazish: bepul', pcs: 'ta',
-      foot: 'Esdalik rasmlaringizni sifatli chop etamiz', tg: 'Telegram kanal', yt: 'YouTube', admin: 'Adminga yozish'
+      foot: 'Esdalik rasmlaringizni sifatli chop etamiz', tg: 'Telegram kanal', yt: 'YouTube', admin: 'Adminga yozish',
+      slogan: 'Esdaliklaringiz telefonda qolib ketmasin', clients: 'mamnun mijoz',
+      calc_cta: 'Rasm narxini hisoblash', calc_cta_sub: '10x15 — {p} so\'mdan',
+      news_tag: 'YANGI', news: "Butun O'zbekiston bo'ylab yetkazib beramiz", news_sub: "BTS orqali — sizga eng yaqin filialgacha",
+      perks: 'Nega aynan biz', p1: "Butun O'zbekiston bo'ylab", p1t: "BTS orqali har bir viloyatga yetkazamiz",
+      p2: 'RC fotoqog\'oz', p2t: 'Rangi yorqin, sifatli va uzoq saqlanadi', p3: 'Tez tayyorlaymiz',
+      p4: 'Qulay narx', p4t: '10x15 rasm {p} so\'mdan. Ko\'p olsangiz — arzonroq',
+      how: 'Qanday buyurtma beriladi', s1: 'Hisoblang va buyurtma bering', s1t: 'Rasm sonini kiriting, xohlasangiz albom yoki ramka qo\'shing',
+      s2: 'Rasmlarni Telegramda yuboring', s2t: 'Buyurtmadan keyin adminga tayyor xabar ochiladi',
+      s3: 'BTS filialidan oling', s3t: 'Eng yaqin filialni o\'zimiz tanlab, qo\'ng\'iroq qilamiz',
+      reviews: 'Mijozlarimiz fikri', reviews_sub: '{n} mijozlarimizdan ba\'zi fikrlar', on_ig: 'Instagramda ko\'rish', close: 'Yopish',
+      rv_demo: 'Namuna joy — fikr videolari va skrinshotlarni admin paneldan yuklaysiz',
+      calc_title: 'Rasm narxini hisoblash', go_cart2: "Savatga o'tish", add_more: "Albom, ramka qo'shish",
+      play: 'Videoni ochish', open_img: 'Kattalashtirish'
     },
     ru: {
       title: 'Musavvir Print — магазин',
@@ -408,7 +510,20 @@
       ig: 'Instagram', home: 'Вернуться на главную',
       m_hello: 'Здравствуйте! Я оформил(а) заказ на сайте{n}.', m_total: 'Итого: {s}', m_phone: 'Телефон: {p}',
       m_photos: 'Отправляю свои фото.', m_free: 'Доставка: бесплатно', pcs: 'шт',
-      foot: 'Качественно печатаем ваши памятные фото', tg: 'Telegram канал', yt: 'YouTube', admin: 'Написать админу'
+      foot: 'Качественно печатаем ваши памятные фото', tg: 'Telegram канал', yt: 'YouTube', admin: 'Написать админу',
+      slogan: 'Пусть ваши воспоминания не останутся в телефоне', clients: 'довольных клиентов',
+      calc_cta: 'Рассчитать печать фото', calc_cta_sub: '10x15 — от {p} сум',
+      news_tag: 'НОВОЕ', news: 'Доставляем по всему Узбекистану', news_sub: 'Через BTS — до ближайшего к вам филиала',
+      perks: 'Почему мы', p1: 'По всему Узбекистану', p1t: 'Доставляем через BTS в любую область',
+      p2: 'Фотобумага RC', p2t: 'Яркие цвета, высокое качество, долго хранятся', p3: 'Быстро',
+      p4: 'Удобные цены', p4t: 'Фото 10x15 от {p} сум. Чем больше — тем дешевле',
+      how: 'Как заказать', s1: 'Посчитайте и оформите заказ', s1t: 'Укажите количество фото, при желании добавьте альбом или рамку',
+      s2: 'Отправьте фото в Telegram', s2t: 'После заказа откроется готовое сообщение админу',
+      s3: 'Заберите в филиале BTS', s3t: 'Сами выберем ближайший филиал и позвоним вам',
+      reviews: 'Отзывы клиентов', reviews_sub: 'Немного отзывов от {n} наших клиентов', on_ig: 'Смотреть в Instagram', close: 'Закрыть',
+      rv_demo: 'Место для примера — видео и скриншоты отзывов загрузите в админ-панели',
+      calc_title: 'Расчёт печати фото', go_cart2: 'Перейти в корзину', add_more: 'Добавить альбом, рамку',
+      play: 'Открыть видео', open_img: 'Увеличить'
     }
   };
   var LANGS = [['uz', "Oʻz"], ['uzc', 'Ўз'], ['ru', 'Ру']];
@@ -463,7 +578,8 @@
   };
 
   // ================= Holat =================
-  var products = [], calcs = [], announcements = [];
+  var products = [], calcs = [], announcements = [], reviews = [];
+  var site = { clients: '250+', speed: "Buyurtmangizni kechiktirmay chop etib, jo'natamiz", speed_ru: 'Печатаем и отправляем без задержек', hero_image: '' };
   var demo = false, loaded = false, loadError = '';
   var query = '';
   var calcId = store.get('mp_calc', '10x15');
@@ -563,6 +679,8 @@
           return p;
         });
         calcs = d.calculators || [];
+        reviews = d.reviews || [];
+        if (d.site) site = d.site;
         announcements = d.announcements || [];
         if (!calcById(calcId) && calcs[0]) calcId = calcs[0].id;
         demo = !!d.demo; loaded = true;
@@ -593,7 +711,7 @@
     }).join('') + '</div>' : '';
     var cells = ''; for (var i = 0; i < 12; i++) cells += '<i></i>';
     return '<section class="calc-band"><div class="wrap">' +
-      '<div class="bar"><div class="langs" data-langs>' + langsHTML() + '</div></div>' +
+      '<div class="bar"><button type="button" class="back-w" id="calc-back">' + esc(t('back')) + '</button><div class="langs" data-langs>' + langsHTML() + '</div></div>' +
       '<div class="calc-card">' +
         '<div class="calc-logo"><img src="/dokon/logo.png" alt="Musavvir Print" width="300" height="96"></div>' + tabs +
         '<div class="screen"><div class="scanline"></div><div class="scr">' +
@@ -606,6 +724,7 @@
         '<input class="tactile" type="number" id="c-qty" min="0" max="100000" inputmode="numeric" placeholder="0">' +
         '<button class="retro-btn" type="button" id="c-add"></button>' +
         '<p class="calc-note" id="c-note"></p>' +
+        '<div class="after-add" id="after-add" hidden><a class="go" href="#/savat">' + esc(t('go_cart2')) + '</a><a href="#/" data-to-products>' + esc(t('add_more')) + '</a></div>' +
       '</div></div></section>';
   }
 
@@ -639,6 +758,7 @@
         : t('other_formats', { a: '<a href="' + LINKS.admin + '" target="_blank" rel="noopener" style="color:var(--pink)">', b: '</a>' });
       var rm = $('#c-rm');
       if (rm) rm.onclick = function () { delete cart.calcs[calcId]; saveCart(); inp.value = ''; paint(); paintTabs(); };
+      $('#after-add').hidden = !Object.keys(cart.calcs).some(function (k) { return cart.calcs[k] > 0; });
     }
     inp.addEventListener('input', paint);
     inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') $('#c-add').click(); });
@@ -672,27 +792,139 @@
     return html + '<div class="grid">' + list.map(cardHTML).join('') + '</div>';
   }
 
+  var UZ_MAP = '<svg viewBox="0 0 200 130" aria-hidden="true"><path fill="#fff" fill-opacity=".95" d="M174.5,51.3L174.9,51.0L175.5,50.7L176.6,51.3L177.6,51.9L177.8,52.3L177.8,52.6L175.5,53.9L174.1,54.6L173.4,54.7L173.3,54.9L172.8,56.3L171.9,56.6L170.8,57.1L170.0,57.8L168.7,59.4L165.6,61.8L165.5,62.3L165.8,62.7L166.8,63.0L168.2,63.7L169.0,64.3L171.0,63.5L171.5,63.7L172.0,64.4L172.6,66.6L173.5,67.2L174.7,67.6L175.4,67.8L176.4,68.3L177.7,68.5L178.6,68.3L179.7,68.8L179.9,68.6L180.0,65.4L180.9,65.9L181.5,65.9L181.9,65.5L182.2,65.0L182.3,63.9L182.1,62.9L182.5,62.4L182.8,62.3L183.1,62.4L183.2,62.7L183.3,63.6L183.9,64.0L184.4,64.3L184.7,65.1L185.1,65.8L185.4,67.6L186.3,67.8L187.4,68.1L188.1,67.8L188.7,68.0L188.9,68.8L188.8,69.6L188.9,70.3L189.2,70.4L190.2,70.0L191.0,70.0L191.7,70.4L192.7,70.9L194.0,72.5L194.4,72.7L196.4,72.8L196.9,73.1L197.6,73.1L198.3,72.8L200.0,73.3L200.0,73.6L199.7,74.0L195.8,76.1L195.5,76.7L194.7,77.6L193.8,78.0L193.4,78.0L191.4,77.2L191.2,77.4L191.1,77.7L191.1,78.1L191.5,79.0L191.3,79.6L190.9,80.0L189.7,79.6L189.5,79.4L189.5,79.1L189.0,79.1L188.3,79.4L186.9,80.9L186.4,81.7L186.2,82.2L185.6,82.4L184.9,82.5L184.1,83.3L183.2,83.8L182.9,83.4L182.7,82.9L182.4,82.8L181.9,82.9L181.2,82.9L180.4,82.4L179.5,81.9L178.6,81.7L176.2,82.0L175.0,82.2L174.6,82.5L173.9,82.5L171.1,83.1L170.5,82.9L170.0,82.0L169.7,81.1L168.9,80.8L168.1,80.6L167.8,80.2L167.7,79.8L167.9,79.4L167.9,79.1L169.8,77.5L171.6,75.9L171.8,75.8L171.9,75.5L172.2,75.0L172.2,74.7L170.9,74.1L170.8,73.8L171.1,73.5L171.1,73.1L170.2,72.0L168.6,70.3L168.1,70.1L167.8,70.2L167.1,71.9L166.9,72.3L165.1,73.4L163.5,74.2L160.8,75.6L160.1,76.0L159.6,75.9L159.1,75.6L157.6,74.3L156.6,73.8L155.9,74.3L155.4,74.9L155.4,76.3L154.8,77.0L154.2,77.4L155.3,81.1L155.2,81.6L154.4,81.7L155.0,83.1L154.4,83.3L153.1,82.9L151.2,82.7L147.7,83.3L147.5,83.6L147.4,83.9L147.6,84.2L149.3,84.2L151.0,84.0L151.4,84.3L151.5,84.8L151.3,85.1L150.7,85.1L149.5,85.4L149.4,85.7L149.3,86.0L149.7,86.8L150.2,87.3L150.3,87.6L150.1,87.9L149.8,88.0L149.4,87.6L149.2,87.7L149.1,88.0L149.0,88.4L148.7,88.7L148.1,88.5L147.6,88.7L147.3,90.2L147.0,91.8L146.0,93.0L145.5,93.4L144.8,93.5L143.7,93.3L143.0,93.2L141.1,92.9L139.1,92.5L136.9,92.0L134.8,93.0L134.2,93.6L133.8,94.2L133.5,94.5L132.6,97.9L132.7,98.3L133.2,98.6L135.7,99.3L136.1,99.6L136.3,100.0L136.4,101.6L136.6,101.8L137.4,102.0L138.7,102.0L139.7,101.8L140.7,101.9L141.3,102.3L141.7,102.8L141.9,103.4L140.7,106.8L140.8,108.1L141.1,109.8L141.8,111.2L143.1,112.6L144.0,113.5L144.2,113.9L144.3,114.6L144.1,115.4L143.6,116.7L142.9,117.8L142.2,118.3L141.2,119.8L140.3,121.5L138.5,123.9L138.0,125.2L137.8,128.9L137.3,130.0L137.3,129.6L136.6,129.2L135.6,129.3L134.8,129.0L134.5,128.6L133.6,128.7L132.2,129.5L130.8,129.1L129.3,127.5L126.5,126.9L122.9,127.3L122.8,125.6L122.8,123.4L123.0,120.5L124.1,118.2L124.1,117.8L123.9,117.4L123.5,117.0L121.4,116.4L120.7,116.1L119.9,115.4L118.9,114.6L117.9,114.1L116.5,113.4L115.2,113.0L114.4,113.3L113.7,113.7L113.0,113.7L112.3,113.5L109.8,111.8L106.1,108.8L103.1,106.8L101.2,105.8L100.8,105.5L99.7,104.5L97.1,102.0L95.4,102.4L93.0,100.8L90.7,99.2L90.3,98.8L87.8,95.8L85.3,93.9L82.5,91.9L80.8,90.6L77.8,88.4L76.4,87.0L75.9,86.6L75.4,85.6L74.6,81.0L73.7,78.9L72.4,77.8L71.3,75.6L70.4,72.3L69.7,70.2L69.1,69.2L67.9,68.1L66.1,66.9L64.4,66.4L63.7,66.4L63.4,66.5L63.1,66.8L62.4,67.6L61.4,67.7L60.7,67.7L60.0,67.4L57.8,67.1L57.0,66.8L55.7,66.8L52.9,67.3L52.2,67.2L49.3,65.3L48.0,64.5L47.7,64.0L47.7,63.3L48.1,62.2L48.5,61.5L48.3,60.6L47.8,59.8L47.8,58.9L48.2,58.4L49.0,58.5L49.3,58.2L49.1,57.7L48.7,57.4L48.2,56.6L46.5,55.9L46.2,55.6L46.3,55.2L46.6,54.9L46.7,54.1L46.7,53.1L46.9,52.6L47.0,52.2L46.7,51.9L46.2,51.5L45.3,50.6L44.1,50.5L40.5,50.5L39.4,50.1L38.5,49.6L37.6,47.7L37.1,47.2L36.7,47.0L35.7,47.0L34.4,46.8L33.8,46.4L32.1,44.6L30.5,43.1L29.8,44.6L29.2,44.9L27.7,44.7L26.6,44.5L26.0,44.8L25.4,45.4L25.5,45.8L26.0,46.2L27.0,47.0L28.5,48.9L29.2,49.9L29.2,50.2L29.1,50.5L28.9,50.6L28.6,50.6L28.2,50.6L28.0,50.3L27.9,49.8L27.4,49.0L26.9,48.5L26.3,48.2L25.5,48.0L24.5,47.6L23.9,47.6L23.4,48.0L22.9,48.6L22.7,50.0L21.9,51.6L21.4,52.2L19.9,52.6L16.4,52.7L15.3,53.2L14.6,53.8L13.3,55.8L12.3,56.5L11.5,57.4L11.7,60.3L12.2,63.7L12.8,64.6L13.3,64.9L13.3,65.2L13.0,65.5L12.7,65.9L12.2,66.6L11.5,66.5L10.3,66.4L9.3,66.2L5.9,66.0L3.1,65.8L0.0,65.7L0.0,62.1L0.0,58.5L0.0,55.0L0.0,51.4L0.0,47.9L0.0,44.3L0.0,40.7L0.0,37.2L0.0,33.6L0.0,30.1L0.0,26.5L0.0,22.9L0.0,19.4L0.0,15.8L0.0,12.3L0.0,8.7L1.5,8.2L3.3,7.7L5.1,7.2L7.1,6.5L9.5,5.8L11.5,5.2L13.9,4.5L15.8,3.9L17.5,3.4L19.7,2.7L23.2,1.8L25.0,1.3L27.0,0.7L28.8,0.2L30.1,0.0L31.4,0.7L33.0,1.8L34.6,2.8L36.2,3.8L37.8,4.8L39.4,5.8L41.1,6.9L42.7,7.9L44.3,8.9L45.9,9.9L47.5,10.9L49.1,12.0L50.7,13.0L52.3,14.0L53.9,15.0L55.5,16.1L57.1,17.1L58.7,18.0L59.3,18.7L59.7,20.3L60.4,21.5L61.7,22.8L63.1,24.2L64.7,26.0L65.8,27.3L67.0,28.6L68.9,30.7L70.1,32.0L71.1,32.0L73.0,31.7L75.6,31.3L77.6,31.0L80.1,30.6L82.4,30.2L84.3,29.9L87.1,30.1L89.8,30.4L91.8,30.5L93.7,30.7L96.0,30.9L97.2,31.0L98.7,31.1L99.3,30.8L100.6,30.1L101.7,29.5L103.0,28.9L104.1,28.5L105.2,29.6L106.1,30.7L107.2,32.0L108.3,33.2L109.5,33.9L111.0,34.8L111.8,36.5L113.0,38.6L113.7,40.1L114.5,41.6L115.7,41.0L116.9,40.3L118.0,39.8L117.9,41.6L117.7,43.2L117.6,45.8L117.4,47.8L117.0,50.3L117.0,52.1L117.0,53.8L116.9,55.1L119.1,55.1L120.7,55.2L122.6,55.2L122.8,56.9L123.1,59.2L123.5,61.2L123.9,63.0L124.4,65.3L124.6,66.5L125.1,67.9L125.6,68.2L126.3,68.5L128.9,68.3L131.1,68.1L132.8,68.0L134.6,67.9L137.1,67.8L137.9,68.1L138.6,67.9L139.4,67.6L140.0,68.6L140.4,69.2L140.8,69.7L141.5,70.2L141.2,71.3L140.8,72.8L140.7,73.6L141.4,74.5L142.0,75.0L143.5,76.0L145.0,76.6L145.9,76.7L146.8,76.5L147.1,75.9L147.1,75.1L146.6,74.3L146.7,73.3L146.9,72.6L147.8,71.3L148.7,70.0L150.1,68.8L151.6,67.5L152.3,66.6L152.5,65.0L153.6,64.1L154.7,63.5L156.1,63.0L156.5,62.3L158.4,60.9L159.5,60.2L161.0,59.8L163.0,59.0L164.5,57.9L166.1,56.0L167.3,54.7L168.3,53.9L169.2,53.9L169.8,54.5L170.3,54.6L170.6,54.3L171.2,53.5L171.8,52.5L172.4,52.1L173.5,51.9L174.5,51.3ZM171.1,71.6L171.0,71.3L170.7,70.6L170.1,70.3L169.9,70.4L170.1,70.9L170.7,71.7L171.1,71.6ZM177.5,87.8L176.9,88.0L175.8,88.0L175.2,87.8L175.6,86.6L175.6,86.3L175.6,86.3L175.3,86.1L174.8,85.6L174.7,84.8L174.8,84.1L175.2,83.8L175.4,83.9L176.0,84.9L176.6,85.3L177.8,85.4L177.2,86.5L177.6,87.6L177.5,87.8ZM184.2,87.0L183.9,87.6L183.3,87.4L182.9,87.0L183.1,86.7L183.7,86.5L184.0,86.3L184.3,86.3L184.2,87.0Z"/><circle cx="150" cy="79" r="5" fill="#e5005c" stroke="#fff" stroke-width="2"/></svg>';
+  var PI = {
+    truck: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z"/><circle cx="6.5" cy="17.5" r="1.8" fill="#fff"/><circle cx="17" cy="17.5" r="1.8" fill="#fff"/></svg>',
+    paper: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1.5"/><rect x="7" y="6" width="10" height="9"/><path d="m7 15 3-3 2 2 2-2 3 3"/></svg>',
+    bolt: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
+    tag: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5" fill="currentColor"/></svg>'
+  };
+  function lowestPrint() {
+    var c = calcById('10x15') || calcs[0];
+    if (!c || !c.tiers.length) return '1 500';
+    return fmt(Math.min.apply(null, c.tiers.map(function (x) { return x.price; })));
+  }
+  function heroHTML() {
+    var art = site.hero_image
+      ? '<div class="art"><div class="photo"><img src="' + esc(site.hero_image) + '" alt=""></div></div>'
+      : '<div class="art" aria-hidden="true"><div class="phone"><div class="scr2">' + '<i></i>'.repeat(8) + '</div></div>' +
+        '<div class="pol p1"><i></i></div><div class="pol p2"><i></i></div><div class="pol p3"><i></i></div></div>';
+    return '<section class="hero"><div class="wrap">' +
+      '<div class="bar"><img src="/dokon/logo-white.png" alt="Musavvir Print" width="125" height="40"><div class="langs" data-langs>' + langsHTML() + '</div></div>' +
+      '<div class="hero-grid"><div>' +
+        '<h1>' + esc(t('slogan')) + '</h1>' +
+        '<div class="clients"><span class="faces" aria-hidden="true"><i></i><i></i><i></i></span><span><b>' + esc(site.clients || '250+') + '</b> ' + esc(t('clients')) + '</span></div>' +
+        '<a class="retro-btn cta" href="#/hisoblash"><span>' + esc(t('calc_cta')) + '<small>' + esc(t('calc_cta_sub', { p: lowestPrint() })) + '</small></span></a>' +
+      '</div>' + art + '</div></div></section>' +
+      '<div class="news"><div class="wrap">' + UZ_MAP + '<div><span class="tag">' + esc(t('news_tag')) + '</span><p>' + esc(t('news')) + '<small>' + esc(t('news_sub')) + '</small></p></div></div></div>';
+  }
+  function perksHTML() {
+    var speed = lang === 'ru' ? (site.speed_ru || site.speed) : lang === 'uzc' ? toCyr(site.speed) : site.speed;
+    var items = [[PI.truck, t('p1'), t('p1t')], [PI.paper, t('p2'), t('p2t')], [PI.bolt, t('p3'), speed], [PI.tag, t('p4'), t('p4t', { p: lowestPrint() })]];
+    return '<h2 class="sr">' + esc(t('perks')) + '</h2><div class="perks">' + items.map(function (x) {
+      return '<div class="perk"><div class="ic">' + x[0] + '</div><h3>' + esc(x[1]) + '</h3><p>' + esc(x[2]) + '</p></div>';
+    }).join('') + '</div>';
+  }
+  function stepsHTML() {
+    return '<div class="section-title"><h2>' + esc(t('how')) + '</h2></div><ol class="steps">' +
+      [['s1', 's1t'], ['s2', 's2t'], ['s3', 's3t']].map(function (k) { return '<li><div><b>' + esc(t(k[0])) + '</b><span>' + esc(t(k[1])) + '</span></div></li>'; }).join('') + '</ol>';
+  }
+  var ICON_PLAY = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>';
+  function reviewsHTML() {
+    var list = reviews;
+    if (!list.length && !demo) return '';
+    var cards = list.length ? list.map(function (r, i) {
+      var who = r.author ? '<div class="who">' + esc(lang === 'uzc' ? toCyr(r.author) : r.author) + '</div>' : '';
+      var note = r.note ? '<div class="note">' + esc(L(r, 'note')) + '</div>' : '';
+      var media = r.kind === 'video'
+        ? '<div class="media"><video muted playsinline loop preload="none"' + (r.poster ? ' poster="' + esc(r.poster) + '"' : '') + ' data-src="' + esc(r.url) + '"></video><span class="play">' + ICON_PLAY + '</span></div>'
+        : '<div class="media shot"><img src="' + esc(r.url) + '" alt="" loading="lazy"></div>';
+      return '<button type="button" class="rv" data-rv="' + i + '" aria-label="' + esc(r.kind === 'video' ? t('play') : t('open_img')) + (r.author ? ': ' + esc(r.author) : '') + '">' + media + who + note + '</button>';
+    }).join('') : [1, 2, 3].map(function () { return '<div class="rv ph"><div class="media">' + esc(t('rv_demo')) + '</div></div>'; }).join('');
+    return '<section class="reviews"><div class="section-title"><h2>' + esc(t('reviews')) + '</h2></div>' +
+      '<p class="center-sub">' + esc(t('reviews_sub', { n: site.clients || '250+' })) + '</p>' +
+      '<div class="rv-track" id="rv-track">' + cards + '</div></section>';
+  }
+  var rvTimer, rvObserver;
+  function wireReviews() {
+    var track = $('#rv-track');
+    clearInterval(rvTimer);
+    if (rvObserver) rvObserver.disconnect();
+    if (!track || !reviews.length) return;
+    // Faqat ekranda ko'ringan video o'ynaydi (ovozsiz)
+    if ('IntersectionObserver' in window) {
+      rvObserver = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          var v = e.target;
+          if (e.isIntersecting) { if (!v.src) v.src = v.getAttribute('data-src'); var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
+          else v.pause();
+        });
+      }, { threshold: 0.6 });
+      track.querySelectorAll('video').forEach(function (v) { rvObserver.observe(v); });
+    }
+    // Lenta o'zi sekin aylanadi; foydalanuvchi tegsa — to'xtaydi
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || reviews.length < 2) return;
+    var paused = false, resume;
+    function pause() { paused = true; clearTimeout(resume); resume = setTimeout(function () { paused = false; }, 8000); }
+    ['pointerdown', 'wheel', 'touchstart', 'focusin'].forEach(function (ev) { track.addEventListener(ev, pause, { passive: true }); });
+    rvTimer = setInterval(function () {
+      if (paused || !document.body.contains(track) || $('.lightbox')) return;
+      var card = track.querySelector('.rv'); if (!card) return;
+      var step = card.getBoundingClientRect().width + 10;
+      if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 4) track.scrollTo({ left: 0, behavior: 'smooth' });
+      else track.scrollBy({ left: step, behavior: 'smooth' });
+    }, 3500);
+  }
+  function openReview(i) {
+    var r = reviews[i]; if (!r) return;
+    var box = document.createElement('div');
+    box.className = 'lightbox'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
+    var media = r.kind === 'video'
+      ? '<video src="' + esc(r.url) + '" controls autoplay playsinline' + (r.poster ? ' poster="' + esc(r.poster) + '"' : '') + '></video>'
+      : '<img src="' + esc(r.url) + '" alt="">';
+    var meta = [r.author ? esc(lang === 'uzc' ? toCyr(r.author) : r.author) : '', r.note ? esc(L(r, 'note')) : ''].filter(Boolean).join(' — ');
+    box.innerHTML = '<button type="button" class="x" aria-label="' + esc(t('close')) + '">×</button><div style="text-align:center">' + media +
+      '<div class="meta">' + meta + (r.link ? '<div><a href="' + esc(r.link) + '" target="_blank" rel="noopener">' + ICON.ig + esc(t('on_ig')) + '</a></div>' : '') + '</div></div>';
+    document.body.appendChild(box);
+    document.body.style.overflow = 'hidden';
+    view.querySelectorAll('.rv video').forEach(function (v) { v.pause(); });
+    function close() { box.remove(); document.body.style.overflow = ''; document.removeEventListener('keydown', onKey); wireReviews(); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    box.addEventListener('click', function (e) { if (e.target === box || e.target.closest('.x')) close(); });
+    document.addEventListener('keydown', onKey);
+    box.querySelector('.x').focus();
+  }
+
   function renderHome() {
     setChrome('home');
     document.title = t('title');
-    var html = calcHTML() + '<div class="wrap">';
+    var html = heroHTML() + '<div class="wrap">' + perksHTML();
     if (demo) html += '<div class="demo-note">' + esc(t('demo')) + '</div>';
-    if (products.length || !loaded) {
-      html += '<div class="section-title"><h2>' + esc(t('products')) + '</h2>' +
+    if (products.length || !loaded || loadError) {
+      html += '<div class="section-title" id="products"><h2>' + esc(t('products')) + '</h2>' +
         (products.length ? '<span>' + esc(t('count', { n: products.length })) + '</span>' : '') + '</div>';
       if (products.length > 8) {
         html += '<label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>' +
           '<span class="sr">' + esc(t('search')) + '</span><input id="q" type="search" placeholder="' + esc(t('search')) + '" autocomplete="off" value="' + esc(query) + '"></label>';
       }
       html += '<div id="plist">' + productsHTML() + '</div>';
-    } else if (loadError) {
-      html += '<div id="plist">' + productsHTML() + '</div>';
     }
-    html += '</div>' + footerHTML();
+    html += stepsHTML() + reviewsHTML() + '</div>' + footerHTML();
     view.innerHTML = html;
-    wireCalc();
+    wireReviews();
     var q = $('#q');
     if (q) q.addEventListener('input', function () { query = q.value.trim().toLowerCase(); $('#plist').innerHTML = productsHTML(); });
+    if (pendingProducts) { pendingProducts = false; setTimeout(function () { var el = $('#products'); if (el) el.scrollIntoView(); }, 0); }
+  }
+  var pendingProducts = false;
+
+  function renderCalc() {
+    setChrome('calc');
+    document.title = t('calc_title') + ' — Musavvir Print';
+    view.innerHTML = calcHTML();
+    wireCalc();
+    $('#calc-back').onclick = function () { if (history.length > 1) history.back(); else location.hash = '#/'; };
+    window.scrollTo(0, 0);
   }
 
   function footerHTML() {
@@ -706,6 +938,9 @@
   }
 
   view.addEventListener('click', function (e) {
+    var rvb = e.target.closest('[data-rv]');
+    if (rvb) { openReview(+rvb.getAttribute('data-rv')); return; }
+    if (e.target.closest('[data-to-products]')) { pendingProducts = true; return; }
     var tab = e.target.closest('[data-calc]');
     if (tab) {
       calcId = tab.getAttribute('data-calc'); store.set('mp_calc', calcId);
@@ -872,8 +1107,8 @@
       b.addEventListener('click', function () {
         var i;
         if (b.hasAttribute('data-edit-calc')) {
-          calcId = b.getAttribute('data-edit-calc'); store.set('mp_calc', calcId); location.hash = '#/';
-          setTimeout(function () { var q = $('#c-qty'); if (q) { q.scrollIntoView({ block: 'center' }); q.focus(); } }, 60);
+          calcId = b.getAttribute('data-edit-calc'); store.set('mp_calc', calcId); location.hash = '#/hisoblash';
+          setTimeout(function () { var q = $('#c-qty'); if (q) q.focus(); }, 60);
           return;
         }
         if (b.hasAttribute('data-rm-calc')) delete cart.calcs[b.getAttribute('data-rm-calc')];
@@ -977,7 +1212,8 @@
 
   // ================= Yo'naltirish =================
   function setChrome(which) {
-    $('#top-white').hidden = which === 'home';
+    $('#top-white').hidden = which === 'home' || which === 'calc';
+    if (which !== 'home') { clearInterval(rvTimer); if (rvObserver) rvObserver.disconnect(); }
     document.querySelectorAll('[data-nav]').forEach(function (a) {
       var on = a.getAttribute('data-nav') === which;
       a.classList.toggle('on', on);
@@ -989,6 +1225,7 @@
     var m = h.match(/^#\/p\/(.+)$/);
     if (h === '#/savat' && !loaded) { setChrome('cart'); view.innerHTML = '<div class="wrap cart"><h1>' + esc(t('cart')) + '</h1><div class="skeleton" style="aspect-ratio:3/1"></div></div>'; }
     else if (h === '#/savat') renderCart();
+    else if (h === '#/hisoblash') renderCalc();
     else if (m && loaded) renderProduct(decodeURIComponent(m[1]));
     else if (m) { setChrome(''); view.innerHTML = '<div class="wrap" style="padding-top:20px"><div class="skeleton" style="aspect-ratio:1"></div></div>'; }
     else renderHome();

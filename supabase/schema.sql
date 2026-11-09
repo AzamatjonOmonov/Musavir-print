@@ -42,6 +42,21 @@ create table if not exists settings (
   updated_at  timestamptz not null default now()
 );
 
+-- Mijozlar fikri: video yoki skrinshot
+create table if not exists reviews (
+  id          uuid primary key default gen_random_uuid(),
+  kind        text not null default 'image',  -- video / image
+  url         text not null,                  -- video yoki rasm
+  poster      text not null default '',       -- video uchun birinchi kadr
+  author      text not null default '',       -- masalan: Dilnoza, Toshkent
+  note        text not null default '',       -- masalan: 100 ta rasm + albom
+  note_ru     text not null default '',
+  link        text not null default '',       -- Instagram havolasi
+  active      boolean not null default true,
+  sort        integer not null default 0,
+  created_at  timestamptz not null default now()
+);
+
 -- Admin panelga kirish urinishlari (parol taxmin qilishdan himoya)
 create table if not exists admin_events (
   id          bigint generated always as identity primary key,
@@ -57,10 +72,16 @@ alter table products     enable row level security;
 alter table orders       enable row level security;
 alter table admin_events enable row level security;
 alter table settings     enable row level security;
+alter table reviews      enable row level security;
 
 -- Tovar rasmlari uchun ochiq papka
 insert into storage.buckets (id, name, public)
 values ('products', 'products', true)
+on conflict (id) do nothing;
+
+-- Fikr videolari uchun papka (50 MB gacha, faqat video)
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('reviews', 'reviews', true, 52428800, array['video/mp4','video/quicktime','video/webm'])
 on conflict (id) do nothing;
 
 -- Agar jadval oldinroq yaratilgan bo'lsa — yangi ustunlar (qayta ishga tushirish zararsiz)

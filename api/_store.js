@@ -50,6 +50,45 @@ async function uploadImage(buffer, contentType) {
   return `${SB_URL}/storage/v1/object/public/${BUCKET}/${name}`;
 }
 
+// Video uchun: brauzer faylni to'g'ridan-to'g'ri Supabase'ga yuklashi uchun bir martalik havola
+const VIDEO_TYPES = { 'video/mp4': 'mp4', 'video/quicktime': 'mov', 'video/webm': 'webm' };
+async function signVideoUpload(type) {
+  const ext = VIDEO_TYPES[type];
+  if (!ext) return { error: 'Faqat MP4, MOV yoki WEBM video' };
+  const name = `${Date.now().toString(36)}-${crypto.randomBytes(6).toString('hex')}.${ext}`;
+  const r = await fetch(`${SB_URL}/storage/v1/object/upload/sign/reviews/${name}`, {
+    method: 'POST', headers: headers({ 'Content-Type': 'application/json' }), body: '{}',
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || !d.url) {
+    console.error('Sign upload error', r.status, d);
+    return { error: "Yuklash havolasi olinmadi" };
+  }
+  return {
+    upload: `${SB_URL}/storage/v1${d.url}`,
+    url: `${SB_URL}/storage/v1/object/public/reviews/${name}`,
+  };
+}
+const ownUrl = (u, bucket) => typeof u === 'string' && SB_URL &&
+  u.startsWith(`${SB_URL}/storage/v1/object/public/${bucket}/`) && !/[\s"'<>]/.test(u) && u.length < 500;
+
+function cleanReview(r) {
+  const kind = r.kind === 'video' ? 'video' : 'image';
+  const url = String(r.url || '');
+  if (!(kind === 'video' ? ownUrl(url, 'reviews') : ownUrl(url, BUCKET))) return { error: 'Avval video yoki rasm yuklang' };
+  let link = str(r.link, 300);
+  if (link && !/^https:\/\/(www\.)?instagram\.com\/[\w./?=&%-]+$/.test(link)) return { error: "Instagram havolasi https://www.instagram.com/... bo'lishi kerak" };
+  return {
+    review: {
+      kind, url,
+      poster: ownUrl(r.poster, BUCKET) ? r.poster : '',
+      author: str(r.author, 60), note: str(r.note, 120), note_ru: str(r.note_ru, 120), link,
+      active: r.active !== false,
+      sort: Math.max(-9999, Math.min(9999, Math.round(Number(r.sort) || 0))),
+    },
+  };
+}
+
 // ---------- Admin kirish: imzolar ----------
 // Imzo kaliti parol + server sirlaridan olinadi: parol almashsa, hamma kirishlar
 // bekor bo'ladi; serverdagi sir esa o'g'irlangan tokendan parolni topishga yo'l qo'ymaydi.
@@ -236,12 +275,8 @@ const DEFAULT_CALCS = [
     ],
   },
 ];
-const DEFAULT_ANNOUNCEMENTS = [
-  {
-    text: "🚚 300 ta rasmdan butun O'zbekiston bo'ylab bepul yetkazamiz",
-    text_ru: '🚚 Бесплатная доставка по всему Узбекистану от 300 фото', on: true,
-  },
-];
+// Bosh sahifadagi «Yangi» lentasi shu gapni aytadi, shuning uchun tepadagi chiziq standart holatda bo'sh
+const DEFAULT_ANNOUNCEMENTS = [];
 
 function cleanCalcs(arr) {
   if (!Array.isArray(arr)) return { error: "Noto'g'ri ma'lumot" };
@@ -266,6 +301,23 @@ function cleanCalcs(arr) {
   }
   return { value: out };
 }
+const DEFAULT_SITE = {
+  clients: '250+',
+  speed: 'Buyurtmangizni kechiktirmay chop etib, jo\'natamiz',
+  speed_ru: 'Печатаем и отправляем без задержек',
+  hero_image: '',
+};
+function cleanSite(v) {
+  v = v || {};
+  return {
+    value: {
+      clients: str(v.clients, 12) || DEFAULT_SITE.clients,
+      speed: str(v.speed, 90) || DEFAULT_SITE.speed,
+      speed_ru: str(v.speed_ru, 90),
+      hero_image: ownUrl(v.hero_image, BUCKET) ? v.hero_image : '',
+    },
+  };
+}
 function cleanAnnouncements(arr) {
   if (!Array.isArray(arr)) return { error: "Noto'g'ri ma'lumot" };
   return {
@@ -284,15 +336,16 @@ function tierPrice(calc, qty) {
 let settingsCache = null;
 let settingsAt = 0;
 async function getSettings({ fresh = false } = {}) {
-  const defaults = { calculators: DEFAULT_CALCS, announcements: DEFAULT_ANNOUNCEMENTS };
+  const defaults = { calculators: DEFAULT_CALCS, announcements: DEFAULT_ANNOUNCEMENTS, site: DEFAULT_SITE };
   if (!configured()) return defaults;
   if (!fresh && settingsCache && Date.now() - settingsAt < 15000) return settingsCache;
   try {
-    const rows = await rest('settings?select=key,value&key=in.(calculators,announcements)');
+    const rows = await rest('settings?select=key,value&key=in.(calculators,announcements,site)');
     const map = Object.fromEntries((rows || []).map((r) => [r.key, r.value]));
     settingsCache = {
       calculators: Array.isArray(map.calculators) && map.calculators.length ? map.calculators : DEFAULT_CALCS,
       announcements: Array.isArray(map.announcements) ? map.announcements : DEFAULT_ANNOUNCEMENTS,
+      site: { ...DEFAULT_SITE, ...(map.site && typeof map.site === 'object' ? map.site : {}) },
     };
     settingsAt = Date.now();
     return settingsCache;
@@ -354,4 +407,5 @@ module.exports = {
   configured, rest, uploadImage, makeToken, checkToken, checkPassword, cleanProduct, DEMO_PRODUCTS,
   makeChallenge, checkChallenge, logEvent, countEvents, sniffImage, SESSION_DAYS,
   priceItem, getSettings, saveSetting, cleanCalcs, cleanAnnouncements, tierPrice, printUnitPrice,
+  cleanSite, cleanReview, signVideoUpload,
 };
