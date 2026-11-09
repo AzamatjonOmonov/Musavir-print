@@ -268,12 +268,15 @@ function priceItem(p, sel) {
 // ---------- Sozlamalar: narx kalkulyatorlari va e'lonlar ----------
 const DEFAULT_CALCS = [
   {
-    id: '10x15', name: '10x15', name_ru: '10x15', on: true, free: true,
+    id: '10x15', name: '10x15', name_ru: '10x15', size: '10×15 sm', size_ru: '10×15 см', lam: 0, on: true, free: true,
     tiers: [
       { from: 1, price: 5000 }, { from: 21, price: 4000 }, { from: 41, price: 3000 }, { from: 50, price: 2000 },
       { from: 100, price: 1800 }, { from: 201, price: 1700 }, { from: 301, price: 1600 }, { from: 501, price: 1500 },
     ],
   },
+  { id: 'a5', name: 'A5', name_ru: 'A5', size: '15×21 sm', size_ru: '15×21 см', lam: 5000, on: true, free: false, tiers: [{ from: 1, price: 10000 }] },
+  { id: 'a4', name: 'A4', name_ru: 'A4', size: '21×30 sm', size_ru: '21×30 см', lam: 5000, on: true, free: false, tiers: [{ from: 1, price: 20000 }] },
+  { id: 'a3', name: 'A3', name_ru: 'A3', size: '30×42 sm', size_ru: '30×42 см', lam: 5000, on: true, free: false, tiers: [{ from: 1, price: 30000 }] },
 ];
 // Bosh sahifadagi «Yangi» lentasi shu gapni aytadi, shuning uchun tepadagi chiziq standart holatda bo'sh
 const DEFAULT_ANNOUNCEMENTS = [];
@@ -297,7 +300,10 @@ function cleanCalcs(arr) {
       .slice(0, 20);
     if (!tiers.length) return { error: `«${name}» uchun kamida bitta narx kiriting` };
     tiers[0].from = 1;
-    out.push({ id, name, name_ru: str(c.name_ru, 30), on: c.on !== false, free: !!c.free, tiers });
+    out.push({
+      id, name, name_ru: str(c.name_ru, 30), size: str(c.size, 24), size_ru: str(c.size_ru, 24),
+      lam: money(c.lam), on: c.on !== false, free: !!c.free, tiers,
+    });
   }
   return { value: out };
 }

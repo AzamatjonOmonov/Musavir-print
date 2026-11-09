@@ -75,8 +75,13 @@
 
   /* ---------- Oq sarlavha (ichki sahifalarda) ---------- */
   header.top-white { position: sticky; top: 0; z-index: 20; background: var(--surface); border-bottom: 1px solid var(--line); }
-  .top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 60px; }
-  .top-row .logo img { height: 38px; width: auto; }
+  .top-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; height: 60px; }
+  .top-row .logo { justify-self: center; }
+  .hbtn { justify-self: start; width: 42px; height: 42px; border-radius: 12px; border: 0; background: var(--bg); display: grid; place-items: center; color: var(--ink); }
+  .phone { justify-self: end; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border-radius: 999px; background: #ffe5ef; color: var(--pink); font-weight: 700; font-size: 14px; text-decoration: none; white-space: nowrap; }
+  @media (max-width: 359px) { .phone span { display: none; } .phone { width: 40px; padding: 0; justify-content: center; } }
+  @media (min-width: 700px) { body.home .top-white { display: none; } }
+  .top-row .logo img { height: 34px; width: auto; display: block; }
 
   /* ---------- Eski kalkulyator (asl dizayn) ---------- */
   .calc-band { background: var(--pink-bg); padding: 12px 0 36px; }
@@ -137,6 +142,14 @@
   }
   .retro-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--wine); }
   .retro-btn:disabled { opacity: .6; }
+  @media (max-width: 699px) { .calc-band { padding-top: 4px; } .calc-band .calc-logo { display: none; } .calc-card { padding: 18px; } }
+  .screen.nofree { min-height: 0; }
+  .screen.nofree .scr-free { display: none; }
+  .qbtns { display: flex; gap: 8px; margin-top: 10px; }
+  .qbtns button { flex: 1; height: 40px; border-radius: 10px; border: 2px solid var(--gray); background: #fff; font-weight: 700; color: var(--ink); }
+  .lam { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: #fff; border: 2px solid var(--gray); cursor: pointer; }
+  .lam input { width: 22px; height: 22px; accent-color: var(--pink); margin: 0; }
+  .lam b { display: block; } .lam small { color: var(--muted); font-weight: 600; }
   .calc-note { text-align: center; font-size: 14px; font-weight: 700; color: rgba(44,44,44,.72); margin: 16px 0 0; line-height: 1.4; }
   .calc-note button { border: 0; background: none; padding: 0; color: var(--pink); text-decoration: underline; text-underline-offset: 3px; font-weight: 700; }
 
@@ -208,23 +221,41 @@
   .dots-h { position: absolute; z-index: 3; left: 0; right: 0; bottom: 3.2%; display: flex; justify-content: center; gap: 8px; }
   .dots-h button { width: 9px; height: 9px; border-radius: 50%; border: 0; padding: 0; background: rgba(255,255,255,.55); cursor: pointer; transition: width .25s; }
   .dots-h button[aria-current="true"] { width: 26px; border-radius: 5px; background: #fff; }
-  /* Telefon: tik karta */
+  /* Telefon: ixcham gorizontal banner (bir qo'lda) */
   @container (max-width: 699px) {
-    .slides-h { border-radius: 24px; }
-    .slide { aspect-ratio: 4 / 5.1; background: linear-gradient(#fff 0 15%, var(--pink) 15%); }
-    .slide-head { height: 15%; padding: 0 6%; }
-    .slide-head img { width: 38%; }
-    .burger { width: 10%; min-width: 0; }
-    .slide h2 { left: 7%; top: 21%; width: 82%; font-size: 10.4cqw; line-height: .88; }
-    .slide h2.long { font-size: 8.4cqw; width: 86%; }
-    .slide .q { width: 19%; }
-    .slide .q1 { left: 2%; top: 17.5%; }
-    .slide .q2 { left: auto; right: 3%; top: 17.5%; }
-    .slide .person { left: 10%; top: 41%; width: 96%; height: 59%; object-position: 70% 100%; }
-    .slide .bg { left: 18%; top: 44%; width: 82%; height: 34%; }
-    .slide .go { left: 7%; top: auto; bottom: 8%; height: 10%; min-width: 0; padding: 0 6.5%; font-size: 4.3cqw; }
-    .dots-h { bottom: 2.6%; }
+    .slides-h { border-radius: 22px; }
+    .slide { aspect-ratio: 1.68; background: var(--pink); }
+    .slide-head { display: none; }
+    .slide h2 { left: 6%; top: 15%; width: 52%; font-size: 6.5cqw; line-height: .9; }
+    .slide h2.long { font-size: 5.4cqw; width: 54%; }
+    .slide h2 em.big { font-size: 1.55em; }
+    .slide .q { width: 11%; }
+    .slide .q1 { left: 1.5%; top: 9%; }
+    .slide .q2 { display: none; }
+    .slide .person { left: 40%; top: 3%; width: 62%; height: 97%; object-position: 75% 100%; }
+    .slide .bg { left: 40%; top: 18%; width: 60%; height: 60%; }
+    .slide .go { left: 6%; top: auto; bottom: 12%; height: 18%; min-width: 0; padding: 0 5.5%; font-size: 3.9cqw; }
+    .dots-h { bottom: 4%; left: auto; right: 4%; justify-content: flex-end; gap: 5px; }
+    .dots-h button { width: 7px; height: 7px; }
+    .dots-h button[aria-current="true"] { width: 18px; }
   }
+  .arr { position: absolute; z-index: 4; top: 50%; width: 46px; height: 46px; margin-top: -23px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); color: var(--ink); display: none; place-items: center; box-shadow: 0 4px 14px rgba(0,0,0,.15); cursor: pointer; }
+  .arr.prev { left: -18px; } .arr.next { right: -18px; }
+  @media (hover: hover) and (min-width: 700px) { .arr { display: grid; } }
+  .slides-h.drag { scroll-snap-type: none; cursor: grabbing; }
+  .slides-h img { -webkit-user-drag: none; user-select: none; }
+
+  /* Nimani çiqaramiz? — ikonkalar qatori */
+  .cats { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 4px 16px 6px; }
+  .cats::-webkit-scrollbar { display: none; }
+  .cat { flex: none; width: 74px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none; color: var(--ink); font-size: 12.5px; font-weight: 600; text-align: center; line-height: 1.15; }
+  .cat .ci { width: 66px; height: 66px; border-radius: 20px; background: var(--surface); display: grid; place-items: center; box-shadow: 0 1px 0 var(--line); }
+  .cat.first .ci { background: var(--pink); }
+  .cat.first .ci .sheet { background: #fff; border-color: #fff; }
+  .cat small { display: block; font-weight: 500; color: var(--muted); font-size: 11px; }
+  .sheet { display: block; background: #fde6ef; border: 2px solid var(--pink); border-radius: 3px; }
+  .cat .ci svg { color: var(--pink); }
+
   .clients-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 16px 0 0; font-size: 15px; color: #4b464e; }
   .clients-row b { font-size: 22px; color: var(--ink); }
   .clients-row .faces { display: flex; }
@@ -247,6 +278,22 @@
   .drawer .socials { justify-content: flex-start; }
 
   /* ---------- Buyurtma tanlash ---------- */
+  .fmt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (min-width: 760px) { .fmt-grid { grid-template-columns: repeat(4, 1fr); } }
+  .fmt-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; background: var(--surface); border-radius: 20px; padding: 14px; text-decoration: none; color: var(--ink); border: 2px solid transparent; min-height: 210px; }
+  .fmt-card:active { border-color: var(--pink); }
+  .fmt-card .fc-art { width: 100%; height: 92px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 10px; background: var(--bg); border-radius: 14px; padding-bottom: 8px; }
+  .fmt-card b { font-size: 20px; letter-spacing: -.02em; }
+  .fmt-card .fc-size { color: var(--muted); font-size: 13px; }
+  .fmt-card .fc-price { margin-top: auto; padding-top: 8px; font-weight: 700; color: var(--pink); }
+  .fmt-card .fc-lam { font-size: 11.5px; color: var(--muted); line-height: 1.3; }
+  .fmt-card.main { grid-column: 1 / -1; background: var(--pink); color: #fff; min-height: 0; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto 1fr; column-gap: 14px; align-items: start; }
+  @media (min-width: 760px) { .fmt-card.main { grid-column: span 2; } }
+  .fmt-card.main .fc-art { grid-column: 2; grid-row: 1 / 4; width: 110px; height: 110px; background: rgba(255,255,255,.18); margin: 0; align-items: center; padding: 0; }
+  .fmt-card.main .fc-art .sheet { background: #fff; border-color: #fff; transform: rotate(-6deg); box-shadow: 4px 4px 0 var(--wine); }
+  .fmt-card.main b { font-size: 26px; }
+  .fmt-card.main .fc-size { color: rgba(255,255,255,.9); }
+  .fmt-card.main .fc-price { color: #fff; background: rgba(0,0,0,.14); border-radius: 999px; padding: 4px 12px; margin-top: 12px; align-self: start; justify-self: start; }
   .order-pg h1 { font-size: 26px; line-height: 1.15; margin: 20px 0 6px; letter-spacing: -.02em; }
   .order-pg .sub { margin: 0 0 18px; color: var(--muted); }
   .print-card { position: relative; overflow: hidden; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; background: var(--pink); color: #fff; border-radius: 22px; padding: 20px; text-decoration: none; }
@@ -383,10 +430,12 @@
 
   /* ---------- Pastki menyu ---------- */
   nav.bottom { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
-  nav.bottom .wrap { display: grid; grid-template-columns: repeat(3, 1fr); height: var(--nav-h); }
-  nav.bottom a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; font-size: 12px; color: var(--muted); position: relative; }
-  nav.bottom a.on { color: var(--pink); }
-  .count { position: absolute; top: 7px; left: calc(50% + 6px); min-width: 18px; height: 18px; border-radius: 9px; background: var(--pink); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
+  nav.bottom .wrap { display: grid; grid-template-columns: repeat(4, 1fr); height: var(--nav-h); }
+  nav.bottom a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; font-size: 11.5px; color: var(--muted); position: relative; }
+  nav.bottom .ic { position: relative; width: 40px; height: 34px; border-radius: 17px; display: grid; place-items: center; transition: background .15s, color .15s; }
+  nav.bottom a.on { color: var(--ink); font-weight: 600; }
+  nav.bottom a.on .ic { background: var(--pink); color: #fff; }
+  .count { position: absolute; top: -4px; left: calc(50% + 6px); min-width: 18px; height: 18px; border-radius: 9px; background: var(--pink); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
   .toast { position: fixed; left: 50%; bottom: calc(var(--nav-h) + 84px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 12px; z-index: 50; opacity: 0; transition: .2s; pointer-events: none; font-size: 14px; white-space: nowrap; }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
@@ -395,10 +444,11 @@
 <body>
 
 <div class="ann" id="ann" hidden><div class="wrap"><span id="ann-text"></span></div></div>
-<header class="top-white" id="top-white" hidden>
+<header class="top-white" id="top-white">
   <div class="wrap top-row">
+    <button type="button" class="hbtn" data-menu aria-label="Menyu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
     <a class="logo" href="#/" aria-label="Musavvir Print"><img src="/dokon/logo.png" alt="Musavvir Print" width="134" height="38"></a>
-    <div class="langs" data-langs></div>
+    <a class="phone" href="tel:+998772771552"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg><span>77 277 15 52</span></a>
   </div>
 </header>
 
@@ -406,19 +456,10 @@
 
 <nav class="bottom" aria-label="Menu">
   <div class="wrap">
-    <a href="#/" data-nav="home">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
-      <span data-t="nav_home"></span>
-    </a>
-    <a href="#/savat" data-nav="cart">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 7h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg>
-      <span data-t="nav_cart"></span>
-      <span class="count" id="cart-count" hidden>0</span>
-    </a>
-    <a href="https://t.me/AzizaxonOmonova" target="_blank" rel="noopener">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 4 3 11l6 2.5L11.5 20 15 15l5 4z"/><path d="m9 13.5 6-4"/></svg>
-      <span data-t="nav_admin"></span>
-    </a>
+    <a href="#/" data-nav="home"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></span><span data-t="nav_home"></span></a>
+    <a href="#/buyurtma" data-nav="order"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><rect x="7" y="6" width="10" height="8" rx="1"/><path d="M8 18h8"/></svg></span><span data-t="nav_order"></span></a>
+    <a href="#/savat" data-nav="cart"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg><span class="count" id="cart-count" hidden>0</span></span><span data-t="nav_cart"></span></a>
+    <a href="https://t.me/AzizaxonOmonova" target="_blank" rel="noopener"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M21 4 3 11l6 2.5L11.5 20 15 15l5 4z"/><path d="m9 13.5 6-4"/></svg></span><span data-t="nav_contact"></span></a>
   </div>
 </nav>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -482,7 +523,7 @@
       title: "Musavvir Print — dökon",
       nav_home: 'Boş sahifa', nav_cart: 'Savat', nav_admin: 'Adminga yoziş',
       each: 'Donasi', total: 'Jami', som: "söm", left: 'Yana {n} ta', free_short: 'bepul 🚚',
-      free_badge: 'Tabriklaymiz! Yetkazib beriş bepul 🚚', how_many: 'Neçta rasm?',
+      free_badge: 'Tabriklaymiz! Yetkazib beriş bepul 🚚', how_many: 'Neçta çiqarmoqçisiz?',
       add_cart: "Savatga qöşiş", update_cart: 'Savatni yangilaş', in_cart: 'Savatda: {n} ta',
       remove: 'Olib taşlaş', added: "Savatga qöşildi", updated: 'Savat yangilandi',
       other_formats: "Polaroid va boşqa ölçamlar — {a}adminga yozing{b}.",
@@ -524,14 +565,14 @@
       calc_title: 'Rasm narxini hisoblaş', go_cart2: "Savatga ötiş", add_more: "Albom, ramka qöşiş",
       play: 'Videoni oçiş', open_img: 'Kattalaştiriş',
       menu: 'Menyu', lang_lbl: 'Til', follow: 'Bizni kuzating', slide_n: '{n}-slayd',
-      order_title: 'Nima buyurtma qilmoqçisiz?', order_sub: 'Tanlang va savatga qöşing — hammasini bitta buyurtmada rasmiylaştirasiz.',
+      order_title: 'Esdalik rasmlaringizni çiqarmoqçimisiz?', order_sub: 'Ölçamni tanlang — keyin sonini yozasiz, narx özi hisoblanadi.', nav_order: 'Buyurtma', nav_contact: 'Aloqa', what_print: 'Nimani çiqaramiz?', lam_label: 'Laminatsiya qilinsin', lam_short: 'laminatsiyali', lam_note: '+{p} söm / dona', from_p: '{p} sömdan', per_pc: 'dona',
       print_card: 'Rasm çiqariş', print_card_t: '{f} — {p} sömdan. Qança köp bölsa, şunça arzon.', print_go: 'Narxini hisoblaş', or_choose: 'Yoki tayyor mahsulot tanlang'
     },
     ru: {
       title: 'Musavvir Print — магазин',
       nav_home: 'Главная', nav_cart: 'Корзина', nav_admin: 'Написать админу',
       each: 'Цена шт.', total: 'Итого', som: 'сум', left: 'Ещё {n} шт', free_short: 'бесплатно 🚚',
-      free_badge: 'Поздравляем! Доставка бесплатно 🚚', how_many: 'Сколько фото?',
+      free_badge: 'Поздравляем! Доставка бесплатно 🚚', how_many: 'Сколько напечатать?',
       add_cart: 'В корзину', update_cart: 'Обновить корзину', in_cart: 'В корзине: {n} шт',
       remove: 'Удалить', added: 'Добавлено в корзину', updated: 'Корзина обновлена',
       other_formats: 'Полароид и другие размеры — {a}напишите админу{b}.',
@@ -573,7 +614,7 @@
       calc_title: 'Расчёт печати фото', go_cart2: 'Перейти в корзину', add_more: 'Добавить альбом, рамку',
       play: 'Открыть видео', open_img: 'Увеличить',
       menu: 'Меню', lang_lbl: 'Язык', follow: 'Мы в соцсетях', slide_n: 'Слайд {n}',
-      order_title: 'Что хотите заказать?', order_sub: 'Выберите и добавьте в корзину — оформите всё одним заказом.',
+      order_title: 'Хотите напечатать памятные фото?', order_sub: 'Выберите размер — потом укажите количество, цена посчитается сама.', nav_order: 'Заказ', nav_contact: 'Связь', what_print: 'Что печатаем?', lam_label: 'Заламинировать', lam_short: 'с ламинацией', lam_note: '+{p} сум / шт', from_p: 'от {p} сум', per_pc: 'шт',
       print_card: 'Печать фото', print_card_t: '{f} — от {p} сум. Чем больше, тем дешевле.', print_go: 'Рассчитать цену', or_choose: 'Или выберите готовый товар'
     }
   };
@@ -640,6 +681,7 @@
   if (!cart || typeof cart !== 'object') cart = {};
   if (!cart.calcs) cart.calcs = {};
   if (cart.prints) { cart.calcs['10x15'] = cart.prints; delete cart.prints; }
+  if (!cart.calcLam || typeof cart.calcLam !== 'object') cart.calcLam = {};
   if (!Array.isArray(cart.items)) cart.items = [];
   var draft = store.get('mp_checkout', { phone: '', address: '' });
   var loc = null;
@@ -647,6 +689,8 @@
   function saveCart() { store.set('mp_cart', cart); updateCount(); }
   function byId(id) { for (var i = 0; i < products.length; i++) if (products[i].id === id) return products[i]; return null; }
   function calcById(id) { for (var i = 0; i < calcs.length; i++) if (calcs[i].id === id) return calcs[i]; return null; }
+  function calcUnit(c, q) { return tierPrice(c, q) + (cart.calcLam[c.id] && c.lam > 0 ? c.lam : 0); }
+  function sizeOf(c) { var sz = lang === 'ru' ? (c.size_ru || (c.size || '').replace(/sm/g, 'см')) : lang === 'uzc' ? (c.size_ru || (c.size || '').replace(/sm/g, 'см')) : c.size; return sz || ''; }
   function tierPrice(c, q) { var p = 0; if (!c || q <= 0) return 0; c.tiers.forEach(function (x) { if (q >= x.from) p = x.price; }); return p; }
   function minPrice(p) {
     var base = p.variants.length ? Math.min.apply(null, p.variants.map(function (v) { return v.price; })) : p.price;
@@ -670,7 +714,7 @@
   }
   function totals() {
     var total = 0;
-    Object.keys(cart.calcs).forEach(function (id) { var c = calcById(id), q = cart.calcs[id]; if (c && q > 0) total += q * tierPrice(c, q); });
+    Object.keys(cart.calcs).forEach(function (id) { var c = calcById(id), q = cart.calcs[id]; if (c && q > 0) total += q * calcUnit(c, q); });
     cart.items.forEach(function (it) { var p = byId(it.id); if (p) total += lineInfo(p, it).unit * it.q; });
     return { total: total, free: freeCount() };
   }
@@ -764,7 +808,7 @@
     }).join('') + '</div>' : '';
     var cells = ''; for (var i = 0; i < 12; i++) cells += '<i></i>';
     return '<section class="calc-band"><div class="wrap">' +
-      '<div class="bar"><button type="button" class="back-w" id="calc-back">' + esc(t('back')) + '</button><div class="langs" data-langs>' + langsHTML() + '</div></div>' +
+      '<div class="bar"><button type="button" class="back-w" id="calc-back">' + esc(t('back')) + '</button></div>' +
       '<div class="calc-card">' +
         '<div class="calc-logo"><img src="/dokon/logo.png" alt="Musavvir Print" width="300" height="85"></div>' + tabs +
         '<div class="screen"><div class="scanline"></div><div class="scr">' +
@@ -775,6 +819,8 @@
         '</div></div>' +
         '<label class="calc-label" for="c-qty">' + esc(t('how_many')) + '</label>' +
         '<input class="tactile" type="number" id="c-qty" min="0" max="100000" inputmode="numeric" placeholder="0">' +
+        '<div class="qbtns" id="c-quick"></div>' +
+        '<label class="lam" id="c-lam" hidden><input type="checkbox" id="c-lam-in"><span><b>' + esc(t('lam_label')) + '</b><small id="c-lam-note"></small></span></label>' +
         '<button class="retro-btn" type="button" id="c-add"></button>' +
         '<p class="calc-note" id="c-note"></p>' +
         '<div class="after-add" id="after-add" hidden><a class="go" href="#/savat">' + esc(t('go_cart2')) + '</a><a href="#/buyurtma">' + esc(t('add_more')) + '</a></div>' +
@@ -786,17 +832,18 @@
     if (!inp) return;
     var c = calcById(calcId);
     if (!c) { $('.calc-card .screen').hidden = true; return; }
+    $('.calc-card .screen').classList.toggle('nofree', !c.free);
     inp.value = cart.calcs[calcId] > 0 ? cart.calcs[calcId] : '';
     function paint() {
       var q = Math.max(0, Math.min(100000, parseInt(inp.value, 10) || 0));
-      var up = tierPrice(c, q);
+      var up = calcUnit(c, q);
       $('#c-fmt').textContent = L(c, 'name').toUpperCase();
       $('#c-unit').textContent = fmt(up);
       $('#c-sum').textContent = fmt(q * up);
       // bepul yetkazish: savatdagi boshqa rasmlar ham hisoblanadi
       var others = freeCount() - (c.free ? (cart.calcs[calcId] || 0) : 0);
       var n = others + (c.free ? q : 0);
-      var showProg = n > 0 && n < FREE_FROM, showBadge = n >= FREE_FROM;
+      var showProg = c.free && n > 0 && n < FREE_FROM, showBadge = c.free && n >= FREE_FROM;
       $('#c-prog').classList.toggle('on', showProg);
       $('#c-badge').classList.toggle('on', showBadge);
       $('#c-left').textContent = t('left', { n: Math.max(0, FREE_FROM - n) });
@@ -814,6 +861,19 @@
       $('#after-add').hidden = !Object.keys(cart.calcs).some(function (k) { return cart.calcs[k] > 0; });
     }
     inp.addEventListener('input', paint);
+    var lamBox = $('#c-lam'), lamIn = $('#c-lam-in');
+    lamBox.hidden = !(c.lam > 0);
+    if (c.lam > 0) {
+      lamIn.checked = !!cart.calcLam[calcId];
+      $('#c-lam-note').textContent = t('lam_note', { p: fmt(c.lam) });
+      lamIn.onchange = function () {
+        if (lamIn.checked) cart.calcLam[calcId] = true; else delete cart.calcLam[calcId];
+        saveCart(); paint();
+      };
+    }
+    var quick = c.free ? [50, 100, 200, 300] : [1, 2, 5, 10];
+    $('#c-quick').innerHTML = quick.map(function (n) { return '<button type="button" data-qq="' + n + '">' + n + '</button>'; }).join('');
+    $('#c-quick').onclick = function (e) { var b = e.target.closest('[data-qq]'); if (!b) return; inp.value = b.getAttribute('data-qq'); paint(); };
     inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') $('#c-add').click(); });
     $('#c-add').onclick = function () {
       var q = Math.max(0, Math.min(100000, parseInt(inp.value, 10) || 0));
@@ -895,7 +955,8 @@
     return '<section class="slider-wrap"><div class="wrap"><div class="slider" aria-roledescription="carousel">' +
       '<div class="slide-head"><img src="/dokon/hero/logo-musavvir.png" alt="Musavvir Print" width="800" height="226">' +
       '<button type="button" class="burger" data-menu aria-label="' + esc(t('menu')) + '"><i></i><i></i><i></i></button></div>' +
-      '<div class="slides-h" id="slides-h">' + items + '</div>' + dots + '</div>' +
+      '<div class="slides-h" id="slides-h">' + items + '</div>' + dots +
+      (list.length > 1 ? '<button type="button" class="arr prev" aria-label="‹"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></button><button type="button" class="arr next" aria-label="›"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button>' : '') + '</div>' +
       '</div></section>';
   }
   var slideTimer;
@@ -912,17 +973,42 @@
     function go(i) { track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' }); }
     track.addEventListener('scroll', function () { requestAnimationFrame(paintDots); }, { passive: true });
     var pausedUntil = 0;
-    function pause() { pausedUntil = Date.now() + 8000; }
+    function pause() { pausedUntil = Date.now() + 6000; }
     document.querySelectorAll('[data-dot]').forEach(function (d) {
       d.addEventListener('click', function () { pause(); go(+d.getAttribute('data-dot')); });
     });
     ['pointerdown', 'touchstart', 'wheel', 'focusin'].forEach(function (ev) { track.addEventListener(ev, pause, { passive: true }); });
+    document.querySelectorAll('.arr').forEach(function (b) {
+      b.addEventListener('click', function () { pause(); var d = b.classList.contains('next') ? 1 : -1; go((current() + d + n) % n); });
+    });
+    // Sichqoncha bilan tortib surish (telefonda barmoq bilan o'zi suriladi)
+    var drag = null;
+    track.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      drag = { x: e.clientX, left: track.scrollLeft, moved: false };
+      track.classList.add('drag');
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x;
+      if (Math.abs(dx) > 4) drag.moved = true;
+      track.scrollLeft = drag.left - dx;
+    });
+    window.addEventListener('pointerup', function () {
+      if (!drag) return;
+      var d = track.scrollLeft - drag.left, i = Math.round(drag.left / track.clientWidth);
+      track.classList.remove('drag');
+      if (Math.abs(d) > track.clientWidth * 0.12) i += d > 0 ? 1 : -1;
+      go(Math.max(0, Math.min(n - 1, i)));
+      if (drag.moved) { var stop = function (ev) { ev.preventDefault(); ev.stopPropagation(); }; track.addEventListener('click', stop, { capture: true, once: true }); setTimeout(function () { track.removeEventListener('click', stop, true); }, 50); }
+      drag = null;
+    });
     if (n < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     slideTimer = setInterval(function () {
       if (!document.body.contains(track)) { clearInterval(slideTimer); return; }
       if (Date.now() < pausedUntil || document.hidden || $('.drawer.open') || $('.lightbox')) return;
       go((current() + 1) % n);
-    }, 5000);
+    }, 3500);
   }
 
   // ---- Menyu
@@ -931,7 +1017,7 @@
     var dr = document.createElement('aside'); dr.className = 'drawer'; dr.setAttribute('role', 'dialog'); dr.setAttribute('aria-modal', 'true'); dr.setAttribute('aria-label', t('menu'));
     var n = cart.items.reduce(function (a, it) { return a + it.q; }, 0) + Object.keys(cart.calcs).filter(function (k) { return cart.calcs[k] > 0; }).length;
     dr.innerHTML = '<div class="dh"><img src="/dokon/hero/logo-musavvir.png" alt="Musavvir Print"><button type="button" class="x" aria-label="' + esc(t('close')) + '">×</button></div>' +
-      '<nav><a href="#/buyurtma">' + esc(t('order_title')) + '</a>' +
+      '<nav><a href="#/buyurtma">' + esc(t('nav_order')) + '</a>' +
       '<a href="#/hisoblash">' + esc(t('calc_title')) + '</a>' +
       '<a href="#/" data-to-products>' + esc(t('products')) + '</a>' +
       (reviews.length ? '<a href="#/" data-to-reviews>' + esc(t('reviews')) + '</a>' : '') +
@@ -1048,7 +1134,7 @@
   function renderHome() {
     setChrome('home');
     document.title = t('title');
-    var html = heroHTML() + '<div class="wrap">' + perksHTML();
+    var html = heroHTML() + '<div class="wrap">' + catsHTML() + perksHTML();
     if (demo) html += '<div class="demo-note">' + esc(t('demo')) + '</div>';
     if (products.length || !loaded || loadError) {
       html += '<div class="section-title" id="products"><h2>' + esc(t('products')) + '</h2>' +
@@ -1070,23 +1156,53 @@
   }
   var pendingProducts = false;
 
-  function renderOrder() {
+  // O'lchamni ko'rsatuvchi proporsional varaq (A3 eng kattasi)
+  function sheetIcon(c, box) {
+    var m = /(\d+(?:[.,]\d+)?)\s*[×x*]\s*(\d+(?:[.,]\d+)?)/.exec(c.size || '');
+    var w = m ? parseFloat(m[1].replace(',', '.')) : 10, h = m ? parseFloat(m[2].replace(',', '.')) : 15;
+    if (w > h) { var t0 = w; w = h; h = t0; }
+    var k = box / 42;
+    return '<i class="sheet" style="width:' + Math.max(9, Math.round(w * k)) + 'px;height:' + Math.max(13, Math.round(h * k)) + 'px"></i>';
+  }
+  function catsHTML() {
+    var tiles = calcs.map(function (c, i) {
+      return '<a class="cat' + (i === 0 ? ' first' : '') + '" href="#/hisoblash/' + encodeURIComponent(c.id) + '"><span class="ci">' + sheetIcon(c, 50) + '</span>' + esc(L(c, 'name')) +
+        '<small>' + esc(t('from_p', { p: fmt(Math.min.apply(null, c.tiers.map(function (x) { return x.price; }))) })) + '</small></a>';
+    });
+    var seen = {};
+    products.forEach(function (p) {
+      if (!p.category || seen[p.category]) return; seen[p.category] = 1;
+      var img = p.images[0] ? '<img src="' + esc(p.images[0]) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:20px">' : ICON_PHOTO.replace('width="44" height="44"', 'width="28" height="28"');
+      tiles.push('<a class="cat" href="#/buyurtma/' + encodeURIComponent(p.category) + '"><span class="ci">' + img + '</span>' + esc(lang === 'uzc' ? toCyr(p.category) : p.category) + '</a>');
+    });
+    if (!tiles.length) return '';
+    return '<div class="section-title"><h2>' + esc(t('what_print')) + '</h2></div><div class="cats">' + tiles.join('') + '</div>';
+  }
+  function renderOrder(cat) {
     setChrome('order');
     document.title = t('order_title') + ' — Musavvir Print';
-    var c = calcById('10x15') || calcs[0];
-    var fmts = calcs.map(function (x) { return L(x, 'name'); });
-    var html = '<div class="wrap order-pg"><a class="back" href="#/">' + esc(t('back')) + '</a>' +
-      '<h1>' + esc(t('order_title')) + '</h1><p class="sub">' + esc(t('order_sub')) + '</p>';
-    if (calcs.length) {
-      html += '<a class="print-card" href="#/hisoblash"><div><h2>' + esc(t('print_card')) + '</h2>' +
-        '<p>' + esc(t('print_card_t', { f: fmts.join(', '), p: lowestPrint() })) + '</p>' +
-        (calcs.length > 1 ? '<div class="fmt-chips">' + fmts.map(function (f) { return '<span>' + esc(f) + '</span>'; }).join('') + '</div>' : '') +
-        '<span class="pill-go">' + esc(t('print_go')) + '</span></div>' +
-        '<div class="mini-screen" aria-hidden="true"><div><small>' + esc(L(c, 'name')) + '</small>' + lowestPrint() + '</div></div></a>';
+    var html = '<div class="wrap order-pg">';
+    if (!cat) {
+      html += '<h1>' + esc(t('order_title')) + '</h1><p class="sub">' + esc(t('order_sub')) + '</p>';
+      if (!loaded) html += '<div class="fmt-grid"><div class="skeleton" style="aspect-ratio:1"></div><div class="skeleton" style="aspect-ratio:1"></div></div>';
+      html += '<div class="fmt-grid">' + calcs.map(function (c) {
+        var min = Math.min.apply(null, c.tiers.map(function (x) { return x.price; }));
+        return '<a class="fmt-card' + (c.free ? ' main' : '') + '" href="#/hisoblash/' + encodeURIComponent(c.id) + '">' +
+          '<span class="fc-art">' + sheetIcon(c, 74) + '</span>' +
+          '<b>' + esc(c.free ? sizeOf(c) || L(c, 'name') : L(c, 'name')) + '</b>' +
+          '<span class="fc-size">' + esc(c.free ? t('print_card') : sizeOf(c)) + '</span>' +
+          '<span class="fc-price">' + esc(t('from_p', { p: fmt(min) })) + '</span>' +
+          (c.lam > 0 ? '<span class="fc-lam">' + esc(t('lam_label')) + ' ' + esc(t('lam_note', { p: fmt(c.lam) })) + '</span>' : '') +
+        '</a>';
+      }).join('') + '</div>';
+      html += '<div class="section-title"><h2>' + esc(t('or_choose')) + '</h2>' + (products.length ? '<span>' + esc(t('count', { n: products.length })) + '</span>' : '') + '</div>' +
+        '<div id="plist">' + productsHTML() + '</div>';
+    } else {
+      var list = products.filter(function (p) { return p.category === cat; });
+      html += '<a class="back" href="#/buyurtma">' + esc(t('back')) + '</a><h1>' + esc(lang === 'uzc' ? toCyr(cat) : cat) + '</h1>' +
+        (list.length ? '<div class="grid">' + list.map(cardHTML).join('') + '</div>' : (loaded ? '<div class="empty"><b>' + esc(t('empty_shop')) + '</b></div>' : productsHTML()));
     }
-    html += '<div class="section-title"><h2>' + esc(t('or_choose')) + '</h2>' + (products.length ? '<span>' + esc(t('count', { n: products.length })) + '</span>' : '') + '</div>' +
-      '<div id="plist">' + productsHTML() + '</div></div>';
-    view.innerHTML = html;
+    view.innerHTML = html + '</div>';
     window.scrollTo(0, 0);
   }
 
@@ -1222,9 +1338,9 @@
     }
     html += '<div class="lines">';
     calcLines.forEach(function (c) {
-      var q = cart.calcs[c.id], up = tierPrice(c, q);
+      var q = cart.calcs[c.id], up = calcUnit(c, q), lamOn = cart.calcLam[c.id] && c.lam > 0;
       html += '<div class="line"><div class="thumb print">' + esc(L(c, 'name')) + '</div><div>' +
-        '<h4>' + esc(t('print_line', { f: L(c, 'name') })) + '</h4><div class="meta">' + q + ' × ' + esc(sum(up)) + '</div>' +
+        '<h4>' + esc(t('print_line', { f: L(c, 'name') })) + '</h4><div class="meta">' + esc([sizeOf(c), lamOn ? t('lam_short') : ''].filter(Boolean).join(' · ')) + (sizeOf(c) || lamOn ? '<br>' : '') + q + ' × ' + esc(sum(up)) + '</div>' +
         '<div class="row"><div class="acts"><button type="button" class="rm" data-edit-calc="' + esc(c.id) + '">' + esc(t('change')) + '</button>' +
         '<button type="button" class="rm" data-rm-calc="' + esc(c.id) + '">' + esc(t('remove')) + '</button></div><span class="sum">' + esc(sum(q * up)) + '</span></div></div></div>';
     });
@@ -1311,7 +1427,7 @@
     var lines = [t('m_hello', { n: orderId ? ' №' + orderId : '' }), ''];
     calcs.forEach(function (c) {
       var q = cart.calcs[c.id];
-      if (q > 0) lines.push('• ' + t('print_line', { f: L(c, 'name') }) + ' — ' + q + ' ' + t('pcs') + ': ' + sum(q * tierPrice(c, q)));
+      if (q > 0) lines.push('• ' + t('print_line', { f: L(c, 'name') }) + (sizeOf(c) ? ' (' + sizeOf(c) + ')' : '') + (cart.calcLam[c.id] && c.lam > 0 ? ', ' + t('lam_short') : '') + ' — ' + q + ' ' + t('pcs') + ': ' + sum(q * calcUnit(c, q)));
     });
     cart.items.forEach(function (it) {
       var p = byId(it.id); if (!p) return;
@@ -1339,7 +1455,7 @@
       body: JSON.stringify({
         phone: digits, address: address, lat: loc && loc.lat, lon: loc && loc.lon, src: SRC,
         website: $('#website').value,
-        cart: { calcs: cart.calcs, items: cart.items.map(function (it) { return { id: it.id, v: it.v, o: it.o, a: it.a, q: it.q }; }) }
+        cart: { calcs: cart.calcs, calcLam: cart.calcLam, items: cart.items.map(function (it) { return { id: it.id, v: it.v, o: it.o, a: it.a, q: it.q }; }) }
       })
     }).then(function (r) { return r.json(); })
       .then(function (d) {
@@ -1348,7 +1464,7 @@
           cart.items.some(function (it) { var p = byId(it.id); return p && (p.print_qty || p.options.length); });
         var msg = buildMessage(d.id, d.phone || ('+998' + digits), d.total, d.free);
         if (needPhotos) msg += '\n' + t('m_photos');
-        cart = { calcs: {}, items: [] }; saveCart();
+        cart = { calcs: {}, calcLam: {}, items: [] }; saveCart();
         renderDone(d, msg, needPhotos);
       })
       .catch(function (err) {
@@ -1384,10 +1500,10 @@
 
   // ================= Yo'naltirish =================
   function setChrome(which) {
-    $('#top-white').hidden = which === 'home' || which === 'calc';
+    document.body.classList.toggle('home', which === 'home');
     if (which !== 'home') { clearInterval(rvTimer); if (rvObserver) rvObserver.disconnect(); }
     document.querySelectorAll('[data-nav]').forEach(function (a) {
-      var on = a.getAttribute('data-nav') === which;
+      var on = a.getAttribute('data-nav') === (which === 'calc' ? 'order' : which);
       a.classList.toggle('on', on);
       if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
@@ -1397,8 +1513,13 @@
     var m = h.match(/^#\/p\/(.+)$/);
     if (h === '#/savat' && !loaded) { setChrome('cart'); view.innerHTML = '<div class="wrap cart"><h1>' + esc(t('cart')) + '</h1><div class="skeleton" style="aspect-ratio:3/1"></div></div>'; }
     else if (h === '#/savat') renderCart();
-    else if (h === '#/hisoblash') renderCalc();
-    else if (h === '#/buyurtma') renderOrder();
+    else if (/^#\/hisoblash(\/|$)/.test(h)) {
+      var cid = decodeURIComponent(h.split('/')[2] || '');
+      if (cid) { calcId = cid; store.set('mp_calc', calcId); }
+      if (!loaded) { setChrome('calc'); view.innerHTML = '<div class="wrap" style="padding-top:20px"><div class="skeleton" style="aspect-ratio:3/4"></div></div>'; }
+      else renderCalc();
+    }
+    else if (/^#\/buyurtma(\/|$)/.test(h)) renderOrder(decodeURIComponent(h.split('/')[2] || ''));
     else if (m && loaded) renderProduct(decodeURIComponent(m[1]));
     else if (m) { setChrome(''); view.innerHTML = '<div class="wrap" style="padding-top:20px"><div class="skeleton" style="aspect-ratio:1"></div></div>'; }
     else renderHome();

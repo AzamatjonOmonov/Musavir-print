@@ -757,6 +757,8 @@
       (main ? '' : '<button type="button" class="mini" data-rmcalc>O\'chirish</button>') + '</span></div>' +
       '<div class="two"><label class="f">Nomi<input class="i" data-c="name" maxlength="30" placeholder="Masalan: A4" value="' + esc(c.name || '') + '"></label>' +
       '<label class="f">Ruscha nomi <small>ixtiyoriy</small><input class="i" data-c="name_ru" maxlength="30" value="' + esc(c.name_ru || '') + '"></label></div>' +
+      '<div class="two"><label class="f">O\'lchami <small>masalan: 21×30 sm</small><input class="i" data-c="size" maxlength="24" value="' + esc(c.size || '') + '"></label>' +
+      '<label class="f">Laminatsiya <small>+ 1 dona uchun, bo\'lmasa bo\'sh</small><span class="money"><input class="i" data-c="lam" inputmode="numeric" placeholder="—" value="' + (c.lam ? fmt(c.lam) : '') + '"></span></label></div>' +
       '<label class="tick"><input type="checkbox" data-c="on"' + (c.on !== false ? ' checked' : '') + '><span>Saytda ko\'rinsin</span></label>' +
       '<label class="tick"><input type="checkbox" data-c="free"' + (c.free ? ' checked' : '') + '><span>Bepul yetkazishga hisoblansin<small>300 ta rasm hisobiga qo\'shiladi</small></span></label>' +
       (main ? '<p class="sub" style="margin:0">Telegram bot va asosiy sahifadagi kalkulyator shu formatdan foydalanadi, shuning uchun uni o\'chirib bo\'lmaydi.</p>' : '') +
@@ -777,6 +779,9 @@
         id: el.getAttribute('data-id'),
         name: el.querySelector('[data-c="name"]').value.trim(),
         name_ru: el.querySelector('[data-c="name_ru"]').value.trim(),
+        size: el.querySelector('[data-c="size"]').value.trim(),
+        size_ru: (calcSizeRu[el.getAttribute('data-id')] || ''),
+        lam: num(el.querySelector('[data-c="lam"]').value),
         on: el.querySelector('[data-c="on"]').checked,
         free: el.querySelector('[data-c="free"]').checked,
         tiers: [].slice.call(el.querySelectorAll('[data-row="tier"]')).map(function (r) {
@@ -874,7 +879,9 @@
     $('#slides').lastElementChild.querySelector('[data-s="title"]').focus();
   };
 
+  var calcSizeRu = {};
   function paintSettings(st) {
+    (st.calculators || []).forEach(function (c) { calcSizeRu[c.id] = c.size_ru || ''; });
     slidesList = (st.slides || []).map(function (x) { return Object.assign({}, x); });
     paintSlides();
     var site = st.site || {};

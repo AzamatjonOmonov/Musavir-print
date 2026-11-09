@@ -66,6 +66,7 @@ module.exports = async (req, res) => {
     for (const [k, v] of Object.entries(cart.calcs).slice(0, 12)) calcQty[String(k).slice(0, 24)] = int(v, 0, 100000);
   }
   if (cart.prints) calcQty['10x15'] = int(cart.prints, 0, 100000);
+  const calcLam = cart.calcLam && typeof cart.calcLam === 'object' ? cart.calcLam : {};
   const rawItems = Array.isArray(cart.items) ? cart.items.slice(0, 50) : [];
   let products;
   let calculators;
@@ -87,10 +88,12 @@ module.exports = async (req, res) => {
     if (qty <= 0) continue;
     const calc = calculators.find((c) => c.id === id && c.on !== false);
     if (!calc) { missing.push(`${id} rasm`); continue; }
-    const up = tierPrice(calc, qty);
+    const lam = calcLam[id] === true && calc.lam > 0;
+    const up = tierPrice(calc, qty) + (lam ? calc.lam : 0);
     total += qty * up;
     if (calc.free) printCount += qty;
-    lines.push({ name: `${calc.name} rasm chop etish`, qty, unit: up, sum: qty * up, print: true });
+    const nm = `${calc.name}${calc.size ? ` (${calc.size})` : ''} rasm chop etish${lam ? ' + laminatsiya' : ''}`;
+    lines.push({ name: nm, qty, unit: up, sum: qty * up, print: true });
   }
   for (const it of rawItems) {
     const p = byId.get(String(it && it.id));
