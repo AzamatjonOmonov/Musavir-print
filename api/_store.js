@@ -303,11 +303,12 @@ function cleanCalcs(arr) {
 }
 // Bosh sahifa slaydlari (5 tagacha). Matnda *so'z* — Times kursiv bilan yoziladi
 const DEFAULT_SLIDES = [
-  { img: '/dokon/hero/slide1.webp', bg: '', title: 'Esdaliklaringiz *telefonda* qolib ketmasin...', title_ru: 'Пусть ваши воспоминания не останутся в *телефоне*...', btn: 'Buyurtma beriş', btn_ru: 'Заказать', link: 'calc', url: '', on: true },
-  { img: '/dokon/hero/slide2.webp', bg: '', title: 'Biz sizga sifatli qilib çiqarib beramiz...', title_ru: 'Напечатаем ваши фото *качественно*...', btn: 'Buyurtma beriş', btn_ru: 'Заказать', link: 'calc', url: '', on: true },
-  { img: '/dokon/hero/slide3.webp', bg: '/dokon/hero/map.webp', title: '*Özbekiston* böylab yetkazib beramiz...', title_ru: 'Доставляем по всему *Узбекистану*...', btn: 'Buyurtma beriş', btn_ru: 'Заказать', link: 'calc', url: '', on: true },
+  { img: '/dokon/hero/slide1.webp', bg: '', title: 'Esdaliklaringiz *telefonda* qolib ketmasin...', title_ru: 'Пусть ваши воспоминания не останутся в *телефоне*...', btn: 'Buyurtma beriş', btn_ru: 'Заказать', link: 'order', url: '', on: true },
+  { img: '/dokon/hero/slide2.webp', bg: '', title: 'Biz sizga sifatli qilib çiqarib beramiz...', title_ru: 'Напечатаем ваши фото *качественно*...', btn: 'Buyurtma beriş', btn_ru: 'Заказать', link: 'order', url: '', on: true },
+  { img: '/dokon/hero/slide3.webp', bg: '/dokon/hero/map.webp', title: '*Özbekiston* böylab yetkazib beramiz...', title_ru: 'Доставляем по всему *Узбекистану*...', btn: 'Buyurtma beriş', btn_ru: 'Заказать', link: 'order', url: '', on: true },
+  { img: '/dokon/hero/slide4.webp', bg: '', title: '*250+* mamnun mijoz...', title_ru: '*250+* довольных клиентов...', btn: 'Buyurtma beriş', btn_ru: 'Заказать', link: 'order', url: '', on: true },
 ];
-const SLIDE_LINKS = ['calc', 'products', 'telegram', 'url'];
+const SLIDE_LINKS = ['order', 'calc', 'products', 'telegram', 'url'];
 const slideImg = (u) => typeof u === 'string' && (/^\/dokon\/hero\/[\w-]+\.(webp|png|jpg)$/.test(u) || ownUrl(u, BUCKET));
 function cleanSlides(arr) {
   if (!Array.isArray(arr)) return { error: "Noto'g'ri ma'lumot" };
@@ -316,7 +317,7 @@ function cleanSlides(arr) {
     if (!x || !slideImg(x.img)) return { error: 'Har bir slaydga surat yuklang' };
     const title = str(x.title, 120);
     if (!title) return { error: 'Har bir slaydga matn yozing' };
-    const link = SLIDE_LINKS.includes(x.link) ? x.link : 'calc';
+    const link = SLIDE_LINKS.includes(x.link) ? x.link : 'order';
     let url = '';
     if (link === 'url') {
       url = str(x.url, 300);

@@ -197,6 +197,8 @@
   .slide .q2 { left: 28.31%; top: 57.23%; transform: rotate(180deg); }
   .slide h2 { position: absolute; left: 8.84%; top: 38.6%; width: 34%; margin: 0; font-weight: 600; font-size: 4.61cqw; line-height: .85; letter-spacing: -.03em; text-wrap: balance; }
   .slide h2.long { font-size: 4.05cqw; }
+  .slide h2 em.big { display: block; font-size: 1.7em; line-height: .95; margin-bottom: .02em; }
+  .slide h2 em.big span { font-family: 'Brand', sans-serif; font-style: normal; font-weight: 400; }
   .slide h2 em { font-family: 'BrandSerif', 'Times New Roman', serif; font-style: italic; font-weight: 700; font-size: 1.0625em; letter-spacing: -.01em; line-height: 1; }
   .slide .go { position: absolute; left: 9.23%; top: 77.42%; min-width: 18.17%; height: 9.21%; padding: 0 2.2%; border-radius: 999px; background: #fff; color: #2e2e2e; font-weight: 600; font-size: 1.88cqw; letter-spacing: -.03em; display: flex; align-items: center; justify-content: center; text-decoration: none; white-space: nowrap; box-shadow: 0 6px 18px rgba(80,0,30,.18); }
   .slide-head { position: absolute; z-index: 3; left: 0; right: 0; top: 0; height: 21.44%; display: flex; align-items: center; justify-content: space-between; padding: 0 7.02% 0 9.16%; pointer-events: none; }
@@ -218,7 +220,7 @@
     .slide .q { width: 19%; }
     .slide .q1 { left: 2%; top: 17.5%; }
     .slide .q2 { left: auto; right: 3%; top: 17.5%; }
-    .slide .person { left: 22%; top: 38%; width: 82%; height: 62%; object-position: 70% 100%; }
+    .slide .person { left: 10%; top: 41%; width: 96%; height: 59%; object-position: 70% 100%; }
     .slide .bg { left: 18%; top: 44%; width: 82%; height: 34%; }
     .slide .go { left: 7%; top: auto; bottom: 8%; height: 10%; min-width: 0; padding: 0 6.5%; font-size: 4.3cqw; }
     .dots-h { bottom: 2.6%; }
@@ -243,6 +245,20 @@
   .drawer .langs button { color: var(--muted); padding: 7px 14px; font-size: 14px; }
   .drawer .langs button[aria-pressed="true"] { background: var(--surface); color: var(--pink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
   .drawer .socials { justify-content: flex-start; }
+
+  /* ---------- Buyurtma tanlash ---------- */
+  .order-pg h1 { font-size: 26px; line-height: 1.15; margin: 20px 0 6px; letter-spacing: -.02em; }
+  .order-pg .sub { margin: 0 0 18px; color: var(--muted); }
+  .print-card { position: relative; overflow: hidden; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; background: var(--pink); color: #fff; border-radius: 22px; padding: 20px; text-decoration: none; }
+  .print-card h2 { margin: 0; font-size: 24px; letter-spacing: -.02em; }
+  .print-card p { margin: 6px 0 14px; font-size: 14px; opacity: .92; max-width: 34ch; }
+  .print-card .pill-go { display: inline-flex; align-items: center; height: 44px; padding: 0 20px; border-radius: 999px; background: #fff; color: #2e2e2e; font-weight: 600; }
+  .print-card .mini-screen { width: 104px; border-radius: 14px; background: var(--paper); border: 3px solid var(--gray); padding: 8px; box-shadow: 4px 4px 0 var(--wine); }
+  .print-card .mini-screen div { background: var(--nokia); border-radius: 6px; color: var(--nokia-dark); font: 700 22px/1 'VT323', monospace; text-align: right; padding: 10px 6px 6px; }
+  .print-card .mini-screen small { display: block; font-size: 14px; opacity: .8; }
+  .fmt-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: -6px 0 14px; }
+  .fmt-chips span { border: 1.5px solid rgba(255,255,255,.6); border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 600; }
+  @media (max-width: 420px) { .print-card { grid-template-columns: 1fr; } .print-card .mini-screen { position: absolute; right: -14px; top: -10px; transform: rotate(8deg) scale(.8); opacity: .9; } .print-card h2, .print-card p { max-width: 70%; } }
 
   /* ---------- Tovarlar ---------- */
   .section-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 28px 0 12px; }
@@ -381,7 +397,7 @@
 <div class="ann" id="ann" hidden><div class="wrap"><span id="ann-text"></span></div></div>
 <header class="top-white" id="top-white" hidden>
   <div class="wrap top-row">
-    <a class="logo" href="#/" aria-label="Musavvir Print"><img src="/dokon/logo.png" alt="Musavvir Print" width="119" height="38"></a>
+    <a class="logo" href="#/" aria-label="Musavvir Print"><img src="/dokon/logo.png" alt="Musavvir Print" width="134" height="38"></a>
     <div class="langs" data-langs></div>
   </div>
 </header>
@@ -507,7 +523,9 @@
       rv_demo: 'Namuna joy — fikr videolari va skrinşotlarni admin paneldan yuklaysiz',
       calc_title: 'Rasm narxini hisoblaş', go_cart2: "Savatga ötiş", add_more: "Albom, ramka qöşiş",
       play: 'Videoni oçiş', open_img: 'Kattalaştiriş',
-      menu: 'Menyu', lang_lbl: 'Til', follow: 'Bizni kuzating', slide_n: '{n}-slayd'
+      menu: 'Menyu', lang_lbl: 'Til', follow: 'Bizni kuzating', slide_n: '{n}-slayd',
+      order_title: 'Nima buyurtma qilmoqçisiz?', order_sub: 'Tanlang va savatga qöşing — hammasini bitta buyurtmada rasmiylaştirasiz.',
+      print_card: 'Rasm çiqariş', print_card_t: '{f} — {p} sömdan. Qança köp bölsa, şunça arzon.', print_go: 'Narxini hisoblaş', or_choose: 'Yoki tayyor mahsulot tanlang'
     },
     ru: {
       title: 'Musavvir Print — магазин',
@@ -554,7 +572,9 @@
       rv_demo: 'Место для примера — видео и скриншоты отзывов загрузите в админ-панели',
       calc_title: 'Расчёт печати фото', go_cart2: 'Перейти в корзину', add_more: 'Добавить альбом, рамку',
       play: 'Открыть видео', open_img: 'Увеличить',
-      menu: 'Меню', lang_lbl: 'Язык', follow: 'Мы в соцсетях', slide_n: 'Слайд {n}'
+      menu: 'Меню', lang_lbl: 'Язык', follow: 'Мы в соцсетях', slide_n: 'Слайд {n}',
+      order_title: 'Что хотите заказать?', order_sub: 'Выберите и добавьте в корзину — оформите всё одним заказом.',
+      print_card: 'Печать фото', print_card_t: '{f} — от {p} сум. Чем больше, тем дешевле.', print_go: 'Рассчитать цену', or_choose: 'Или выберите готовый товар'
     }
   };
   var LANGS = [['uz', 'Öz'], ['uzc', 'Ўз'], ['ru', 'Ру']];
@@ -746,7 +766,7 @@
     return '<section class="calc-band"><div class="wrap">' +
       '<div class="bar"><button type="button" class="back-w" id="calc-back">' + esc(t('back')) + '</button><div class="langs" data-langs>' + langsHTML() + '</div></div>' +
       '<div class="calc-card">' +
-        '<div class="calc-logo"><img src="/dokon/logo.png" alt="Musavvir Print" width="300" height="96"></div>' + tabs +
+        '<div class="calc-logo"><img src="/dokon/logo.png" alt="Musavvir Print" width="300" height="85"></div>' + tabs +
         '<div class="screen"><div class="scanline"></div><div class="scr">' +
           '<div class="scr-top"><span id="c-fmt"></span><span>' + esc(t('each')) + ': <span id="c-unit">0</span></span></div>' +
           '<div class="scr-main"><div class="l">' + esc(t('total')) + ':</div><div class="n"><span id="c-sum">0</span><i>_</i></div><div class="c">' + esc(t('som')) + '</div></div>' +
@@ -757,7 +777,7 @@
         '<input class="tactile" type="number" id="c-qty" min="0" max="100000" inputmode="numeric" placeholder="0">' +
         '<button class="retro-btn" type="button" id="c-add"></button>' +
         '<p class="calc-note" id="c-note"></p>' +
-        '<div class="after-add" id="after-add" hidden><a class="go" href="#/savat">' + esc(t('go_cart2')) + '</a><a href="#/" data-to-products>' + esc(t('add_more')) + '</a></div>' +
+        '<div class="after-add" id="after-add" hidden><a class="go" href="#/savat">' + esc(t('go_cart2')) + '</a><a href="#/buyurtma">' + esc(t('add_more')) + '</a></div>' +
       '</div></div></section>';
   }
 
@@ -838,13 +858,21 @@
   }
   // Matndagi *so'z* → Times kursiv
   function richTitle(txt) {
-    return esc(txt).replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    // Matn boshidagi qisqa *250+* — alohida qatorda katta raqam (Figma'dagidek)
+    var m = /^\*([^*]{1,6})\*\s*/.exec(txt);
+    var lead = '';
+    if (m && /\d/.test(m[1])) {
+      lead = '<em class="big">' + esc(m[1]).replace(/([^\d\s]+)/g, '<span>$1</span>') + '</em>';
+      txt = txt.slice(m[0].length);
+    }
+    return lead + esc(txt).replace(/\*([^*]+)\*/g, '<em>$1</em>');
   }
   function slideHref(x) {
+    if (x.link === 'calc') return '#/hisoblash';
     if (x.link === 'products') return '#/';
     if (x.link === 'telegram') return LINKS.admin;
     if (x.link === 'url' && x.url) return x.url;
-    return '#/hisoblash';
+    return '#/buyurtma';
   }
   function heroHTML() {
     var list = slides;
@@ -868,7 +896,6 @@
       '<div class="slide-head"><img src="/dokon/hero/logo-musavvir.png" alt="Musavvir Print" width="800" height="226">' +
       '<button type="button" class="burger" data-menu aria-label="' + esc(t('menu')) + '"><i></i><i></i><i></i></button></div>' +
       '<div class="slides-h" id="slides-h">' + items + '</div>' + dots + '</div>' +
-      '<div class="clients-row"><span class="faces" aria-hidden="true"><i></i><i></i><i></i></span><span><b>' + esc(site.clients || '250+') + '</b> ' + esc(t('clients')) + '</span></div>' +
       '</div></section>';
   }
   var slideTimer;
@@ -904,7 +931,8 @@
     var dr = document.createElement('aside'); dr.className = 'drawer'; dr.setAttribute('role', 'dialog'); dr.setAttribute('aria-modal', 'true'); dr.setAttribute('aria-label', t('menu'));
     var n = cart.items.reduce(function (a, it) { return a + it.q; }, 0) + Object.keys(cart.calcs).filter(function (k) { return cart.calcs[k] > 0; }).length;
     dr.innerHTML = '<div class="dh"><img src="/dokon/hero/logo-musavvir.png" alt="Musavvir Print"><button type="button" class="x" aria-label="' + esc(t('close')) + '">×</button></div>' +
-      '<nav><a href="#/hisoblash">' + esc(t('calc_title')) + '</a>' +
+      '<nav><a href="#/buyurtma">' + esc(t('order_title')) + '</a>' +
+      '<a href="#/hisoblash">' + esc(t('calc_title')) + '</a>' +
       '<a href="#/" data-to-products>' + esc(t('products')) + '</a>' +
       (reviews.length ? '<a href="#/" data-to-reviews>' + esc(t('reviews')) + '</a>' : '') +
       '<a href="#/savat">' + esc(t('cart')) + (n ? '<span class="count2">' + n + '</span>' : '') + '</a></nav>' +
@@ -1042,6 +1070,26 @@
   }
   var pendingProducts = false;
 
+  function renderOrder() {
+    setChrome('order');
+    document.title = t('order_title') + ' — Musavvir Print';
+    var c = calcById('10x15') || calcs[0];
+    var fmts = calcs.map(function (x) { return L(x, 'name'); });
+    var html = '<div class="wrap order-pg"><a class="back" href="#/">' + esc(t('back')) + '</a>' +
+      '<h1>' + esc(t('order_title')) + '</h1><p class="sub">' + esc(t('order_sub')) + '</p>';
+    if (calcs.length) {
+      html += '<a class="print-card" href="#/hisoblash"><div><h2>' + esc(t('print_card')) + '</h2>' +
+        '<p>' + esc(t('print_card_t', { f: fmts.join(', '), p: lowestPrint() })) + '</p>' +
+        (calcs.length > 1 ? '<div class="fmt-chips">' + fmts.map(function (f) { return '<span>' + esc(f) + '</span>'; }).join('') + '</div>' : '') +
+        '<span class="pill-go">' + esc(t('print_go')) + '</span></div>' +
+        '<div class="mini-screen" aria-hidden="true"><div><small>' + esc(L(c, 'name')) + '</small>' + lowestPrint() + '</div></div></a>';
+    }
+    html += '<div class="section-title"><h2>' + esc(t('or_choose')) + '</h2>' + (products.length ? '<span>' + esc(t('count', { n: products.length })) + '</span>' : '') + '</div>' +
+      '<div id="plist">' + productsHTML() + '</div></div>';
+    view.innerHTML = html;
+    window.scrollTo(0, 0);
+  }
+
   function renderCalc() {
     setChrome('calc');
     document.title = t('calc_title') + ' — Musavvir Print';
@@ -1052,7 +1100,7 @@
   }
 
   function footerHTML() {
-    return '<footer class="foot"><div class="wrap"><img src="/dokon/logo.png" alt="Musavvir Print" width="138" height="44"><p>' + esc(t('foot')) + '</p>' +
+    return '<footer class="foot"><div class="wrap"><img src="/dokon/logo.png" alt="Musavvir Print" width="156" height="44"><p>' + esc(t('foot')) + '</p>' +
       '<div class="socials">' +
       '<a class="tg" href="' + LINKS.tg + '" target="_blank" rel="noopener">' + ICON.tg + esc(t('tg')) + '</a>' +
       '<a class="ig" href="' + LINKS.ig + '" target="_blank" rel="noopener">' + ICON.ig + 'Instagram</a>' +
@@ -1350,6 +1398,7 @@
     if (h === '#/savat' && !loaded) { setChrome('cart'); view.innerHTML = '<div class="wrap cart"><h1>' + esc(t('cart')) + '</h1><div class="skeleton" style="aspect-ratio:3/1"></div></div>'; }
     else if (h === '#/savat') renderCart();
     else if (h === '#/hisoblash') renderCalc();
+    else if (h === '#/buyurtma') renderOrder();
     else if (m && loaded) renderProduct(decodeURIComponent(m[1]));
     else if (m) { setChrome(''); view.innerHTML = '<div class="wrap" style="padding-top:20px"><div class="skeleton" style="aspect-ratio:1"></div></div>'; }
     else renderHome();
