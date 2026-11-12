@@ -6,6 +6,7 @@ const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '';
 const SITE_URL = (process.env.SITE_URL || 'https://www.musavvirprint.uz').replace(/\/$/, '');
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'AzizaxonOmonova';
 const FREE_DELIVERY_FROM = 300;
+const MIN_ORDER = 50; // minimal buyurtma — saytdagi MIN_ORDER bilan bir xil
 
 // 10x15 narxlari (1 dona) — saytdagi bilan bir xil bo'lishi shart
 function unitPrice(qty) {
@@ -88,7 +89,7 @@ const srcLabel = (src) => SRC_LABELS[src] || src;
 const esc = (s) =>
   String(s ?? '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
-module.exports = {
+module.exports = { MIN_ORDER,
   TOKEN, ADMIN_CHAT_ID, SITE_URL, ADMIN_USERNAME, FREE_DELIVERY_FROM,
   unitPrice, fmt, tg, webhookSecret, signPhone, safeEqual, verifyInitData, esc,
   cleanSrc, srcLabel,

@@ -141,8 +141,18 @@
             <!-- Quantity Input -->
             <div>
                 <label class="block text-sm font-bold text-calc-dark mb-1 ml-2 uppercase tracking-wider">Nechta rasm?</label>
-                <input type="number" id="qty-input" min="0" max="10000" placeholder="0" 
+                <input type="number" id="qty-input" min="50" max="10000" value="50" placeholder="50" inputmode="numeric"
                     class="tactile-input w-full rounded-xl py-3 px-4 text-2xl font-bold text-center text-musavvir-pink placeholder-gray-400" />
+                <p id="min-note" class="mt-2 ml-2 text-xs font-bold text-calc-dark/70 leading-snug">
+                    Buyurtma <span class="text-musavvir-pink">50 donadan</span> boshlanadi — qancha ko'p bo'lsa, shuncha arzon
+                </p>
+                <div id="small-order" class="hidden mt-3 rounded-xl border-2 border-musavvir-pink bg-white/60 p-3 text-center">
+                    <p class="text-sm font-bold text-calc-dark leading-snug mb-2">50 tadan kam kerakmi? Adminga yozing — birga hal qilamiz.</p>
+                    <button id="small-admin-btn" type="button"
+                        class="w-full rounded-lg py-2 text-sm font-bold uppercase tracking-widest bg-musavvir-pink text-white">
+                        Adminga yozish
+                    </button>
+                </div>
             </div>
 
             <!-- Phone (faqat saytda; botda raqam Telegram orqali olinadi) -->
@@ -209,6 +219,7 @@
 
         const formatter = new Intl.NumberFormat('ru-RU');
         const FREE_DELIVERY_FROM = 300;
+        const MIN_ORDER = 50; // minimal buyurtma (server: api/_lib.js MIN_ORDER bilan bir xil bo'lsin)
         let hasFiredConfetti = false;
 
         // 10x15 narxlari (1 dona)
@@ -245,6 +256,18 @@
         function calculate() {
             let qty = parseInt(qtyInput.value);
             if (isNaN(qty) || qty < 0) qty = 0;
+
+            const below = qty > 0 && qty < MIN_ORDER;
+            document.getElementById('small-order').classList.toggle('hidden', !below);
+            document.getElementById('min-note').classList.toggle('text-musavvir-pink', below);
+            if (below) {
+                displayUnitPrice.textContent = '—';
+                displayPrice.textContent = 'MIN ' + MIN_ORDER;
+                show(deliveryBadge, false);
+                show(progress, false);
+                hasFiredConfetti = false;
+                return;
+            }
 
             const price = unitPrice(qty);
             displayUnitPrice.textContent = formatter.format(price);
@@ -388,7 +411,10 @@
         }
 
         function openAdminChat(qty) {
-            const link = 'https://t.me/' + ADMIN + '?text=' + encodeURIComponent(customerText(qty));
+            const text = qty < MIN_ORDER
+                ? 'Assalomu alaykum! Menga ' + qty + ' ta rasm chiqarish kerak edi. Shu son bilan buyurtma bersam bo\'ladimi?'
+                : customerText(qty);
+            const link = 'https://t.me/' + ADMIN + '?text=' + encodeURIComponent(text);
             if (inTelegram) tgApp.openTelegramLink(link);
             else window.open(link, '_blank');
         }
@@ -452,6 +478,12 @@
                 qtyInput.focus();
                 return;
             }
+            if (qty < MIN_ORDER) {
+                haptic('error');
+                setStatus('Minimal buyurtma ' + MIN_ORDER + ' dona. Kamroq kerak bo\'lsa, adminga yozing.', true);
+                qtyInput.focus();
+                return;
+            }
 
             if (!inTelegram) return placeWebOrder(qty);
 
@@ -509,6 +541,9 @@
         }
 
         qtyInput.addEventListener('input', calculate);
+        document.getElementById('small-admin-btn').addEventListener('click', () => {
+            openAdminChat(parseInt(qtyInput.value) || 0);
+        });
         calculate();
     </script>
 </body>

@@ -1,10 +1,11 @@
 // Bot va sayt buyurtmalari uchun umumiy: tekshirish va guruhga yuborish
-const { ADMIN_CHAT_ID, FREE_DELIVERY_FROM, unitPrice, fmt, tg, esc } = require('./_lib');
+const { ADMIN_CHAT_ID, FREE_DELIVERY_FROM, MIN_ORDER, unitPrice, fmt, tg, esc } = require('./_lib');
 
 // qty, manzil va lokatsiyani tekshiradi; xato bo'lsa { error } qaytaradi
 function parseOrder(b) {
   const qty = Math.floor(Number(b.qty));
   if (!Number.isFinite(qty) || qty < 1 || qty > 100000) return { error: 'Rasm sonini kiriting' };
+  if (qty < MIN_ORDER) return { error: `Minimal buyurtma ${MIN_ORDER} dona. Kamroq kerak bo'lsa, adminga yozing.` };
   const address = String(b.address || '').trim().slice(0, 300);
   const lat = Number(b.lat);
   const lon = Number(b.lon);
