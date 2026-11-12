@@ -93,7 +93,7 @@ module.exports = async (req, res) => {
         chat_id: uid,
         text:
           "Endi pastdagi tugmani bosing, rasm sonini va manzilingizni yozing. " +
-          "Narx darhol hisoblanadi 👇",
+          "Narx darhol hisoblanadi. Buyurtma 50 donadan boshlanadi 👇",
         reply_markup: appButton(url),
       });
       return res.status(200).send('ok');

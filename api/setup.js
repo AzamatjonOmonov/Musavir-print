@@ -14,12 +14,13 @@ module.exports = async (req, res) => {
   });
   await tg('setMyCommands', { commands: [{ command: 'start', description: 'Buyurtma berish' }] });
   await tg('setMyShortDescription', {
-    short_description: "Esdalik rasmlaringizni sifatli chop etamiz. 300 tadan yetkazish bepul.",
+    short_description: "Esdalik rasmlaringizni sifatli chop etamiz. Buyurtma 50 donadan, 300 tadan yetkazish bepul.",
   });
   await tg('setMyDescription', {
     description:
       "Musavvir Print — telefoningizdagi esdalik rasmlarni sifatli fotoqog'ozga chop etamiz.\n\n" +
-      "Start bosing, raqamingizni ulashing va rasm sonini yozing — narx darhol hisoblanadi.",
+      "Start bosing, raqamingizni ulashing va rasm sonini yozing — narx darhol hisoblanadi.\n" +
+      "Buyurtma 50 donadan boshlanadi.",
   });
   const me = await tg('getMe', {});
   res.status(200).json({
