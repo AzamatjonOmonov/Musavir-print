@@ -116,7 +116,7 @@
                         <span id="display-price">0</span>
                         <span class="text-4xl ml-1 mb-1 cursor-blink">_</span>
                     </div>
-                    <div class="text-2xl opacity-90 mt-1 font-bold">so'm</div>
+                    <div id="som-label" class="text-2xl opacity-90 mt-1 font-bold">so'm</div>
                 </div>
 
                 <!-- Free Delivery: progress / badge -->
@@ -260,6 +260,7 @@
             const below = qty > 0 && qty < MIN_ORDER;
             document.getElementById('small-order').classList.toggle('hidden', !below);
             document.getElementById('min-note').classList.toggle('text-musavvir-pink', below);
+            document.getElementById('som-label').style.visibility = below ? 'hidden' : '';
             if (below) {
                 displayUnitPrice.textContent = '—';
                 displayPrice.textContent = 'MIN ' + MIN_ORDER;
