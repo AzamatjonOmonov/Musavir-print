@@ -6,7 +6,17 @@ const {
 const ASK_PHONE_TEXT =
   "Assalomu alaykum! Musavvir Print botiga xush kelibsiz 📸\n\n" +
   "Esdalik rasmlaringizni sifatli qilib chop etib beramiz. " +
-  "Buyurtma berish uchun pastdagi tugma orqali telefon raqamingizni ulashing 👇";
+  "Buyurtma berish uchun telefon raqamingizni yuboring:\n" +
+  "• pastdagi «📱 Raqamni ulashish» tugmasini bosing,\n" +
+  "• yoki bog'lanadigan raqamingizni yozib yuboring, masalan: 90 123 45 67 👇";
+
+// Matn ko'rinishida yozilgan raqamni tekshiradi: 901234567, +998 90 123 45 67, 998-90-123-45-67
+function parseTypedPhone(text) {
+  const d = String(text || '').replace(/\D/g, '');
+  if (d.length === 9) return '+998' + d;
+  if (d.length === 12 && d.startsWith('998')) return '+' + d;
+  return '';
+}
 
 function phoneKeyboard() {
   return {
@@ -41,6 +51,26 @@ async function readSrc(uid) {
   try { return cleanSrc(new URL(url).searchParams.get('src')); } catch { return ''; }
 }
 
+// Raqam qabul qilindi (tugma yoki matn orqali) → Mini App tugmasi
+async function acceptPhone(uid, phone) {
+  const src = await readSrc(uid);
+  const url = appUrl(uid, phone, src);
+  await setMenu(uid, url);
+  await tg('sendMessage', {
+    chat_id: uid,
+    text: `Rahmat! ✅ Raqamingiz: ${phone}`,
+    reply_markup: { remove_keyboard: true },
+  });
+  await tg('sendMessage', {
+    chat_id: uid,
+    text:
+      "Endi pastdagi tugmani bosing, rasm sonini va manzilingizni yozing. " +
+      "Narx darhol hisoblanadi. Buyurtma 50 donadan boshlanadi 👇\n\n" +
+      "Raqamni o'zgartirmoqchi bo'lsangiz, yangisini shu yerga yozib yuboring.",
+    reply_markup: appButton(url),
+  });
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(200).send('ok');
   if (!TOKEN) return res.status(500).send('BOT_TOKEN yo\'q');
@@ -68,12 +98,18 @@ module.exports = async (req, res) => {
     if (!msg || msg.chat.type !== 'private') return res.status(200).send('ok');
     const uid = msg.from.id;
 
+    const typed = !msg.contact && !(msg.text || '').startsWith('/') ? parseTypedPhone(msg.text) : '';
+    if (typed) {
+      await acceptPhone(uid, typed);
+      return res.status(200).send('ok');
+    }
+
     if (msg.contact) {
       // Faqat o'z raqamini qabul qilamiz
       if (msg.contact.user_id !== uid) {
         await tg('sendMessage', {
           chat_id: uid,
-          text: "Iltimos, o'zingizning raqamingizni tugma orqali ulashing 👇",
+          text: "Iltimos, o'z raqamingizni tugma orqali ulashing yoki raqamni yozib yuboring (masalan: 90 123 45 67) 👇",
           reply_markup: phoneKeyboard(),
         });
         return res.status(200).send('ok');
@@ -81,21 +117,7 @@ module.exports = async (req, res) => {
       let phone = String(msg.contact.phone_number).replace(/[^\d+]/g, '');
       if (!phone.startsWith('+')) phone = '+' + phone;
 
-      const src = await readSrc(uid);
-      const url = appUrl(uid, phone, src);
-      await setMenu(uid, url);
-      await tg('sendMessage', {
-        chat_id: uid,
-        text: "Rahmat! ✅",
-        reply_markup: { remove_keyboard: true },
-      });
-      await tg('sendMessage', {
-        chat_id: uid,
-        text:
-          "Endi pastdagi tugmani bosing, rasm sonini va manzilingizni yozing. " +
-          "Narx darhol hisoblanadi. Buyurtma 50 donadan boshlanadi 👇",
-        reply_markup: appButton(url),
-      });
+      await acceptPhone(uid, phone);
       return res.status(200).send('ok');
     }
 
