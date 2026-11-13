@@ -140,6 +140,17 @@ textarea.txt{resize:vertical;min-height:60px}
 .a4{position:relative;aspect-ratio:2480/3508;width:100%;background:#fff;box-shadow:var(--shadow);border-radius:3px;overflow:hidden}
 .a4>.frame{cursor:pointer}
 .a4>.frame.flag::after{content:"";position:absolute;top:4px;right:4px;width:9px;height:9px;border-radius:50%;background:#e09b20;box-shadow:0 0 0 2px #fff}
+.a4>.frame .lowtag{position:absolute;left:4px;bottom:4px;background:#c0392b;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:999px;pointer-events:none;z-index:1;box-shadow:0 0 0 1.5px #fff}
+.a4>.frame .owntag{position:absolute;right:4px;bottom:3px;color:#fff;font-size:13px;text-shadow:0 0 3px rgba(0,0,0,.7);pointer-events:none;z-index:1}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.pchip{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:500}
+.pchip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.pchip.ghost{border-style:dashed;color:var(--muted)}
+.sliders{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.arow{display:grid;grid-template-columns:96px minmax(0,1fr) 34px;align-items:center;gap:8px;font-size:12px}
+.arow input{width:100%;accent-color:var(--accent);margin:0}
+.arow output{font-variant-numeric:tabular-nums;text-align:right;color:var(--muted)}
+#edAdjBox:not([hidden]){display:flex;flex-direction:column;gap:8px;margin-top:6px}
 .a4>.frame.dragover{outline:3px solid var(--accent);outline-offset:-3px}
 .a4 img.coverimg{width:100%;height:100%;display:block}
 /* muqova */
@@ -316,8 +327,14 @@ textarea.txt{resize:vertical;min-height:60px}
       <button class="btn" id="smart">Aqlli joylash</button>
       <p class="hint">Rasmlarni tahlil qilib, tik rasmlarni tik kataklarga, yotiqlarini yotiq kataklarga joylaydi va har bir sahifaga mos setkani tanlaydi (tanlangan setkadan ±2 rasm). Natijani keyin qo'lda o'zgartirish mumkin.</p>
     </div>
-    <label class="switch"><input type="checkbox" id="albCover" checked> Muqovani 1-sahifa qilish</label>
-    <p class="hint">Muqova "Muqova" bo'limida tayyorlanadi. Chetlar 7 mm, rasmlar orasi 2 mm, A4 300 DPI.</p>
+    <div class="field" id="adjPanel">
+      <span class="lbl">Rasm sozlamalari (hamma rasmlar uchun)</span>
+      <div class="presets" id="adjPresets"></div>
+      <div id="adjSliders"></div>
+      <p class="hint" id="adjStatus">Sozlama hamma rasmlarga tushadi. Bitta rasmni alohida sozlash uchun rasm ustiga bosing.</p>
+    </div>
+    <label class="switch"><input type="checkbox" id="albCover"> Muqovani 1-sahifa qilish</label>
+    <p class="hint">Ixtiyoriy: kerak bo'lsa yoqing. Muqova "Muqova" bo'limida tayyorlanadi. Chetlar 7 mm, rasmlar orasi 2 mm, A4 300 DPI.</p>
     <div class="field">
       <span class="lbl">Tartib</span>
       <p class="hint">Rasmni sichqoncha bilan boshqa katakka sudrab tashlasangiz, ikkalasi joy almashadi.</p>
@@ -436,6 +453,12 @@ textarea.txt{resize:vertical;min-height:60px}
         <button class="btn" id="edReset">Tiklash</button>
       </div>
       <button class="btn" id="edHero" hidden>★ Katta rasm qilish</button>
+      <p class="notice" id="edLow" hidden>Bu rasm A4 sahifadagi shu katak uchun kichik (150 DPI dan past), chop etilganda xira chiqishi mumkin. Mijozdan asl faylni so'rang yoki kichikroq katakka qo'ying.</p>
+      <div class="field" id="edAdjField" hidden>
+        <span class="lbl">Rasm sozlamasi</span>
+        <div class="seg"><button id="eaAll">Umumiy</button><button id="eaOwn">Alohida</button></div>
+        <div id="edAdjBox" hidden><div class="presets"></div><div class="sliders"></div></div>
+      </div>
       <p class="hint">Rasmni sichqoncha bilan suring. Kattalashtirish uchun g'ildirakdan foydalaning. ← → tugmalari bilan keyingi rasmga o'tasiz.</p>
       <div class="nav">
         <button class="btn" id="edPrev">← Oldingi</button>
@@ -887,7 +910,7 @@ const $ = id => document.getElementById(id);
 const S = {
   mode: "polaroid",
   pol: { photos: [], view: "photos", flagOnly: false, bg: { kind: "img", id: "hearts", src: HEARTS }, customBgs: [], cutline: true },
-  alb: { photos: [], layout: "6", over: {}, seed: {}, cover: true, orient: "p" },
+  alb: { photos: [], layout: "6", over: {}, seed: {}, cover: false, orient: "p", adj: null },
   cov: { tpl: "metrika", themeF: "all", f: { ism: "", fam: "", ismlar: "", sarlavha: "", soz: "", sana: "", soat: "", vazn: "", boy: "", joy: "", matn: "", oyat: "" }, st: {}, color: "#c46a8c", tint: false, slots: [], decor: null },
   scale: 1, cancel: false
 };
@@ -949,12 +972,12 @@ const needsCheck = p => !p.reviewed && (p.loss > WARN_LOSS || p.mode === "fit");
 function imgStyle(p, g) {
   return `width:${g.DW / p.fw * 100}%;height:${g.DH / p.fh * 100}%;left:${g.cx / p.fw * 100}%;top:${g.cy / p.fh * 100}%;transform:translate(-50%,-50%) rotate(${g.deg}deg)`;
 }
-function frameHTML(p, lazy = true) {
+function frameHTML(p, lazy = true, src = p.thumb) {
   const L = lazy ? ' loading="lazy"' : "";
-  const main = `<img src="${p.thumb}" alt=""${L} decoding="async" style="${imgStyle(p, geom(p))}">`;
+  const main = `<img src="${src}" alt=""${L} decoding="async" style="${imgStyle(p, geom(p))}">`;
   if (p.mode === "fit" && p.fitBg === "blur") {
     const b = geom(p, { mode: "fill", zoom: 1.15, angle: 0, ox: 0, oy: 0 });
-    return `<img class="blur" src="${p.thumb}" alt=""${L} decoding="async" style="${imgStyle(p, b)}">` + main;
+    return `<img class="blur" src="${src}" alt=""${L} decoding="async" style="${imgStyle(p, b)}">` + main;
   }
   return main;
 }
@@ -1259,12 +1282,13 @@ function renderAlb() {
     const og = (lbl, keys) => `<optgroup label="${lbl}">${keys.map(k => `<option value="${k}"${k === pg.key ? " selected" : ""}>${layName(k)}</option>`).join("")}</optgroup>`;
     const opts = og("Setka", Object.keys(LAYOUTS)) + og("Mozaika", MOS_N.map(n => "m" + n)) + og("Qatorli", MOS_N.map(n => "q" + n));
     out.push(`<div class="pagewrap"><div class="pagehead"><span>Sahifa ${pg.k + 1 + (A.cover ? 1 : 0)}</span><span class="pgctl">${isM ? `<button class="btn sm" data-reseed="${pg.k}" title="Boshqa variant">↻</button>` : ""}<select data-pagelay="${pg.k}" aria-label="Sahifa setkasi">${opts}</select></span></div>
-      <div class="a4" style="aspect-ratio:${PW()}/${PH()}">${pg.items.map((p, j) => `<div class="frame${needsCheck(p) ? " flag" : ""}${p.hero && isM ? " hero" : ""}" draggable="true" data-cell="${pg.start + j}" data-open="alb:${p.id}" style="${cellStyle(rs[j])}">${frameHTML(p)}</div>`).join("")}
+      <div class="a4" style="aspect-ratio:${PW()}/${PH()}">${pg.items.map((p, j) => `<div class="frame${albCheck(p) ? " flag" : ""}${p.hero && isM ? " hero" : ""}${lowRes(p) ? " low" : ""}" draggable="true" data-cell="${pg.start + j}" data-open="alb:${p.id}" style="${cellStyle(rs[j])}">${frameHTML(p, true, albThumb(p))}${lowRes(p) ? `<span class="lowtag" title="${effDpi(p)} DPI">Past sifat</span>` : ""}${p.adj ? `<span class="owntag" title="Alohida sozlangan">◐</span>` : ""}</div>`).join("")}
       ${(parseLay(pg.key).t === "g" ? rs.slice(pg.items.length) : []).map(r => `<div class="frame empty" style="${cellStyle(r)}"></div>`).join("")}</div></div>`);
   }
   $("pages").innerHTML = out.join("");
-  $("aFlagN").textContent = A.photos.filter(needsCheck).length;
+  $("aFlagN").textContent = A.photos.filter(albCheck).length;
   if (A.cover && (coverDirty || !coverThumbURL)) refreshCoverThumb();
+  queueAdjThumbs(A.photos);
 }
 
 // ================= MUQOVA =================
@@ -1477,6 +1501,178 @@ function drawPhoto(ctx, p, bmp, fx, fy, shape) {
   place(geom(p)); ctx.restore();
 }
 async function thumbBmp(p) { if (!p.tb) p.tb = await createImageBitmap(p.thumbBlob); return p.tb; }
+// ================= RASM SOZLAMALARI (filtrlar) =================
+// Qiymatlar: a — avto yaxshilash, b — yorqinlik, c — kontrast, s — to'yinganlik, w — iliqlik,
+// sh — soyalarni ochish, sp — aniqlik, sm — yumshatish. Hammasi 0 bo'lsa rasm o'zgarmaydi.
+const ADJ0 = { a: false, b: 0, c: 0, s: 0, w: 0, sh: 0, sp: 0, sm: 0 };
+const ADJ_PRESETS = [
+  { id: "asl", name: "Asl", v: {} },
+  { id: "avto", name: "Avto yaxshilash", v: { a: true, sh: 15, sp: 30 } },
+  { id: "iliq", name: "Iliq", v: { w: 28, s: 8, sh: 10, c: 5, sp: 15 } },
+  { id: "yorqin", name: "Yorqin", v: { s: 28, c: 14, b: 6, sp: 20 } },
+  { id: "yumshoq", name: "Yumshoq", v: { sm: 45, b: 8, c: -8, w: 10 } },
+  { id: "oqqora", name: "Oq-qora", v: { s: -100, c: 16, sp: 20 } }
+];
+const ADJ_SLIDERS = [
+  { k: "b", name: "Yorqinlik", min: -50, max: 50 },
+  { k: "c", name: "Kontrast", min: -50, max: 50 },
+  { k: "s", name: "To'yinganlik", min: -100, max: 100 },
+  { k: "w", name: "Iliqlik", min: -50, max: 50 },
+  { k: "sh", name: "Soyalarni ochish", min: 0, max: 100 },
+  { k: "sp", name: "Aniqlik", min: 0, max: 100 },
+  { k: "sm", name: "Yumshatish", min: 0, max: 100 }
+];
+const LOW_DPI = 150; // bundan past bo'lsa A4 da xira chiqadi
+const mkAdj = v => Object.assign({}, ADJ0, v || {});
+const adjId = a => !a || (!a.a && ADJ_SLIDERS.every(x => !a[x.k]));
+const adjKey = a => adjId(a) ? "" : JSON.stringify([a.a ? 1 : 0, a.b, a.c, a.s, a.w, a.sh, a.sp, a.sm]);
+const effAdj = p => p.adj || S.alb.adj;
+const presetOf = a => { const k = adjKey(a); const f = ADJ_PRESETS.find(x => adjKey(mkAdj(x.v)) === k); return f ? f.id : "custom"; };
+
+// Avto uchun rasm statistikasi (kichik nusxadan bir marta hisoblanadi)
+async function adjStats(p) {
+  if (p.st) return p.st;
+  const bmp = await thumbBmp(p), sc = Math.min(1, 256 / Math.max(bmp.width, bmp.height));
+  const cv = document.createElement("canvas"); cv.width = Math.max(1, Math.round(bmp.width * sc)); cv.height = Math.max(1, Math.round(bmp.height * sc));
+  const cx = cv.getContext("2d", { willReadFrequently: true }); cx.drawImage(bmp, 0, 0, cv.width, cv.height);
+  const d = cx.getImageData(0, 0, cv.width, cv.height).data, hist = new Uint32Array(256); let n = 0, sum = 0;
+  for (let i = 0; i < d.length; i += 4) { const l = (d[i] * 77 + d[i + 1] * 150 + d[i + 2] * 29) >> 8; hist[l]++; n++; sum += l; }
+  const pick = q => { let c = 0; for (let i = 0; i < 256; i++) { c += hist[i]; if (c >= q * n) return i; } return 255; };
+  p.st = { lo: pick(0.005) / 255, hi: pick(0.995) / 255, mean: sum / n / 255 };
+  return p.st;
+}
+// Ranglar uchun jadval (har kanal uchun 256 qiymat)
+function adjLUT(a, st) {
+  const R = new Uint8ClampedArray(256), G = new Uint8ClampedArray(256), B = new Uint8ClampedArray(256);
+  let lo = 0, hi = 1, gam = 1;
+  if (a.a && st) {
+    lo = Math.min(st.lo, 0.12) * 0.85; hi = Math.max(st.hi, 0.85) + (1 - Math.max(st.hi, 0.85)) * 0.15;
+    const m = Math.min(0.95, Math.max(0.05, (st.mean - lo) / (hi - lo)));
+    gam = Math.max(0.72, Math.min(1.3, Math.log(0.48) / Math.log(m))); gam = 1 + (gam - 1) * 0.7;
+  }
+  const bExp = Math.pow(2, -a.b / 60), cK = 1 + a.c / 100 * 1.2, shA = a.sh / 100 * 2.2, wt = a.w / 50;
+  const fr = 1 + wt * 0.07, fg = 1 + wt * 0.015, fb = 1 - wt * 0.1;
+  for (let i = 0; i < 256; i++) {
+    let v = i / 255;
+    if (a.a) { v = Math.max(0, Math.min(1, (v - lo) / (hi - lo))); v = Math.pow(v, gam); }
+    if (shA) v += shA * v * (1 - v) * (1 - v);
+    if (a.b) v = Math.pow(Math.max(0, Math.min(1, v)), bExp);
+    if (a.c) v = 0.5 + (v - 0.5) * cK;
+    v *= 255; R[i] = v * fr; G[i] = v * fg; B[i] = v * fb;
+  }
+  return { R, G, B };
+}
+// Xira nusxa (aniqlik va yumshatish uchun)
+function blurCopy(src, w, h, r) {
+  const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+  const cx = cv.getContext("2d", { willReadFrequently: true });
+  if ("filter" in cx && typeof cx.filter === "string") { cx.filter = `blur(${r}px)`; cx.drawImage(src, 0, 0); cx.filter = "none"; }
+  else { const t = document.createElement("canvas"); t.width = Math.max(1, Math.round(w / (r * 1.5))); t.height = Math.max(1, Math.round(h / (r * 1.5))); t.getContext("2d").drawImage(src, 0, 0, t.width, t.height); cx.imageSmoothingQuality = "high"; cx.drawImage(t, 0, 0, w, h); }
+  return cx.getImageData(0, 0, w, h).data;
+}
+// Rasmni sozlab, yangi canvas qaytaradi. maxSide — ishlov beriladigan eng katta tomon
+async function applyAdj(p, src, a, maxSide) {
+  const st = a.a ? await adjStats(p) : null;
+  const sw = src.width, sh = src.height, sc = Math.min(1, maxSide / Math.max(sw, sh));
+  const w = Math.max(1, Math.round(sw * sc)), h = Math.max(1, Math.round(sh * sc));
+  const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+  const cx = cv.getContext("2d", { willReadFrequently: true }); cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = "high"; cx.drawImage(src, 0, 0, w, h);
+  const im = cx.getImageData(0, 0, w, h), d = im.data, L = Math.max(w, h);
+  const T = adjLUT(a, st), sat = 1 + a.s / 100;
+  const spA = a.sp / 100 * 1.3, smA = a.sm / 100 * 0.85;
+  const sb = spA ? blurCopy(cv, w, h, Math.max(0.6, L / 1400)) : null;
+  const mb = smA ? blurCopy(cv, w, h, Math.max(1, L / 350)) : null;
+  const THR = 34;
+  for (let i = 0; i < d.length; i += 4) {
+    let r = d[i], g = d[i + 1], b = d[i + 2];
+    if (mb) { // chekkalarni saqlab yumshatish: farq kichik joylar (teri, fon) silliqlanadi
+      const dr = mb[i] - r, dg = mb[i + 1] - g, db = mb[i + 2] - b, df = (Math.abs(dr) + Math.abs(dg) + Math.abs(db)) / 3;
+      const k = smA * Math.max(0, 1 - df / THR); r += dr * k; g += dg * k; b += db * k;
+    }
+    if (sb) { r += (r - sb[i]) * spA; g += (g - sb[i + 1]) * spA; b += (b - sb[i + 2]) * spA; }
+    r = T.R[r < 0 ? 0 : r > 255 ? 255 : r | 0]; g = T.G[g < 0 ? 0 : g > 255 ? 255 : g | 0]; b = T.B[b < 0 ? 0 : b > 255 ? 255 : b | 0];
+    if (sat !== 1) { const l = r * 0.299 + g * 0.587 + b * 0.114; r = l + (r - l) * sat; g = l + (g - l) * sat; b = l + (b - l) * sat; }
+    d[i] = r; d[i + 1] = g; d[i + 2] = b;
+  }
+  cx.putImageData(im, 0, 0);
+  return cv;
+}
+// Ko'rinish uchun sozlangan kichik nusxa
+const albThumb = p => (p.athumb && p.athumbKey === adjKey(effAdj(p))) ? p.athumb : p.thumb;
+let adjQueue = [], adjRunning = 0, adjTotal = 0, adjDone = 0;
+function queueAdjThumbs(list) {
+  const need = list.filter(p => { const k = adjKey(effAdj(p)); if (!k) { if (p.athumb) { URL.revokeObjectURL(p.athumb); p.athumb = null; } p.athumbKey = ""; return false; } return p.athumbKey !== k; });
+  adjQueue = need.concat(adjQueue.filter(p => !need.includes(p)));
+  adjTotal = adjQueue.length + adjRunning; adjDone = 0; adjStatus();
+  for (let i = adjRunning; i < 2; i++) adjWorker();
+  if (!need.length) updateAdjImgs(list);
+}
+async function adjWorker() {
+  adjRunning++;
+  try {
+    while (adjQueue.length) {
+      const p = adjQueue.shift(), a = effAdj(p), k = adjKey(a);
+      if (!k || p.athumbKey === k) { adjDone++; continue; }
+      try {
+        const cv = await applyAdj(p, await thumbBmp(p), a, THUMB);
+        const blob = await canvasToBlob(cv, "image/jpeg", 0.88);
+        if (adjKey(effAdj(p)) === k) { if (p.athumb) URL.revokeObjectURL(p.athumb); p.athumb = URL.createObjectURL(blob); p.athumbKey = k; updateAdjImgs([p]); }
+      } catch (e) { console.warn("adj", e); }
+      adjDone++; if (adjDone % 8 === 0 || !adjQueue.length) adjStatus();
+    }
+  } finally { adjRunning--; adjStatus(); }
+}
+function updateAdjImgs(list) {
+  for (const p of list) {
+    const src = albThumb(p);
+    document.querySelectorAll(`#pages [data-open="alb:${p.id}"] img`).forEach(im => { if (im.getAttribute("src") !== src) im.src = src; });
+    if (ED && ED.p === p && ED.adj) $("edFrame").querySelectorAll("img").forEach(im => { if (im.getAttribute("src") !== src) im.src = src; });
+  }
+}
+function adjStatus() {
+  const el = $("adjStatus"); if (!el) return;
+  if (adjRunning && adjTotal > 1) el.textContent = `Ko'rinishlar yangilanmoqda: ${Math.min(adjDone, adjTotal)} / ${adjTotal}`;
+  else el.textContent = "Sozlama hamma rasmlarga tushadi. Bitta rasmni alohida sozlash uchun rasm ustiga bosing.";
+}
+// Eksport: to'liq rasmni kerakli o'lchamda sozlash
+async function adjFull(p, bmp, drawW) {
+  const a = effAdj(p); if (adjId(a)) return bmp;
+  const need = Math.ceil(Math.max(bmp.width, bmp.height) * Math.min(1, drawW * 1.15 / bmp.width));
+  return applyAdj(p, bmp, a, Math.max(64, need));
+}
+// Sifat: rasm katakda necha DPI chiqadi
+const effDpi = p => p.fw ? Math.round(300 * p.w / geom(p).DW) : 999;
+const lowRes = p => effDpi(p) < LOW_DPI;
+const albCheck = p => needsCheck(p) || (lowRes(p) && !p.reviewed);
+
+// Boshqaruv elementlari (umumiy panel va tahrirlash oynasi uchun)
+function adjChips(box, get, set) {
+  const pid = presetOf(get());
+  box.querySelector(".presets").innerHTML = ADJ_PRESETS.map(x => `<button class="pchip" data-preset="${x.id}" aria-pressed="${pid === x.id}">${x.name}</button>`).join("") + (pid === "custom" ? `<span class="pchip ghost">Qo'lda</span>` : "");
+  box.querySelectorAll("[data-preset]").forEach(b => b.onclick = () => { set(mkAdj(ADJ_PRESETS.find(x => x.id === b.dataset.preset).v), true); buildAdjUI(box, get, set); });
+}
+function buildAdjUI(box, get, set) {
+  const a = get();
+  adjChips(box, get, set);
+  box.querySelector(".sliders").innerHTML = ADJ_SLIDERS.map(x => `<div class="arow"><label>${x.name}</label><input type="range" min="${x.min}" max="${x.max}" step="1" value="${a[x.k]}" data-adj="${x.k}"><output>${a[x.k] > 0 && x.min < 0 ? "+" : ""}${a[x.k]}</output></div>`).join("");
+  box.querySelectorAll("[data-adj]").forEach(inp => {
+    const x = ADJ_SLIDERS.find(q => q.k === inp.dataset.adj), out = inp.nextElementSibling;
+    inp.oninput = () => { const v = +inp.value; out.textContent = (v > 0 && x.min < 0 ? "+" : "") + v; const n = mkAdj(get()); n[x.k] = v; set(n, false); };
+    inp.onchange = () => adjChips(box, get, set);
+    inp.ondblclick = () => { const n = mkAdj(get()); n[x.k] = 0; set(n, true); buildAdjUI(box, get, set); };
+  });
+}
+let adjTimer = null;
+function setGlobalAdj(a, now) {
+  S.alb.adj = adjId(a) ? null : a;
+  clearTimeout(adjTimer); adjTimer = setTimeout(() => queueAdjThumbs(S.alb.photos.filter(p => !p.adj)), now ? 0 : 220);
+}
+function renderAdjPanel() {
+  const box = $("adjPanel");
+  box.querySelector("#adjPresets").classList.add("presets"); box.querySelector("#adjSliders").classList.add("sliders");
+  buildAdjUI(box, () => mkAdj(S.alb.adj), setGlobalAdj);
+}
+
 let fontsOk = null;
 function fontsReady() {
   if (!fontsOk) {
@@ -1669,9 +1865,12 @@ function drawEditor() {
   const p = ED.p, list = ED.list(), i = list.indexOf(p), half = $("edHalf"), fr = $("edFrame");
   if (ED.kind === "polaroid") { half.className = "half"; half.setAttribute("style", bgCss("l") + ";--ar:.75"); fr.className = "frame"; }
   else { half.className = "half solo"; half.setAttribute("style", `aspect-ratio:${p.fw}/${p.fh};--ar:${p.fw / p.fh}`); fr.className = "frame" + (ED.circle ? " circle" : ""); }
-  fr.innerHTML = frameHTML(p, false);
+  fr.innerHTML = frameHTML(p, false, ED.adj ? albThumb(p) : p.thumb);
   $("edName").textContent = p.name;
-  $("edSub").textContent = `${p.w}×${p.h} px · ${i + 1} / ${list.length}` + (p.mode === "fill" && p.loss > 0.01 ? ` · avtomatikda ${Math.round(p.loss * 100)}% kesiladi` : "");
+  $("edSub").textContent = `${p.w}×${p.h} px · ${i + 1} / ${list.length}` + (p.mode === "fill" && p.loss > 0.01 ? ` · avtomatikda ${Math.round(p.loss * 100)}% kesiladi` : "") + (ED.adj ? ` · ${effDpi(p)} DPI` : "");
+  $("edLow").hidden = !(ED.adj && lowRes(p));
+  $("edAdjField").hidden = !ED.adj;
+  if (ED.adj) { $("eaAll").setAttribute("aria-pressed", !p.adj); $("eaOwn").setAttribute("aria-pressed", !!p.adj); $("edAdjBox").hidden = !p.adj; if (p.adj) buildAdjUI($("edAdjBox"), () => mkAdj(ED.p.adj), setOwnAdj); }
   $("mFill").setAttribute("aria-pressed", p.mode === "fill"); $("mFit").setAttribute("aria-pressed", p.mode === "fit");
   $("fitBgField").hidden = p.mode !== "fit";
   $("fbBlur").setAttribute("aria-pressed", p.fitBg === "blur"); $("fbWhite").setAttribute("aria-pressed", p.fitBg === "white");
@@ -1681,6 +1880,8 @@ function drawEditor() {
   $("edPrev").disabled = i <= 0;
   $("edNext").textContent = i >= list.length - 1 ? "Yopish" : "Keyingi →";
 }
+let ownTimer = null;
+function setOwnAdj(a, now) { if (!ED) return; const p = ED.p; p.adj = a; p.reviewed = true; clearTimeout(ownTimer); ownTimer = setTimeout(() => queueAdjThumbs([p]), now ? 0 : 150); }
 function edChange(fn) { const p = ED.p; fn(p); clampOffset(p); p.edited = true; p.reviewed = true; drawEditor(); ED.live && ED.live(p); }
 function edKeys(e) {
   if (e.target.tagName === "INPUT" && e.target.type === "range" && (e.key === "ArrowLeft" || e.key === "ArrowRight")) return;
@@ -1711,6 +1912,8 @@ function edKeys(e) {
   $("edPrev").onclick = () => stepEditor(-1);
   $("edNext").onclick = () => stepEditor(1);
   $("edDone").onclick = closeEditor;
+  $("eaAll").onclick = () => { ED.p.adj = null; queueAdjThumbs([ED.p]); drawEditor(); };
+  $("eaOwn").onclick = () => { if (!ED.p.adj) ED.p.adj = mkAdj(S.alb.adj); queueAdjThumbs([ED.p]); drawEditor(); };
   $("edHero").onclick = () => { const p = ED.p, pages = albPages(), pg = pages.find(x => x.items.includes(p)); if (pg) pg.items.forEach(q => { if (q !== p) q.hero = false; }); p.hero = !p.hero; closeEditor(); };
   $("editor").addEventListener("pointerdown", e => { if (e.target === $("editor")) closeEditor(); });
 })();
@@ -1724,10 +1927,10 @@ function openFor(key) {
   } else if (kind === "alb") {
     const p = S.alb.photos.find(x => x.id === +v); if (!p) return;
     const pg = albPages().find(x => x.items.includes(p));
-    openEditor(p, { kind: "cell", hero: !!pg && parseLay(pg.key).t === "m", list: () => S.alb.photos, after: (q, closed) => { if (closed) renderAlb(); } });
+    openEditor(p, { kind: "cell", adj: true, hero: !!pg && parseLay(pg.key).t === "m", list: () => S.alb.photos, after: (q, closed) => { if (closed) renderAlb(); } });
   } else if (kind === "albflag") {
-    const fl = S.alb.photos.filter(needsCheck); if (!fl.length) return;
-    openEditor(fl[0], { kind: "cell", list: () => S.alb.photos.filter(x => needsCheck(x) || x === ED.p), after: (q, closed) => { if (closed) renderAlb(); } });
+    const fl = S.alb.photos.filter(albCheck); if (!fl.length) return;
+    openEditor(fl[0], { kind: "cell", adj: true, list: () => S.alb.photos.filter(x => albCheck(x) || x === ED.p), after: (q, closed) => { if (closed) renderAlb(); } });
   } else if (kind === "cov") {
     const k = +v, p = S.cov.slots[k]; if (!p) return;
     const circ = TPL[S.cov.tpl].slots[k].shape === "circle";
@@ -1770,7 +1973,7 @@ async function renderAlbPage(cv, ctx, pg, k = 1) {
   if (pg === "cover") { await drawCoverFull(ctx); return toJpeg(cv, 300 * k); }
   ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, PW(), PH());
   const rs = pg.rects;
-  for (let j = 0; j < pg.items.length; j++) { const p = pg.items[j]; await withFull(p, bmp => drawPhoto(ctx, p, bmp, rs[j].x, rs[j].y)); }
+  for (let j = 0; j < pg.items.length; j++) { const p = pg.items[j]; await withFull(p, async bmp => drawPhoto(ctx, p, await adjFull(p, bmp, geom(p).DW * k), rs[j].x, rs[j].y)); }
   return toJpeg(cv, 300 * k);
 }
 async function drawCoverFull(ctx) {
@@ -1982,7 +2185,7 @@ $("fromAlb").onclick = () => { const tp = TPL[S.cov.tpl], used = new Set(S.cov.s
 $("decorAdd").onclick = () => $("decorFile").click();
 $("decorFile").onchange = async e => { const f = e.target.files[0]; e.target.value = ""; if (!f) return; try { const bmp = await createImageBitmap(f); S.cov.decor = { bmp, scale: 1, dy: 0 }; covChanged(true); } catch (err) { toast("Bezak rasmi ochilmadi. PNG yuklang."); } };
 $("decorDel").onclick = () => { S.cov.decor = null; covChanged(true); };
-$("albCover").onchange = e => { S.alb.cover = e.target.checked; ls.set("albCover", S.alb.cover); renderAll(); };
+$("albCover").onchange = e => { S.alb.cover = e.target.checked; renderAll(); };
 $("coverCanvas").addEventListener("click", e => {
   const r = e.currentTarget.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * A4W, y = (e.clientY - r.top) / r.height * A4H;
   const k = TPL[S.cov.tpl].slots.findIndex(s => x >= s.x && x <= s.x + s.w && y >= s.y && y <= s.y + s.h);
@@ -2019,12 +2222,12 @@ $("order").value = ls.get("order", "");
 const cw = ls.get("card", null); if (cw) { document.querySelectorAll(".cardSize").forEach(x => x.value = cw); document.documentElement.style.setProperty("--card-w", cw + "px"); }
 S.pol.cutline = ls.get("cut", true); $("cutline").checked = S.pol.cutline;
 S.alb.layout = String(ls.get("lay", "6")); { const L0 = parseLay(S.alb.layout); if (L0.t === "g" ? !LAYOUTS[L0.n] : !MOS_N.includes(L0.n)) S.alb.layout = "6"; }
-S.alb.cover = ls.get("albCover", true);
+S.alb.cover = false; // muqova har safar o'chiq boshlanadi
 S.scale = [1, 2, 3].includes(ls.get("scale", 1)) ? ls.get("scale", 1) : 1;
 const cv0 = ls.get("cov2", null); if (cv0) { Object.assign(S.cov, { tpl: TPL[cv0.tpl] ? cv0.tpl : "metrika", color: cv0.color || S.cov.color, tint: !!cv0.tint, st: cv0.st || {}, themeF: cv0.themeF || "all" }); Object.assign(S.cov.f, cv0.f || {}); if (/[\u0600-\u06FF]/.test(S.cov.f.oyat)) S.cov.f.oyat = ""; }
 S.alb.orient = ls.get("orient", "p") === "l" ? "l" : "p";
 const h0 = location.hash.slice(1); if (["polaroid", "albom", "muqova"].includes(h0)) S.mode = h0;
-renderBgs(); renderAll(); loadCustomBgs();
+renderBgs(); renderAdjPanel(); renderAll(); loadCustomBgs();
 fontsReady().then(() => { if (S.mode === "muqova") renderCoverPreview(); if (S.mode === "albom" && S.alb.cover) refreshCoverThumb(); });
 })();
 </script>
