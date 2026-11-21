@@ -324,9 +324,9 @@ details.adj[open] summary{margin-bottom:10px}
       <div class="orient" role="group" aria-label="Sahifa yo'nalishi"><button data-orient="p">A4 tik</button><button data-orient="l">A4 yotiq</button></div>
     </div>
     <div class="field">
-      <span class="lbl">Rasmlar orasi (oq chiziq)</span>
+      <span class="lbl" id="gapLbl">Oq ramka</span>
       <div class="orient four" id="gapBtns" role="group" aria-label="Rasmlar orasi"></div>
-      <p class="hint">0 = zich, rasmlar bir-biriga tegib turadi. 1–3 mm oq chiziq rasmlarni ajratadi, kesish oson bo'ladi.</p>
+      <p class="hint" id="gapHint"></p>
     </div>
     <details class="adj" id="adjAlbBox"><summary>Rang va yorug'lik — hamma rasmlar</summary><div id="adjAlb" class="fields"></div><p class="hint" style="margin-top:8px">Hamma rasmlarga birdan qo'llanadi. Bitta rasmni alohida sozlash uchun rasmni bosing.</p></details>
     <div class="field">
@@ -895,14 +895,14 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 const SW = 3000, SH = 2000, FW = 1272, FH = 1576, FY = 106, FX = [114, 1614];
 // Albom: A4, 300 DPI
 const A4W = 2480, A4H = 3508;
-// Albom/kollaj varag'i: A4 (300 DPI, 7 mm chet) yoki 10×15 (508 DPI, chetsiz, rasmlar orasi 1,5 mm)
+// Albom/kollaj varag'i: A4 (300 DPI, 7 mm chet) yoki 10×15 = 4R standarti, 4×6 dyuym = 101,6×152,4 mm (508 DPI). 10×15 da oq ramka: chet va rasmlar orasi bir xil
 const SIZES = {
   a4: { w: 2480, h: 3508, wmm: 210, hmm: 297, marg: 7, gap: 2, dpi: 300, label: "A4", max: 12, file: "albom" },
-  p10: { w: 2000, h: 3000, wmm: 100, hmm: 150, marg: 0, gap: 1.5, dpi: 508, label: "10×15", max: 6, file: "10x15" }
+  p10: { w: 2032, h: 3048, wmm: 101.6, hmm: 152.4, marg: 0, gap: 0, dpi: 508, label: "10×15", max: 6, file: "10x15", frame: true }
 };
 let BW = 2480, BH = 3508, MARG = 0, GAP = 0;
 const SZ = () => SIZES[S.alb.size] || SIZES.a4;
-function applySize() { const z = SZ(), mm = z.w / z.wmm, g = S.alb.gap[S.alb.size]; BW = z.w; BH = z.h; MARG = Math.round(z.marg * mm); GAP = Math.round((g == null ? z.gap : g) * mm); }
+function applySize() { const z = SZ(), mm = z.w / z.wmm, g = S.alb.gap[S.alb.size]; BW = z.w; BH = z.h; GAP = Math.round((g == null ? z.gap : g) * mm); MARG = z.frame ? GAP : Math.round(z.marg * mm); }
 // [ustun, qator] yoki tepada katta rasm + pastda setka: { hero: ulush, c, r }
 const LAYOUTS = { 1: [1, 1], 2: [1, 2], 3: { hero: .56, c: 2, r: 1 }, 4: [2, 2], 5: { hero: .44, c: 2, r: 2 }, 6: [2, 3], 7: { hero: .37, c: 2, r: 3 }, 8: [2, 4], 9: [3, 3], 10: [2, 5], 12: [3, 4] };
 const PART = 50, FIT_LOSS = 0.28, WARN_LOSS = 0.15, THUMB = 720;
@@ -1275,10 +1275,12 @@ function renderAlb() {
   document.querySelector('[data-clear="albom"]').hidden = !has;
   $("albCover").checked = A.cover;
   const z = SZ(), isA4 = A.size === "a4";
-  $("albCoverRow").hidden = !isA4; $("albSpecHint").textContent = isA4 ? "Muqova \"Muqova\" bo'limida tayyorlanadi. Chetlar 7 mm, rasmlar orasi 2 mm, A4 300 DPI." : "10×15 chetsiz: rasmlar varaqni to'liq egallaydi. 508 DPI, bitta varaqqa 1 tadan 6 tagacha rasm. Chetsiz pechatda printer chetdan ~1 mm qirqishi mumkin, muhim narsani eng chetga qo'ymang.";
+  $("albCoverRow").hidden = !isA4; $("albSpecHint").textContent = isA4 ? "Muqova \"Muqova\" bo'limida tayyorlanadi. Chetlar 7 mm, rasmlar orasi 2 mm, A4 300 DPI." : "10×15 = 4R standarti (4×6 dyuym, 101,6×152,4 mm), 508 DPI, bitta varaqqa 1 tadan 6 tagacha rasm. Printer chetsiz pechatda chetdan ~1–2 mm qirqadi: oq ramka qo'ysangiz, chetdagi rasm qismi kesilib ketmaydi.";
   document.querySelectorAll("[data-asize]").forEach(b => b.setAttribute("aria-pressed", b.dataset.asize === A.size));
   document.querySelectorAll("[data-orient]").forEach(b => { b.setAttribute("aria-pressed", b.dataset.orient === A.orient); b.textContent = `${z.label} ${b.dataset.orient === "p" ? "tik" : "yotiq"}`; });
   $("aDemo").classList.toggle("p10", !isA4);
+  $("gapLbl").textContent = isA4 ? "Rasmlar orasi (oq chiziq)" : "Oq ramka (chetlari va orasi)";
+  $("gapHint").textContent = isA4 ? "A4 da chetlar 7 mm, bu faqat rasmlar orasini o'zgartiradi." : "Zich = rasmlar varaqni to'liq egallaydi. 1–3 mm tanlasangiz, har bir rasm atrofida (tepa, past, chap, o'ng va rasmlar orasida) bir xil oq ramka bo'ladi.";
   const gNow = A.gap[A.size]; $("gapBtns").innerHTML = [0, 1, 2, 3].map(g => `<button data-agap="${g}" aria-pressed="${g === gNow}">${g ? g + " mm" : "Zich"}</button>`).join("");
   $("smart").disabled = !has;
   renderLays();
@@ -1671,7 +1673,7 @@ function renderBar() {
   $("saveDir").hidden = !dirOk || m === "muqova";
   document.querySelectorAll("[data-scale]").forEach(b => { const v = +b.dataset.scale; b.disabled = v > maxScale(); b.setAttribute("aria-pressed", v === K); });
   const pw = m === "albom" ? PW() : A4W, phh = m === "albom" ? PH() : A4H;
-  $("spec").textContent = m === "polaroid" ? `${SW * K}×${SH * K} px · 15×10 sm · ${508 * K} DPI` : m === "albom" ? `${SZ().label} · ${pw * K}×${phh * K} px · ${SZ().dpi * K} DPI` : `A4 · ${pw * K}×${phh * K} px · ${300 * K} DPI`;
+  $("spec").textContent = m === "polaroid" ? `${SW * K}×${SH * K} px · 15×10 sm · ${508 * K} DPI` : m === "albom" ? `${S.alb.size === "p10" ? "4R 10×15 (102×152 mm)" : "A4"} · ${pw * K}×${phh * K} px · ${SZ().dpi * K} DPI` : `A4 · ${pw * K}×${phh * K} px · ${300 * K} DPI`;
 }
 function renderAll() {
   document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === S.mode));
@@ -1970,7 +1972,7 @@ function jobsFor(mode) {
     const fz = SZ().file;
     if (coverOn() && pages.length) jobs.push({ o: "p", name: `${name}_albom_${pad(n++)}_muqova${sfx}.jpg`, render: (cv, ctx) => renderAlbPage(cv, ctx, "cover", K) });
     for (const pg of pages) jobs.push({ o: S.alb.orient, name: `${name}_${fz}_${pad(n++)}${sfx}.jpg`, render: (cv, ctx) => renderAlbPage(cv, ctx, pg, K) });
-    return { w: A4W * K, h: A4H * K, jobs, zip: `${name}_${fz}${sfx}`, fmt: mode === "albom" && S.alb.size === "p10" ? [100, 150] : "a4", prep: async () => ({}) };
+    return { w: A4W * K, h: A4H * K, jobs, zip: `${name}_${fz}${sfx}`, fmt: mode === "albom" && S.alb.size === "p10" ? [101.6, 152.4] : "a4", prep: async () => ({}) };
   }
   return { w: A4W * K, h: A4H * K, jobs: [{ name: `${name}_muqova${sfx}.jpg`, render: (cv, ctx) => renderAlbPage(cv, ctx, "cover", K) }], zip: `${name}_muqova${sfx}`, prep: async () => ({}) };
 }
