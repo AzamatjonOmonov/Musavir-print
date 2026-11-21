@@ -185,6 +185,15 @@ textarea.txt{resize:vertical;min-height:60px}
 .orient{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .orient button{border:0;background:var(--surface);padding:7px;font-weight:500}
 .orient button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+/* rang sozlash, oq chiziq */
+.orient.four{grid-template-columns:repeat(4,1fr)}
+details.adj{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg)}
+details.adj summary{cursor:pointer;font-weight:600;font-size:13px}
+details.adj[open] summary{margin-bottom:10px}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.adjrow{display:grid;grid-template-columns:92px minmax(0,1fr) 34px;align-items:center;gap:6px;font-size:12px}
+.adjrow input{accent-color:var(--accent);min-width:0;width:100%}
+.adjrow output{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
 /* panel pastda */
 .bar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;z-index:20}
 .bar .sum{font-variant-numeric:tabular-nums;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
@@ -229,11 +238,11 @@ textarea.txt{resize:vertical;min-height:60px}
 <header class="top">
   <div class="brand">
     <h1>Musavvir Studio</h1>
-    <p>Polaroid varaqlar, A4 albom va muqova</p>
+    <p>Polaroid, 10×15 kollaj, A4 albom va muqova</p>
   </div>
   <div class="modes" role="group" aria-label="Bo'lim">
     <button data-mode="polaroid" aria-pressed="true">Polaroid</button>
-    <button data-mode="albom" aria-pressed="false">Albom</button>
+    <button data-mode="albom" aria-pressed="false">Albom · 10×15</button>
     <button data-mode="muqova" aria-pressed="false">Muqova</button>
   </div>
   <div class="orderbox">
@@ -255,6 +264,7 @@ textarea.txt{resize:vertical;min-height:60px}
       <p class="hint">Figma'dan fonni 3000×2000 PNG yoki JPG qilib eksport qilib yuklang. Yuklangan fonlar shu brauzerda saqlanadi.</p>
     </div>
     <label class="switch"><input type="checkbox" id="cutline" checked> O'rtada kesish chizig'i</label>
+    <details class="adj"><summary>Rang va yorug'lik — hamma rasmlar</summary><div id="adjPol" class="fields"></div></details>
     <div class="field">
       <span class="lbl">Avtomatik joylash</span>
       <p class="hint">Rasm ramkaga deyarli to'g'ri kelsa, ramka to'ldiriladi. 28% dan ko'pi kesilib ketadigan bo'lsa, rasm butunligicha sig'diriladi, atrofi xira fon bilan to'ldiriladi. Sariq belgili rasmlarni tekshirib chiqing.</p>
@@ -309,15 +319,22 @@ textarea.txt{resize:vertical;min-height:60px}
       <p class="hint" id="layHint"></p>
     </div>
     <div class="field">
-      <span class="lbl">Sahifa</span>
+      <span class="lbl">Varaq o'lchami</span>
+      <div class="orient" role="group" aria-label="Varaq o'lchami"><button data-asize="p10">10×15 (1–6 rasm)</button><button data-asize="a4">A4 albom</button></div>
       <div class="orient" role="group" aria-label="Sahifa yo'nalishi"><button data-orient="p">A4 tik</button><button data-orient="l">A4 yotiq</button></div>
     </div>
+    <div class="field">
+      <span class="lbl">Rasmlar orasi (oq chiziq)</span>
+      <div class="orient four" id="gapBtns" role="group" aria-label="Rasmlar orasi"></div>
+      <p class="hint">0 = zich, rasmlar bir-biriga tegib turadi. 1–3 mm oq chiziq rasmlarni ajratadi, kesish oson bo'ladi.</p>
+    </div>
+    <details class="adj" id="adjAlbBox"><summary>Rang va yorug'lik — hamma rasmlar</summary><div id="adjAlb" class="fields"></div><p class="hint" style="margin-top:8px">Hamma rasmlarga birdan qo'llanadi. Bitta rasmni alohida sozlash uchun rasmni bosing.</p></details>
     <div class="field">
       <button class="btn" id="smart">Aqlli joylash</button>
       <p class="hint">Rasmlarni tahlil qilib, tik rasmlarni tik kataklarga, yotiqlarini yotiq kataklarga joylaydi va har bir sahifaga mos setkani tanlaydi (tanlangan setkadan ±2 rasm). Natijani keyin qo'lda o'zgartirish mumkin.</p>
     </div>
-    <label class="switch"><input type="checkbox" id="albCover" checked> Muqovani 1-sahifa qilish</label>
-    <p class="hint">Muqova "Muqova" bo'limida tayyorlanadi. Chetlar 7 mm, rasmlar orasi 2 mm, A4 300 DPI.</p>
+    <label class="switch" id="albCoverRow"><input type="checkbox" id="albCover" checked> Muqovani 1-sahifa qilish</label>
+    <p class="hint" id="albSpecHint">Muqova "Muqova" bo'limida tayyorlanadi. Chetlar 7 mm, rasmlar orasi 2 mm, A4 300 DPI.</p>
     <div class="field">
       <span class="lbl">Tartib</span>
       <p class="hint">Rasmni sichqoncha bilan boshqa katakka sudrab tashlasangiz, ikkalasi joy almashadi.</p>
@@ -341,7 +358,7 @@ textarea.txt{resize:vertical;min-height:60px}
       <div>
         <h2>Albom qanday tayyorlanadi</h2>
         <ol>
-          <li><b>Setkani tanlang</b> (chapda): 1 tadan 12 tagacha rasm.</li>
+          <li><b>O'lcham va setkani tanlang</b> (chapda): A4 da 1–12, 10×15 da 1–6 rasm.</li>
           <li><b>Rasmlarni yuklang.</b> Sahifalarga o'zi taqsimlanadi.</li>
           <li><b>Kerakli sahifaning setkasini o'zgartiring,</b> rasmlarni sudrab almashtiring.</li>
           <li><b>Saqlang:</b> sahifalar JPEG, butun albom bitta PDF bo'lib chiqadi.</li>
@@ -435,6 +452,7 @@ textarea.txt{resize:vertical;min-height:60px}
         <button class="btn" id="rotR" title="O'ngga 90°">↻ 90°</button>
         <button class="btn" id="edReset">Tiklash</button>
       </div>
+      <details class="adj" id="edAdjBox"><summary>Rang va yorug'lik — shu rasm</summary><div id="adjEd" class="fields"></div><p class="hint" style="margin-top:8px">Umumiy sozlamaga qo'shimcha bo'lib qo'llanadi.</p></details>
       <button class="btn" id="edHero" hidden>★ Katta rasm qilish</button>
       <p class="hint">Rasmni sichqoncha bilan suring. Kattalashtirish uchun g'ildirakdan foydalaning. ← → tugmalari bilan keyingi rasmga o'tasiz.</p>
       <div class="nav">
@@ -876,7 +894,15 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 // Polaroid: Figma shablonidan, 3000×2000 (15×10 sm, 508 DPI)
 const SW = 3000, SH = 2000, FW = 1272, FH = 1576, FY = 106, FX = [114, 1614];
 // Albom: A4, 300 DPI
-const A4W = 2480, A4H = 3508, MM = A4W / 210, MARG = Math.round(7 * MM), GAP = Math.round(2 * MM);
+const A4W = 2480, A4H = 3508;
+// Albom/kollaj varag'i: A4 (300 DPI, 7 mm chet) yoki 10×15 (508 DPI, chetsiz, rasmlar orasi 1,5 mm)
+const SIZES = {
+  a4: { w: 2480, h: 3508, wmm: 210, hmm: 297, marg: 7, gap: 2, dpi: 300, label: "A4", max: 12, file: "albom" },
+  p10: { w: 2000, h: 3000, wmm: 100, hmm: 150, marg: 0, gap: 1.5, dpi: 508, label: "10×15", max: 6, file: "10x15" }
+};
+let BW = 2480, BH = 3508, MARG = 0, GAP = 0;
+const SZ = () => SIZES[S.alb.size] || SIZES.a4;
+function applySize() { const z = SZ(), mm = z.w / z.wmm, g = S.alb.gap[S.alb.size]; BW = z.w; BH = z.h; MARG = Math.round(z.marg * mm); GAP = Math.round((g == null ? z.gap : g) * mm); }
 // [ustun, qator] yoki tepada katta rasm + pastda setka: { hero: ulush, c, r }
 const LAYOUTS = { 1: [1, 1], 2: [1, 2], 3: { hero: .56, c: 2, r: 1 }, 4: [2, 2], 5: { hero: .44, c: 2, r: 2 }, 6: [2, 3], 7: { hero: .37, c: 2, r: 3 }, 8: [2, 4], 9: [3, 3], 10: [2, 5], 12: [3, 4] };
 const PART = 50, FIT_LOSS = 0.28, WARN_LOSS = 0.15, THUMB = 720;
@@ -886,8 +912,8 @@ const HEARTS = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDA
 const $ = id => document.getElementById(id);
 const S = {
   mode: "polaroid",
-  pol: { photos: [], view: "photos", flagOnly: false, bg: { kind: "img", id: "hearts", src: HEARTS }, customBgs: [], cutline: true },
-  alb: { photos: [], layout: "6", over: {}, seed: {}, cover: true, orient: "p" },
+  pol: { photos: [], view: "photos", flagOnly: false, bg: { kind: "img", id: "hearts", src: HEARTS }, customBgs: [], cutline: true, adj: {} },
+  alb: { photos: [], layout: "6", over: {}, seed: {}, cover: true, orient: "p", size: "a4", gap: { a4: 2, p10: 0 }, adj: {} },
   cov: { tpl: "metrika", themeF: "all", f: { ism: "", fam: "", ismlar: "", sarlavha: "", soz: "", sana: "", soat: "", vazn: "", boy: "", joy: "", matn: "", oyat: "" }, st: {}, color: "#c46a8c", tint: false, slots: [], decor: null },
   scale: 1, cancel: false
 };
@@ -951,10 +977,10 @@ function imgStyle(p, g) {
 }
 function frameHTML(p, lazy = true) {
   const L = lazy ? ' loading="lazy"' : "";
-  const main = `<img src="${p.thumb}" alt=""${L} decoding="async" style="${imgStyle(p, geom(p))}">`;
+  const src = thumbSrc(p), main = `<img src="${src}" alt=""${L} decoding="async" style="${imgStyle(p, geom(p))}">`;
   if (p.mode === "fit" && p.fitBg === "blur") {
     const b = geom(p, { mode: "fill", zoom: 1.15, angle: 0, ox: 0, oy: 0 });
-    return `<img class="blur" src="${p.thumb}" alt=""${L} decoding="async" style="${imgStyle(p, b)}">` + main;
+    return `<img class="blur" src="${src}" alt=""${L} decoding="async" style="${imgStyle(p, b)}">` + main;
   }
   return main;
 }
@@ -1107,9 +1133,12 @@ function gridRects(c, r, x0, y0, W, H) {
   return out;
 }
 const land = () => S.alb.orient === "l";
-const PW = () => land() ? A4H : A4W, PH = () => land() ? A4W : A4H;
+const PW = () => land() ? BH : BW, PH = () => land() ? BW : BH;
+const layKeys = () => Object.keys(LAYOUTS).filter(n => +n <= SZ().max);
+const mosKeys = () => MOS_N.filter(n => n <= SZ().max);
+const coverOn = () => S.alb.cover && S.alb.size === "a4";
 function cellRects(n) {
-  const L = LAYOUTS[n], W = A4W - 2 * MARG, H = A4H - 2 * MARG;
+  const L = LAYOUTS[n], W = BW - 2 * MARG, H = BH - 2 * MARG;
   let rs;
   if (Array.isArray(L)) rs = gridRects(L[0], L[1], MARG, MARG, W, H);
   else { const hh = Math.round((H - GAP) * L.hero); rs = [{ x: MARG, y: MARG, w: W, h: hh }, ...gridRects(L.c, L.r, MARG, MARG + hh + GAP, W, H - hh - GAP)]; }
@@ -1122,7 +1151,7 @@ function cellRects(n) {
 // Aqlli joylash: har sahifa uchun mos setka va rasmlarni kataklarga yo'nalishi bo'yicha moslash
 function smartLayout() {
   const A = S.alb, n0 = parseLay(A.layout).n; ph = A.photos.slice(), out = [], over = {};
-  const cands = Object.keys(LAYOUTS).map(Number).filter(n => Math.abs(n - n0) <= 2 && (n > 1 || n0 === 1));
+  const cands = layKeys().map(Number).filter(n => Math.abs(n - n0) <= 2 && (n > 1 || n0 === 1));
   const fit = (items, n) => {
     const rs = cellRects(n), ci = rs.map((r, i) => i).sort((a, b) => rs[a].w / rs[a].h - rs[b].w / rs[b].h);
     const pi = items.slice().sort((a, b) => a.w / a.h - b.w / b.h);
@@ -1133,7 +1162,7 @@ function smartLayout() {
   let i = 0, k = 0;
   while (i < ph.length) {
     const rest = ph.length - i; let best = null;
-    const opts = rest <= Math.max(...cands) ? [rest in LAYOUTS ? rest : Object.keys(LAYOUTS).map(Number).find(n => n >= rest)] : cands;
+    const opts = rest <= Math.max(...cands) ? [rest in LAYOUTS ? rest : layKeys().map(Number).find(n => n >= rest)] : cands;
     for (const n of opts) {
       const items = ph.slice(i, i + n), r = fit(items, n), score = r.loss + 0.03 * Math.abs(n - n0);
       if (!best || score < best.score) best = { n, score, order: r.order, cnt: items.length };
@@ -1219,20 +1248,20 @@ function albPages() {
 function layIcon(n) {
   const L = LAYOUTS[n];
   if (land()) {
-    if (Array.isArray(L)) return `<i style="aspect-ratio:297/210;width:36px;grid-template-columns:repeat(${L[1]},1fr);grid-template-rows:repeat(${L[0]},1fr)">${"<b></b>".repeat(L[0] * L[1])}</i>`;
+    if (Array.isArray(L)) return `<i style="aspect-ratio:${BH}/${BW};width:36px;grid-template-columns:repeat(${L[1]},1fr);grid-template-rows:repeat(${L[0]},1fr)">${"<b></b>".repeat(L[0] * L[1])}</i>`;
     const h = L.hero / (1 - L.hero) * L.r;
-    return `<i style="aspect-ratio:297/210;width:36px;grid-template-columns:${h}fr repeat(${L.r},1fr);grid-template-rows:repeat(${L.c},1fr)"><b style="grid-row:1/-1"></b>${"<b></b>".repeat(L.c * L.r)}</i>`;
+    return `<i style="aspect-ratio:${BH}/${BW};width:36px;grid-template-columns:${h}fr repeat(${L.r},1fr);grid-template-rows:repeat(${L.c},1fr)"><b style="grid-row:1/-1"></b>${"<b></b>".repeat(L.c * L.r)}</i>`;
   }
-  if (Array.isArray(L)) return `<i style="grid-template-columns:repeat(${L[0]},1fr);grid-template-rows:repeat(${L[1]},1fr)">${"<b></b>".repeat(L[0] * L[1])}</i>`;
+  if (Array.isArray(L)) return `<i style="aspect-ratio:${BW}/${BH};grid-template-columns:repeat(${L[0]},1fr);grid-template-rows:repeat(${L[1]},1fr)">${"<b></b>".repeat(L[0] * L[1])}</i>`;
   const h = L.hero / (1 - L.hero) * L.r;
-  return `<i style="grid-template-columns:repeat(${L.c},1fr);grid-template-rows:${h}fr repeat(${L.r},1fr)"><b style="grid-column:1/-1"></b>${"<b></b>".repeat(L.c * L.r)}</i>`;
+  return `<i style="aspect-ratio:${BW}/${BH};grid-template-columns:repeat(${L.c},1fr);grid-template-rows:${h}fr repeat(${L.r},1fr)"><b style="grid-column:1/-1"></b>${"<b></b>".repeat(L.c * L.r)}</i>`;
 }
 function renderLays() {
   const cur = parseLay(S.alb.layout);
   $("laytype").innerHTML = [["g", "Setka"], ["m", "Mozaika"], ["q", "Qatorli"]].map(([t, n]) => `<button data-laytype="${t}" aria-pressed="${cur.t === t}">${n}</button>`).join("");
   $("lays").innerHTML = cur.t === "g"
-    ? Object.keys(LAYOUTS).map(n => `<button class="lay" data-lay="${n}" aria-pressed="${+n === cur.n}" aria-label="${n} ta rasm">${layIcon(n)}${n}</button>`).join("")
-    : MOS_N.map(n => `<button class="lay num" data-lay="${cur.t}${n}" aria-pressed="${n === cur.n}" aria-label="${n} ta rasm">${n}</button>`).join("");
+    ? layKeys().map(n => `<button class="lay" data-lay="${n}" aria-pressed="${+n === cur.n}" aria-label="${n} ta rasm">${layIcon(n)}${n}</button>`).join("")
+    : mosKeys().map(n => `<button class="lay num" data-lay="${cur.t}${n}" aria-pressed="${n === cur.n}" aria-label="${n} ta rasm">${n}</button>`).join("");
   $("layHint").textContent = cur.t === "m" ? "Sahifa rasmlarning o'z shakliga qarab katta-kichik kataklarga bo'linadi, bitta rasm katta bo'ladi. Kesilish juda kam. Sahifadagi ↻ tugmasi boshqa variant beradi, ★ belgilangan rasm katta bo'ladi."
     : cur.t === "q" ? "Har qatorda rasmlar bir xil balandlikda, eni rasmning o'z nisbatida. Deyarli hech narsa kesilmaydi."
     : "Bitta sahifaning setkasini alohida o'zgartirish uchun sahifa tepasidagi ro'yxatdan tanlang. Setka o'zgarsa, o'sha rasmlarning qo'lda qilingan tahriri qaytadan avtomatik bo'ladi.";
@@ -1245,7 +1274,12 @@ function renderAlb() {
   $("aEmpty").hidden = has; $("aToolbar").hidden = !has; $("pages").hidden = !has;
   document.querySelector('[data-clear="albom"]').hidden = !has;
   $("albCover").checked = A.cover;
-  document.querySelectorAll("[data-orient]").forEach(b => b.setAttribute("aria-pressed", b.dataset.orient === A.orient));
+  const z = SZ(), isA4 = A.size === "a4";
+  $("albCoverRow").hidden = !isA4; $("albSpecHint").textContent = isA4 ? "Muqova \"Muqova\" bo'limida tayyorlanadi. Chetlar 7 mm, rasmlar orasi 2 mm, A4 300 DPI." : "10×15 chetsiz: rasmlar varaqni to'liq egallaydi. 508 DPI, bitta varaqqa 1 tadan 6 tagacha rasm. Chetsiz pechatda printer chetdan ~1 mm qirqishi mumkin, muhim narsani eng chetga qo'ymang.";
+  document.querySelectorAll("[data-asize]").forEach(b => b.setAttribute("aria-pressed", b.dataset.asize === A.size));
+  document.querySelectorAll("[data-orient]").forEach(b => { b.setAttribute("aria-pressed", b.dataset.orient === A.orient); b.textContent = `${z.label} ${b.dataset.orient === "p" ? "tik" : "yotiq"}`; });
+  $("aDemo").classList.toggle("p10", !isA4);
+  const gNow = A.gap[A.size]; $("gapBtns").innerHTML = [0, 1, 2, 3].map(g => `<button data-agap="${g}" aria-pressed="${g === gNow}">${g ? g + " mm" : "Zich"}</button>`).join("");
   $("smart").disabled = !has;
   renderLays();
   $("aDemo").style.aspectRatio = `${PW()}/${PH()}`;
@@ -1253,18 +1287,18 @@ function renderAlb() {
   $("aDemo").innerHTML = demo.map(r => `<div class="frame empty" style="${cellStyle(r)}"></div>`).join("");
   if (!has) return;
   const pages = albPages(), out = [];
-  if (A.cover) out.push(`<div class="pagewrap"><div class="pagehead"><span>Muqova</span><button class="btn sm" data-goto="muqova">Tahrirlash</button></div><div class="a4" data-goto="muqova" style="cursor:pointer"><img class="coverimg" id="albCoverImg" alt="Muqova" src="${coverThumbURL}"></div></div>`);
+  if (coverOn()) out.push(`<div class="pagewrap"><div class="pagehead"><span>Muqova</span><button class="btn sm" data-goto="muqova">Tahrirlash</button></div><div class="a4" data-goto="muqova" style="cursor:pointer"><img class="coverimg" id="albCoverImg" alt="Muqova" src="${coverThumbURL}"></div></div>`);
   for (const pg of pages) {
     const rs = pg.rects, isM = parseLay(pg.key).t === "m";
     const og = (lbl, keys) => `<optgroup label="${lbl}">${keys.map(k => `<option value="${k}"${k === pg.key ? " selected" : ""}>${layName(k)}</option>`).join("")}</optgroup>`;
-    const opts = og("Setka", Object.keys(LAYOUTS)) + og("Mozaika", MOS_N.map(n => "m" + n)) + og("Qatorli", MOS_N.map(n => "q" + n));
-    out.push(`<div class="pagewrap"><div class="pagehead"><span>Sahifa ${pg.k + 1 + (A.cover ? 1 : 0)}</span><span class="pgctl">${isM ? `<button class="btn sm" data-reseed="${pg.k}" title="Boshqa variant">↻</button>` : ""}<select data-pagelay="${pg.k}" aria-label="Sahifa setkasi">${opts}</select></span></div>
+    const opts = og("Setka", layKeys()) + og("Mozaika", mosKeys().map(n => "m" + n)) + og("Qatorli", mosKeys().map(n => "q" + n));
+    out.push(`<div class="pagewrap"><div class="pagehead"><span>${isA4 ? "Sahifa" : "Varaq"} ${pg.k + 1 + (coverOn() ? 1 : 0)}</span><span class="pgctl">${isM ? `<button class="btn sm" data-reseed="${pg.k}" title="Boshqa variant">↻</button>` : ""}<select data-pagelay="${pg.k}" aria-label="Sahifa setkasi">${opts}</select></span></div>
       <div class="a4" style="aspect-ratio:${PW()}/${PH()}">${pg.items.map((p, j) => `<div class="frame${needsCheck(p) ? " flag" : ""}${p.hero && isM ? " hero" : ""}" draggable="true" data-cell="${pg.start + j}" data-open="alb:${p.id}" style="${cellStyle(rs[j])}">${frameHTML(p)}</div>`).join("")}
       ${(parseLay(pg.key).t === "g" ? rs.slice(pg.items.length) : []).map(r => `<div class="frame empty" style="${cellStyle(r)}"></div>`).join("")}</div></div>`);
   }
   $("pages").innerHTML = out.join("");
   $("aFlagN").textContent = A.photos.filter(needsCheck).length;
-  if (A.cover && (coverDirty || !coverThumbURL)) refreshCoverThumb();
+  if (coverOn() && (coverDirty || !coverThumbURL)) refreshCoverThumb();
 }
 
 // ================= MUQOVA =================
@@ -1461,6 +1495,8 @@ function shapePath(ctx, x, y, w, h, shape) {
   else ctx.rect(x, y, w, h);
 }
 function drawPhoto(ctx, p, bmp, fx, fy, shape) {
+  const adj = effAdj(p);
+  if (!adjZero(adj) && !ctx.canvas.__fast) bmp = adjustedSource(p, bmp, adj, ctx.getTransform().a);
   ctx.save(); shapePath(ctx, fx, fy, p.fw, p.fh, shape); ctx.clip();
   ctx.fillStyle = "#fff"; ctx.fillRect(fx, fy, p.fw, p.fh);
   ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
@@ -1622,7 +1658,7 @@ function renderBar() {
     $("saveMain").textContent = "Saqlash (ZIP)";
   } else if (m === "albom") {
     const pg = S.alb.photos.length ? albPages().length : 0; can = pg > 0;
-    sum = `<span>Rasm: <b>${S.alb.photos.length}</b></span><span>Sahifa: <b>${pg + (S.alb.cover && pg ? 1 : 0)}</b></span>${S.alb.cover && pg ? `<span class="hint">muqova bilan</span>` : ""}`;
+    sum = `<span>Rasm: <b>${S.alb.photos.length}</b></span><span>${S.alb.size === "a4" ? "Sahifa" : "10×15 varaq"}: <b>${pg + (coverOn() && pg ? 1 : 0)}</b></span>${coverOn() && pg ? `<span class="hint">muqova bilan</span>` : ""}`;
     $("saveMain").textContent = "Saqlash (ZIP)";
   } else {
     can = true; sum = `<span>A4 muqova</span>`;
@@ -1635,7 +1671,7 @@ function renderBar() {
   $("saveDir").hidden = !dirOk || m === "muqova";
   document.querySelectorAll("[data-scale]").forEach(b => { const v = +b.dataset.scale; b.disabled = v > maxScale(); b.setAttribute("aria-pressed", v === K); });
   const pw = m === "albom" ? PW() : A4W, phh = m === "albom" ? PH() : A4H;
-  $("spec").textContent = m === "polaroid" ? `${SW * K}×${SH * K} px · 15×10 sm · ${508 * K} DPI` : `A4 · ${pw * K}×${phh * K} px · ${300 * K} DPI`;
+  $("spec").textContent = m === "polaroid" ? `${SW * K}×${SH * K} px · 15×10 sm · ${508 * K} DPI` : m === "albom" ? `${SZ().label} · ${pw * K}×${phh * K} px · ${SZ().dpi * K} DPI` : `A4 · ${pw * K}×${phh * K} px · ${300 * K} DPI`;
 }
 function renderAll() {
   document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === S.mode));
@@ -1650,20 +1686,139 @@ function setMode(m) {
   try { if (location.hash !== "#" + m) history.replaceState(null, "", "#" + m); } catch (e) {}
 }
 
+// ================= Rang va yorug'lik =================
+// Har rasm uchun: umumiy (bo'lim) sozlama + rasmning o'z sozlamasi qo'shiladi. Ko'rinishda kichik nusxa, saqlashda asl rasm ishlanadi.
+const ADJ = [["br", "Yorug'lik", -100, 100], ["sh", "Soyalar", -100, 100], ["hi", "Yorug' joylar", -100, 100], ["co", "Kontrast", -100, 100], ["sa", "To'yinganlik", -100, 100], ["wa", "Iliqlik", -100, 100], ["so", "Yumshatish", 0, 100]];
+const ADJ_PRE = [["Pechat uchun", { br: 12, sh: 28, hi: -6, sa: 8 }], ["Yorqin", { br: 6, co: 12, sa: 22 }], ["Yumshoq portret", { so: 45, br: 6, co: -6, wa: 6 }], ["Tiklash", {}]];
+const adjZero = a => !a || ADJ.every(([k]) => !a[k]);
+const adjKey = a => ADJ.map(([k]) => a[k] || 0).join(",");
+function adjGlobal(p) { if (S.alb.photos.includes(p)) return S.alb.adj; if (S.pol.photos.includes(p)) return S.pol.adj; return null; }
+function effAdj(p) {
+  const g = adjGlobal(p) || {}, o = p.adj || {}, r = {};
+  for (const [k, , mn, mx] of ADJ) { const v = (g[k] || 0) + (o[k] || 0); if (v) r[k] = Math.max(mn, Math.min(mx, v)); }
+  return r;
+}
+function blurPass(s, t, w, h, r, stride, step, len, lines) {
+  const iw = 1 / (2 * r + 1);
+  for (let ln = 0; ln < lines; ln++) {
+    const base = ln * stride;
+    for (let c = 0; c < 3; c++) {
+      let acc = 0;
+      for (let i = -r; i <= r; i++) acc += s[base + Math.min(len - 1, Math.max(0, i)) * step + c];
+      for (let x = 0; x < len; x++) {
+        t[base + x * step + c] = acc * iw;
+        acc += s[base + Math.min(len - 1, x + r + 1) * step + c] - s[base + Math.max(0, x - r) * step + c];
+      }
+    }
+  }
+}
+function blurRGB(d, w, h, r) {
+  const a = new Uint8ClampedArray(d), b = new Uint8ClampedArray(d.length);
+  for (let k = 0; k < 2; k++) { blurPass(a, b, w, h, r, w * 4, 4, w, h); blurPass(b, a, w, h, r, 4, w * 4, h, w); }
+  return a;
+}
+function adjustCanvas(cv, a) {
+  if (adjZero(a)) return;
+  const ctx = cv.getContext("2d", { willReadFrequently: true }), w = cv.width, h = cv.height, im = ctx.getImageData(0, 0, w, h), d = im.data;
+  if (a.so > 0) { // terini yumshatish: xiralashgan nusxa bilan aralash, keskin chegaralar (ko'z, qosh) saqlanadi
+    const r = Math.max(1, Math.round(Math.min(w, h) * 0.008)), bl = blurRGB(d, w, h, r), k = a.so / 100 * 0.9, T = 2 * 16 * 16;
+    for (let i = 0; i < d.length; i += 4) {
+      const dl = (d[i] - bl[i]) * .3 + (d[i + 1] - bl[i + 1]) * .59 + (d[i + 2] - bl[i + 2]) * .11, wg = k * Math.exp(-(dl * dl) / T);
+      d[i] += (bl[i] - d[i]) * wg; d[i + 1] += (bl[i + 1] - d[i + 1]) * wg; d[i + 2] += (bl[i + 2] - d[i + 2]) * wg;
+    }
+  }
+  const br = (a.br || 0) / 100, sh = (a.sh || 0) / 100, hi = (a.hi || 0) / 100, co = (a.co || 0) / 100, wa = (a.wa || 0) / 100, sa = 1 + (a.sa || 0) / 100;
+  const gam = Math.pow(2, -br * 0.9), LR = new Uint8ClampedArray(256), LG = new Uint8ClampedArray(256), LB = new Uint8ClampedArray(256);
+  for (let v = 0; v < 256; v++) {
+    let x = Math.pow(v / 255, gam);
+    x += sh * 1.6 * x * (1 - x) * (1 - x);
+    x += hi * 1.6 * x * x * (1 - x);
+    x = (x - .5) * (1 + co * (co > 0 ? .8 : .6)) + .5;
+    x = Math.max(0, Math.min(1, x)) * 255;
+    LR[v] = x * (1 + wa * .10); LG[v] = x * (1 + wa * .02); LB[v] = x * (1 - wa * .10);
+  }
+  for (let i = 0; i < d.length; i += 4) {
+    let r = LR[d[i]], g = LG[d[i + 1]], b = LB[d[i + 2]];
+    if (sa !== 1) { const l = r * .299 + g * .587 + b * .114; r = l + (r - l) * sa; g = l + (g - l) * sa; b = l + (b - l) * sa; }
+    d[i] = r; d[i + 1] = g; d[i + 2] = b;
+  }
+  ctx.putImageData(im, 0, 0);
+}
+// Saqlashda: asl rasm kerakli o'lchamgacha kichraytirilib, keyin ishlanadi
+function adjustedSource(p, bmp, a, sc) {
+  const g = geom(p), tw = Math.max(1, Math.min(bmp.width, Math.ceil(g.DW * sc * 1.05))), th = Math.max(1, Math.round(bmp.height * tw / bmp.width));
+  const cv = document.createElement("canvas"); cv.width = tw; cv.height = th;
+  const c = cv.getContext("2d", { willReadFrequently: true }); c.imageSmoothingQuality = "high"; c.drawImage(bmp, 0, 0, tw, th);
+  adjustCanvas(cv, a); return cv;
+}
+const adjQ = new Set(); let adjBusy = false, adjTimer = null, adjDirty = false;
+function thumbSrc(p) {
+  const a = effAdj(p); if (adjZero(a)) return p.thumb;
+  if (p._ak === adjKey(a) && p._au) return p._au;
+  queueAdj(p); return p._au || p.thumb;
+}
+function queueAdj(p) { adjQ.add(p); if (!adjBusy) runAdjQ(); }
+async function makeAdjThumb(p) {
+  const a = effAdj(p), k = adjKey(a); if (adjZero(a) || p._ak === k) return;
+  const bmp = await thumbBmp(p), cv = document.createElement("canvas"); cv.width = bmp.width; cv.height = bmp.height;
+  cv.getContext("2d", { willReadFrequently: true }).drawImage(bmp, 0, 0); adjustCanvas(cv, a);
+  const blob = await canvasToBlob(cv, "image/jpeg", .9);
+  if (adjKey(effAdj(p)) !== k) return;
+  if (p._au) URL.revokeObjectURL(p._au); p._au = URL.createObjectURL(blob); p._ak = k;
+}
+async function runAdjQ() {
+  adjBusy = true;
+  while (adjQ.size) { const p = adjQ.values().next().value; adjQ.delete(p); try { await makeAdjThumb(p); } catch (e) {} }
+  adjBusy = false; clearTimeout(adjTimer);
+  adjTimer = setTimeout(() => { if (ED) { drawEditor(); adjDirty = true; } else renderAll(); }, 30);
+}
+const fmtAdj = v => (v > 0 ? "+" : "") + v;
+function adjPanel(el, get, o) {
+  const a = get() || {};
+  el.innerHTML = `<div class="presets">${ADJ_PRE.map((pr, i) => `<button class="btn sm" data-apre="${i}">${pr[0]}</button>`).join("")}</div>`
+    + ADJ.map(([k, l, mn, mx]) => `<label class="adjrow"><span>${l}</span><input type="range" min="${mn}" max="${mx}" step="1" value="${a[k] || 0}" data-adj="${k}" title="Ikki marta bossangiz 0 bo'ladi"><output>${fmtAdj(a[k] || 0)}</output></label>`).join("")
+    + (o.extra || "");
+  const set = (r, v) => { get()[r.dataset.adj] = v; r.value = v; r.nextElementSibling.textContent = fmtAdj(v); };
+  el.oninput = e => { const r = e.target.closest("[data-adj]"); if (!r) return; set(r, +r.value); o.input && o.input(); };
+  el.onchange = e => { if (e.target.closest("[data-adj]")) o.change(); };
+  el.ondblclick = e => { const r = e.target.closest("[data-adj]"); if (r) { set(r, 0); o.change(); } };
+  el.onclick = e => {
+    const b = e.target.closest("[data-apre]");
+    if (b) { const obj = get(); ADJ.forEach(([k]) => delete obj[k]); Object.assign(obj, ADJ_PRE[+b.dataset.apre][1]); adjPanel(el, get, o); o.change(); return; }
+    o.click && o.click(e);
+  };
+}
+function initAdjPanels() {
+  adjPanel($("adjAlb"), () => S.alb.adj, { change: () => { ls.set("adjAlb", S.alb.adj); renderAll(); } });
+  adjPanel($("adjPol"), () => S.pol.adj, { change: () => { ls.set("adjPol", S.pol.adj); renderAll(); } });
+}
+let edAdjT = null;
+function buildEdAdj() {
+  const live = () => { clearTimeout(edAdjT); edAdjT = setTimeout(() => { if (!ED) return; ED.p.edited = true; queueAdj(ED.p); }, 60); };
+  adjPanel($("adjEd"), () => (ED.p.adj = ED.p.adj || {}), { input: live, change: live,
+    extra: `<div class="btnrow"><button class="btn sm" data-adjall>Shu sozlamani hamma rasmga</button></div>`,
+    click: e => {
+      if (!e.target.closest("[data-adjall]")) return;
+      const src = Object.assign({}, ED.p.adj || {}); ED.list().forEach(q => { q.adj = Object.assign({}, src); queueAdj(q); });
+      adjDirty = true; toast(`${ED.list().length} ta rasmga qo'llandi`);
+    } });
+}
+
 // ================= Tahrirlagich =================
 let ED = null; // { p, list(), kind, circle, after() }
 function openEditor(p, opts) {
-  ED = Object.assign({ p }, opts); $("editor").hidden = false; drawEditor();
+  ED = Object.assign({ p }, opts); $("editor").hidden = false; drawEditor(); buildEdAdj();
   document.addEventListener("keydown", edKeys);
 }
 function closeEditor() {
   if (!ED) return; const e = ED; e.p.reviewed = true; ED = null; $("editor").hidden = true;
   document.removeEventListener("keydown", edKeys); e.after && e.after(e.p, true);
+  if (adjDirty) { adjDirty = false; renderAll(); }
 }
 function stepEditor(d) {
   const list = ED.list(), p = ED.p; p.reviewed = true; ED.after && ED.after(p, false);
   const n = list[list.indexOf(p) + d];
-  if (n) { ED.p = n; drawEditor(); } else closeEditor();
+  if (n) { ED.p = n; drawEditor(); buildEdAdj(); } else closeEditor();
 }
 function drawEditor() {
   const p = ED.p, list = ED.list(), i = list.indexOf(p), half = $("edHalf"), fr = $("edFrame");
@@ -1771,7 +1926,7 @@ async function renderAlbPage(cv, ctx, pg, k = 1) {
   ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, PW(), PH());
   const rs = pg.rects;
   for (let j = 0; j < pg.items.length; j++) { const p = pg.items[j]; await withFull(p, bmp => drawPhoto(ctx, p, bmp, rs[j].x, rs[j].y)); }
-  return toJpeg(cv, 300 * k);
+  return toJpeg(cv, SZ().dpi * k);
 }
 async function drawCoverFull(ctx) {
   const opened = [];
@@ -1812,9 +1967,10 @@ function jobsFor(mode) {
   }
   if (mode === "albom") {
     const pages = albPages(), jobs = []; let n = 1;
-    if (S.alb.cover && pages.length) jobs.push({ o: "p", name: `${name}_albom_${pad(n++)}_muqova${sfx}.jpg`, render: (cv, ctx) => renderAlbPage(cv, ctx, "cover", K) });
-    for (const pg of pages) jobs.push({ o: S.alb.orient, name: `${name}_albom_${pad(n++)}${sfx}.jpg`, render: (cv, ctx) => renderAlbPage(cv, ctx, pg, K) });
-    return { w: A4W * K, h: A4H * K, jobs, zip: `${name}_albom${sfx}`, prep: async () => ({}) };
+    const fz = SZ().file;
+    if (coverOn() && pages.length) jobs.push({ o: "p", name: `${name}_albom_${pad(n++)}_muqova${sfx}.jpg`, render: (cv, ctx) => renderAlbPage(cv, ctx, "cover", K) });
+    for (const pg of pages) jobs.push({ o: S.alb.orient, name: `${name}_${fz}_${pad(n++)}${sfx}.jpg`, render: (cv, ctx) => renderAlbPage(cv, ctx, pg, K) });
+    return { w: A4W * K, h: A4H * K, jobs, zip: `${name}_${fz}${sfx}`, fmt: mode === "albom" && S.alb.size === "p10" ? [100, 150] : "a4", prep: async () => ({}) };
   }
   return { w: A4W * K, h: A4H * K, jobs: [{ name: `${name}_muqova${sfx}.jpg`, render: (cv, ctx) => renderAlbPage(cv, ctx, "cover", K) }], zip: `${name}_muqova${sfx}`, prep: async () => ({}) };
 }
@@ -1866,11 +2022,12 @@ async function exportPdf(mode) {
   S.cancel = false;
   try {
     const ex = await J.prep(); showProgress("PDF tayyorlanmoqda", J.jobs.length);
-    const doc = new PDF({ orientation: J.jobs[0].o || "p", unit: "mm", format: "a4", compress: false });
+    const fmt = J.fmt || "a4", fw = fmt === "a4" ? 210 : fmt[0], fh = fmt === "a4" ? 297 : fmt[1];
+    const doc = new PDF({ orientation: J.jobs[0].o || "p", unit: "mm", format: fmt, compress: false });
     for (let k = 0; k < J.jobs.length && !S.cancel; k++) {
       const buf = await J.jobs[k].render(cv, ctx, ex), o = J.jobs[k].o || "p";
-      if (k) doc.addPage("a4", o);
-      doc.addImage(new Uint8Array(buf), "JPEG", 0, 0, o === "l" ? 297 : 210, o === "l" ? 210 : 297, undefined, "NONE");
+      if (k) doc.addPage(fmt, o);
+      doc.addImage(new Uint8Array(buf), "JPEG", 0, 0, o === "l" ? fh : fw, o === "l" ? fw : fh, undefined, "NONE");
       setProgress(k + 1, J.jobs.length, `${k + 1} / ${J.jobs.length}`);
     }
     if (S.cancel) return;
@@ -1927,7 +2084,7 @@ document.addEventListener("drop", e => {
 document.addEventListener("dragend", () => { dragCell = null; document.querySelectorAll(".dragover").forEach(x => x.classList.remove("dragover")); });
 
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-laytype],[data-reseed],[data-theme],[data-orient],[data-style],[data-sfont],[data-sreset],[data-scale],[data-open],[data-inc],[data-dec],[data-del],[data-bg],[data-delbg],#bgAdd,[data-pick],[data-clear],[data-lay],[data-goto],[data-tpl],[data-color],[data-font],[data-slotpick],[data-slotdel]");
+  const t = e.target.closest("[data-agap],[data-asize],[data-laytype],[data-reseed],[data-theme],[data-orient],[data-style],[data-sfont],[data-sreset],[data-scale],[data-open],[data-inc],[data-dec],[data-del],[data-bg],[data-delbg],#bgAdd,[data-pick],[data-clear],[data-lay],[data-goto],[data-tpl],[data-color],[data-font],[data-slotpick],[data-slotdel]");
   if (!t) return;
   const P = S.pol, byId = id => P.photos.find(p => p.id === +id);
   if (t.dataset.delbg) { e.preventDefault(); e.stopPropagation(); const id = t.dataset.delbg; bgStore("readwrite", s => s.delete(id)); P.customBgs = P.customBgs.filter(c => c.id !== id); if (P.bg.id === id) selectBg("hearts"); else renderBgs(); return; }
@@ -1945,8 +2102,8 @@ document.addEventListener("click", e => {
   if (t.dataset.inc) { const p = byId(t.dataset.inc); p.copies = Math.min(99, p.copies + 1); refreshPolCard(p); renderBar(); return; }
   if (t.dataset.dec) { const p = byId(t.dataset.dec); p.copies = Math.max(1, p.copies - 1); refreshPolCard(p); renderBar(); return; }
   if (t.dataset.del) { const id = +t.dataset.del.split(":")[1], p = byId(id); if (p) { URL.revokeObjectURL(p.thumb); P.photos = P.photos.filter(x => x !== p); } renderAll(); return; }
-  if (t.dataset.lay) { S.alb.layout = t.dataset.lay; S.alb.over = {}; ls.set("lay", S.alb.layout); renderAll(); return; }
-  if (t.dataset.laytype) { const n = parseLay(S.alb.layout).n, ty = t.dataset.laytype; S.alb.layout = ty === "g" ? String(LAYOUTS[n] ? n : 6) : ty + n; S.alb.over = {}; ls.set("lay", S.alb.layout); renderAll(); return; }
+  if (t.dataset.lay) { S.alb.layout = t.dataset.lay; S.alb.over = {}; ls.set(S.alb.size === "a4" ? "lay" : "lay10", S.alb.layout); renderAll(); return; }
+  if (t.dataset.laytype) { const n = parseLay(S.alb.layout).n, ty = t.dataset.laytype; S.alb.layout = ty === "g" ? String(LAYOUTS[n] ? n : (S.alb.size === "a4" ? 6 : 4)) : ty + n; S.alb.over = {}; ls.set(S.alb.size === "a4" ? "lay" : "lay10", S.alb.layout); renderAll(); return; }
   if (t.dataset.reseed) { const k = +t.dataset.reseed; S.alb.seed[k] = (S.alb.seed[k] || 0) + 1; renderAll(); return; }
   if (t.dataset.goto) { setMode(t.dataset.goto); return; }
   if (t.dataset.scale) { if (t.disabled) return; S.scale = +t.dataset.scale; ls.set("scale", S.scale); renderBar(); if (S.scale === 3) toast("3x: fayllar juda katta bo'ladi (sahifa ~30-40 MB). Faqat Chrome'da ishlaydi, PDF yasalmaydi."); return; }
@@ -1956,6 +2113,8 @@ document.addEventListener("click", e => {
   if (t.dataset.style) { openStyle = openStyle === t.dataset.style ? null : t.dataset.style; renderCovPanel(); return; }
   if (t.dataset.sfont) { const [k, f] = t.dataset.sfont.split("|"), st = S.cov.st[k] = S.cov.st[k] || {}; st.font = st.font === f ? undefined : f; covChanged(true); return; }
   if (t.dataset.sreset) { delete S.cov.st[t.dataset.sreset]; covChanged(true); return; }
+  if (t.dataset.agap != null) { const g = +t.dataset.agap; if (S.alb.gap[S.alb.size] !== g) { S.alb.gap[S.alb.size] = g; ls.set("agap", S.alb.gap); applySize(); mosCache.clear(); renderAll(); } return; }
+  if (t.dataset.asize) { if (S.alb.size !== t.dataset.asize) { setAlbSize(t.dataset.asize); renderAll(); } return; }
   if (t.dataset.orient) { if (S.alb.orient !== t.dataset.orient) { S.alb.orient = t.dataset.orient; ls.set("orient", S.alb.orient); renderAll(); } return; }
   if (t.dataset.slotpick) { slotTarget = +t.dataset.slotpick; $("slotFile").click(); return; }
   if (t.dataset.slotdel) { S.cov.slots[+t.dataset.slotdel] = null; renderAll(); return; }
@@ -1982,6 +2141,14 @@ $("fromAlb").onclick = () => { const tp = TPL[S.cov.tpl], used = new Set(S.cov.s
 $("decorAdd").onclick = () => $("decorFile").click();
 $("decorFile").onchange = async e => { const f = e.target.files[0]; e.target.value = ""; if (!f) return; try { const bmp = await createImageBitmap(f); S.cov.decor = { bmp, scale: 1, dy: 0 }; covChanged(true); } catch (err) { toast("Bezak rasmi ochilmadi. PNG yuklang."); } };
 $("decorDel").onclick = () => { S.cov.decor = null; covChanged(true); };
+function setAlbSize(sz) {
+  const A = S.alb; A.size = SIZES[sz] ? sz : "a4"; ls.set("asize", A.size); applySize();
+  const L = parseLay(A.layout);
+  if (L.n > SZ().max) A.layout = L.t === "g" ? "4" : L.t + "4";
+  A.over = {}; A.seed = {}; mosCache.clear();
+  if (A.size === "a4") A.layout = String(ls.get("lay", A.layout)); else A.layout = String(ls.get("lay10", A.layout));
+  const L2 = parseLay(A.layout); if (L2.n > SZ().max || (L2.t === "g" ? !LAYOUTS[L2.n] : !MOS_N.includes(L2.n))) A.layout = A.size === "a4" ? "6" : "4";
+}
 $("albCover").onchange = e => { S.alb.cover = e.target.checked; ls.set("albCover", S.alb.cover); renderAll(); };
 $("coverCanvas").addEventListener("click", e => {
   const r = e.currentTarget.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * A4W, y = (e.clientY - r.top) / r.height * A4H;
@@ -2023,9 +2190,13 @@ S.alb.cover = ls.get("albCover", true);
 S.scale = [1, 2, 3].includes(ls.get("scale", 1)) ? ls.get("scale", 1) : 1;
 const cv0 = ls.get("cov2", null); if (cv0) { Object.assign(S.cov, { tpl: TPL[cv0.tpl] ? cv0.tpl : "metrika", color: cv0.color || S.cov.color, tint: !!cv0.tint, st: cv0.st || {}, themeF: cv0.themeF || "all" }); Object.assign(S.cov.f, cv0.f || {}); if (/[\u0600-\u06FF]/.test(S.cov.f.oyat)) S.cov.f.oyat = ""; }
 S.alb.orient = ls.get("orient", "p") === "l" ? "l" : "p";
+{ const g0 = ls.get("agap", null); if (g0) ["a4", "p10"].forEach(k => { if ([0, 1, 2, 3].includes(g0[k])) S.alb.gap[k] = g0[k]; }); }
+S.alb.adj = ls.get("adjAlb", {}) || {}; S.pol.adj = ls.get("adjPol", {}) || {};
+setAlbSize(ls.get("asize", "a4"));
+initAdjPanels();
 const h0 = location.hash.slice(1); if (["polaroid", "albom", "muqova"].includes(h0)) S.mode = h0;
 renderBgs(); renderAll(); loadCustomBgs();
-fontsReady().then(() => { if (S.mode === "muqova") renderCoverPreview(); if (S.mode === "albom" && S.alb.cover) refreshCoverThumb(); });
+fontsReady().then(() => { if (S.mode === "muqova") renderCoverPreview(); if (S.mode === "albom" && coverOn()) refreshCoverThumb(); });
 })();
 </script>
 
