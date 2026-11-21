@@ -1003,19 +1003,43 @@ async function decode(file) {
 }
 const canvasToBlob = (cv, type, q) => new Promise((res, rej) => cv.toBlob(b => b ? res(b) : rej(new Error("toBlob")), type, q));
 const isImg = f => f.type.startsWith("image/") || /\.(jpe?g|png|webp|heic|heif|gif|bmp)$/i.test(f.name);
+// iPhone HEIC rasmlari: brauzer o'zi ocholmasa (Chrome, Windows), shu yerda JPG ga o'giriladi (heic-to, LGPL). Kutubxona faqat HEIC uchragandagina yuklanadi.
+const isHeicF = f => /hei[cf]/i.test(f.type) || /\.(heic|heif)$/i.test(f.name);
+let heicLib = null;
+function loadHeic() {
+  if (!heicLib) heicLib = new Promise((res, rej) => {
+    const srcs = ["/studio/heic-to.js", "https://cdn.jsdelivr.net/npm/heic-to@1.6.7/dist/iife/heic-to.js"];
+    const next = () => {
+      if (window.HeicTo) return res(window.HeicTo);
+      const src = srcs.shift(); if (!src) return rej(new Error("HEIC kutubxonasi yuklanmadi"));
+      const sc = document.createElement("script"); sc.src = src; sc.onload = next; sc.onerror = next; document.head.appendChild(sc);
+    };
+    next();
+  }).catch(e => { heicLib = null; throw e; });
+  return heicLib;
+}
+async function heicToJpeg(f) {
+  const H = await loadHeic(), blob = await H({ blob: f, type: "image/jpeg", quality: 0.95 });
+  return new File([blob], f.name.replace(/\.(heic|heif)$/i, "") + ".jpg", { type: "image/jpeg", lastModified: f.lastModified });
+}
 
 async function readFiles(list) {
   const files = [...list].filter(isImg), out = [], errors = [];
   if (!files.length) return { out, errors };
   S.cancel = false;
-  showProgress("Rasmlar o'qilmoqda", files.length);
+  const nHeic = files.filter(isHeicF).length;
+  showProgress(nHeic ? `Rasmlar o'qilmoqda (${nHeic} ta HEIC JPG ga o'girilmoqda)` : "Rasmlar o'qilmoqda", files.length);
+  if (nHeic) loadHeic().catch(() => {});
   let done = 0, i = 0;
   const worker = async () => {
     const cv = document.createElement("canvas"), ctx = cv.getContext("2d");
     while (i < files.length && !S.cancel) {
-      const f = files[i++];
+      let f = files[i++];
       try {
-        const bmp = await decode(f), w = bmp.width, h = bmp.height, sc = Math.min(1, THUMB / Math.max(w, h));
+        let bmp;
+        try { bmp = await decode(f); }
+        catch (e1) { f = await heicToJpeg(f); bmp = await decode(f); } // HEIC yoki brauzer ocholmagan format
+        const w = bmp.width, h = bmp.height, sc = Math.min(1, THUMB / Math.max(w, h));
         cv.width = Math.round(w * sc); cv.height = Math.round(h * sc);
         ctx.imageSmoothingQuality = "high"; ctx.drawImage(bmp, 0, 0, cv.width, cv.height);
         bmp.close && bmp.close();
@@ -1032,7 +1056,7 @@ async function readFiles(list) {
 }
 function showErrors(mode, errors) {
   const e = document.querySelector(`[data-errs="${mode}"]`); if (!e) return;
-  if (errors.length) { e.hidden = false; e.textContent = `${errors.length} ta fayl ochilmadi (ehtimol HEIC formatda yoki buzilgan): ${errors.slice(0, 8).join(", ")}${errors.length > 8 ? " …" : ""}. Ularni JPG qilib qayta yuklang.`; }
+  if (errors.length) { e.hidden = false; e.textContent = `${errors.length} ta fayl ochilmadi (fayl buzilgan yoki rasm emas): ${errors.slice(0, 8).join(", ")}${errors.length > 8 ? " …" : ""}. Internet bor-yo'qligini tekshirib, shu rasmlarni qayta tanlab ko'ring.`; }
   else e.hidden = true;
 }
 async function importTo(mode, list) {
